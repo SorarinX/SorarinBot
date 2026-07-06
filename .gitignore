@@ -23,6 +23,7 @@ Thumbs.db
 # Data
 *.db
 token.json
+config.yaml
 config.yaml.bak
 config.yaml.tmp
 
