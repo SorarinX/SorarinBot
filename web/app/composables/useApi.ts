@@ -62,6 +62,13 @@ export function useApi<T>(
 
   const refresh = () => execute()
 
+  // Re-fetch when url changes (for computed/ref urls)
+  if (typeof url !== 'string') {
+    watch(url, () => {
+      if (immediate) execute()
+    })
+  }
+
   if (immediate) {
     execute()
   }

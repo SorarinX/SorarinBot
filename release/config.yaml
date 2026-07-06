@@ -1,0 +1,23 @@
+admin:
+    password_hash: ""
+wechat:
+    strict_login: false
+    token_file: ./token.json
+    auto_login: true
+    trigger_prefix: ""
+web:
+    listen: localhost:8080
+chat:
+    context_enabled: true
+    max_context: 3
+    image_ttl: 300
+plugins:
+    enabled: false
+database:
+    path: ./data.db
+provider:
+    name: openaicompat
+    base_url: ""
+    model: ""
+    api_key: ""
+prompt: "You are a helpful AI assistant."

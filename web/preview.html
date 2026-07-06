@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SorarinBot — 预览</title>
+<link href="https://cdn.jsdelivr.net/npm/@nuxt/ui@4/dist/nuxt-ui.css" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #f8fafc;
+  --sidebar-bg: #111827;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --primary: #3b82f6;
+  --green: #22c55e;
+  --radius: 12px;
+}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+/* Sidebar */
+.sidebar { width: 240px; background: var(--sidebar-bg); color: #fff; display: flex; flex-direction: column; flex-shrink: 0; }
+.sidebar-brand { padding: 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.sidebar-brand img { width: 28px; height: 28px; border-radius: 6px; }
+.sidebar-brand span { font-size: 15px; font-weight: 600; }
+.sidebar-nav { flex: 1; padding: 12px; display: flex; flex-direction: column; gap: 2px; }
+.nav-group { margin-bottom: 8px; }
+.nav-group-label { font-size: 11px; color: rgba(255,255,255,0.3); padding: 8px 12px 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; color: rgba(255,255,255,0.55); font-size: 14px; cursor: pointer; transition: all 0.15s; text-decoration: none; }
+.nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
+.nav-item.active { background: rgba(59,130,246,0.15); color: #60a5fa; }
+.nav-item .icon { width: 18px; text-align: center; font-size: 15px; }
+.sidebar-footer { padding: 12px; border-top: 1px solid rgba(255,255,255,0.06); }
+.sidebar-status { display: flex; align-items: center; gap: 8px; padding: 8px 12px; font-size: 13px; color: rgba(255,255,255,0.45); }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px rgba(34,197,94,0.4); }
+/* Main */
+.main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.header { display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; background: rgba(255,255,255,0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); min-height: 53px; }
+.header h1 { font-size: 17px; font-weight: 600; }
+.content { flex: 1; overflow-y: auto; padding: 20px 24px; }
+/* Cards */
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+.stat-card { background: #fff; border-radius: var(--radius); padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.stat-label { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.stat-value { font-size: 26px; font-weight: 650; letter-spacing: -0.03em; }
+.stat-detail { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+.stat-icon { width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+.stat-icon.green { background: #f0fdf4; color: var(--green); }
+.stat-icon.blue { background: #eff6ff; color: var(--primary); }
+.stat-icon.orange { background: #fffbeb; color: #f59e0b; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.section { background: #fff; border-radius: var(--radius); box-shadow: 0 1px 3px rgba(0,0,0,0.06); overflow: hidden; }
+.section-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid var(--border); }
+.section-header h2 { font-size: 14px; font-weight: 600; }
+.section-body { padding: 12px 20px; }
+.badge { font-size: 12px; padding: 2px 8px; border-radius: 6px; background: #f1f5f9; color: var(--text-muted); }
+.session-item { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: 14px; }
+.session-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+.log-line { font-family: 'SF Mono', Consolas, monospace; font-size: 12px; line-height: 1.7; color: var(--text-muted); }
+/* Table */
+.table { width: 100%; border-collapse: collapse; }
+.table th { text-align: left; padding: 8px 12px; font-size: 13px; font-weight: 500; color: var(--text-muted); border-bottom: 1px solid var(--border); background: var(--bg); }
+.table td { padding: 8px 12px; font-size: 14px; border-bottom: 1px solid var(--border); }
+.table tr:last-child td { border-bottom: none; }
+/* Chat */
+.chat-layout { display: flex; height: calc(100vh - 100px); }
+.chat-main { flex: 1; display: flex; flex-direction: column; }
+.chat-messages { flex: 1; overflow-y: auto; padding: 20px; }
+.msg { display: flex; gap: 10px; margin-bottom: 16px; }
+.msg.user { justify-content: flex-end; }
+.msg .avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+.msg.bot .avatar { background: #eff6ff; color: var(--primary); }
+.msg.user .avatar { background: #f1f5f9; color: var(--text-muted); }
+.msg .bubble { max-width: 70%; padding: 10px 14px; border-radius: 12px; font-size: 14px; line-height: 1.5; }
+.msg.bot .bubble { background: #f1f5f9; }
+.msg.user .bubble { background: var(--primary); color: #fff; }
+.msg .time { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+.chat-input { border-top: 1px solid var(--border); padding: 12px 20px; display: flex; gap: 8px; }
+.chat-input input { flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 14px; outline: none; }
+.chat-input input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(59,130,246,0.1); }
+.chat-sidebar { width: 280px; border-left: 1px solid var(--border); padding: 16px; overflow-y: auto; }
+.param-group { margin-bottom: 16px; }
+.param-group h3 { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+.param-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.param-label { font-size: 12px; color: var(--text-muted); }
+.param-value { font-size: 12px; font-family: monospace; }
+input[type="range"] { width: 100%; accent-color: var(--primary); }
+.btn { padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border); background: #fff; font-size: 13px; cursor: pointer; }
+.btn:hover { background: var(--bg); }
+.btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+.btn-primary:hover { background: #2563eb; }
+/* Settings */
+.settings-form { max-width: 600px; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 13px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 14px; outline: none; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(59,130,246,0.1); }
+.form-group textarea { min-height: 100px; resize: vertical; font-family: inherit; }
+.form-actions { display: flex; gap: 8px; margin-top: 16px; }
+.test-result { margin-top: 12px; padding: 12px; border-radius: 8px; font-size: 13px; }
+.test-result.ok { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+/* Responsive */
+@media (max-width: 1024px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } .grid-2 { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { .sidebar { display: none; } .stats-grid { grid-template-columns: 1fr; } }
+/* Page visibility */
+.page { display: none; }
+.page.active { display: block; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <img src="logo.png" alt="SorarinBot" onerror="this.style.display='none'">
+    <span>SorarinBot</span>
+  </div>
+  <nav class="sidebar-nav">
+    <a class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')">
+      <span class="icon">◉</span> 仪表盘
+    </a>
+    <a class="nav-item" data-page="chat" onclick="showPage('chat')">
+      <span class="icon">◆</span> 聊天会话
+    </a>
+    <a class="nav-item" data-page="history" onclick="showPage('history')">
+      <span class="icon">▣</span> 消息记录
+    </a>
+    <a class="nav-item" data-page="logs" onclick="showPage('logs')">
+      <span class="icon">⊞</span> 系统日志
+    </a>
+    <a class="nav-item" data-page="settings" onclick="showPage('settings')">
+      <span class="icon">◐</span> 配置
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-status">
+      <span class="dot"></span>
+      <span>运行中</span>
+    </div>
+  </div>
+</aside>
+
+<!-- Main -->
+<div class="main">
+  <header class="header">
+    <h1 id="pageTitle">仪表盘</h1>
+    <span style="font-size:13px;color:var(--text-muted)" id="pageMeta">实时更新 · 5s</span>
+  </header>
+
+  <div class="content">
+
+    <!-- Dashboard -->
+    <div id="page-dashboard" class="page active">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label"><span class="stat-icon green">●</span> 运行状态</div>
+          <div class="stat-value">运行中</div>
+          <div class="stat-detail">启动于 2026-07-06 12:00:00</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label"><span class="stat-icon blue">◇</span> 当前 Provider</div>
+          <div class="stat-value" style="font-size:18px;margin-top:4px">openaicompat</div>
+          <div class="stat-detail">mimo-v2.5-pro</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label"><span class="stat-icon blue">↗</span> 今日消息</div>
+          <div class="stat-value">42</div>
+          <div class="stat-detail">总计 1,287 条记录</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label"><span class="stat-icon orange">∑</span> Token 消耗</div>
+          <div class="stat-value">128,450</div>
+          <div class="stat-detail">包含 prompt + completion</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label"><span class="stat-icon green">✓</span> 响应成功率</div>
+          <div class="stat-value" style="font-size:18px;margin-top:4px">100%</div>
+          <div class="stat-detail">基于 1,287 次对话</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label"><span class="stat-icon blue">⊞</span> 最近日志</div>
+          <div class="stat-value" style="font-size:18px;margin-top:4px">156 条</div>
+          <div class="stat-detail">切换至日志页查看详情</div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="section">
+          <div class="section-header"><h2>活跃会话</h2><span class="badge">3 个</span></div>
+          <div class="section-body">
+            <div class="session-item"><span class="session-dot"></span> 张三</div>
+            <div class="session-item"><span class="session-dot"></span> 李四</div>
+            <div class="session-item"><span class="session-dot"></span> 王五</div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-header"><h2>最近日志</h2><span class="badge">156 条</span></div>
+          <div class="section-body">
+            <div class="log-line">2026-07-06 12:00:01 INFO provider: openaicompat, model=mimo-v2.5-pro</div>
+            <div class="log-line">2026-07-06 12:00:02 INFO web UI at http://localhost:8080</div>
+            <div class="log-line">2026-07-06 12:00:05 INFO [scan] QR code displayed</div>
+            <div class="log-line">2026-07-06 12:01:30 INFO [text] 张三: 你好</div>
+            <div class="log-line">2026-07-06 12:01:32 INFO [text] reply to 张三 (1.2s)</div>
+            <div class="log-line">2026-07-06 12:05:15 INFO [text] 李四: 帮我写首诗</div>
+            <div class="log-line">2026-07-06 12:05:18 INFO [text] reply to 李四 (2.8s)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat -->
+    <div id="page-chat" class="page">
+      <div class="chat-layout">
+        <div class="chat-main">
+          <div class="chat-messages">
+            <div class="msg user">
+              <div class="bubble">你好，帮我介绍一下你自己</div>
+              <div class="avatar">👤</div>
+            </div>
+            <div class="msg bot">
+              <div class="avatar">🤖</div>
+              <div class="bubble">你好！我是 SorarinBot，一个微信 AI 助手。我可以帮你回答问题、写文章、翻译、编程等各种任务。有什么我可以帮你的吗？</div>
+            </div>
+            <div class="msg user">
+              <div class="bubble">帮我写一首关于春天的诗</div>
+              <div class="avatar">👤</div>
+            </div>
+            <div class="msg bot">
+              <div class="avatar">🤖</div>
+              <div class="bubble">春风拂面暖阳斜，<br>桃花枝头笑语哗。<br>燕子归来寻旧巢，<br>柳絮飘飞似雪花。<br><br>溪水潺潺流不尽，<br>青山隐隐映朝霞。<br>人间四月芳菲尽，<br>唯有春光最可嘉。</div>
+            </div>
+            <div class="msg user">
+              <div class="bubble">写得真好！再写一首关于大海的</div>
+              <div class="avatar">👤</div>
+            </div>
+            <div class="msg bot">
+              <div class="avatar">🤖</div>
+              <div class="bubble">碧波万顷连天际，<br>海鸥翱翔逐浪飞。<br>潮起潮落皆有时，<br>浩瀚无垠心自归。<br><br>沙滩细软如金毯，<br>贝壳斑斓映日辉。<br>聆听涛声如诉语，<br>大海深处有诗情。</div>
+            </div>
+          </div>
+          <div class="chat-input">
+            <input type="text" placeholder="输入消息...">
+            <button class="btn btn-primary">发送</button>
+          </div>
+        </div>
+        <div class="chat-sidebar">
+          <div class="param-group">
+            <h3>模型</h3>
+            <select style="width:100%;border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:13px">
+              <option>mimo-v2.5-pro</option>
+              <option>gpt-4o</option>
+              <option>deepseek-chat</option>
+              <option>claude-sonnet-4-20250514</option>
+            </select>
+          </div>
+          <div class="param-group">
+            <h3>System Prompt</h3>
+            <textarea style="width:100%;border:1px solid var(--border);border-radius:8px;padding:8px;font-size:12px;min-height:80px;resize:vertical">You are a helpful AI assistant.</textarea>
+          </div>
+          <div class="param-group">
+            <h3>参数</h3>
+            <div class="param-row">
+              <span class="param-label">Temperature</span>
+              <span class="param-value">0.7</span>
+            </div>
+            <input type="range" min="0" max="2" step="0.1" value="0.7">
+            <div class="param-row" style="margin-top:8px">
+              <span class="param-label">Top P</span>
+              <span class="param-value">1.0</span>
+            </div>
+            <input type="range" min="0" max="1" step="0.05" value="1">
+            <div class="param-row" style="margin-top:8px">
+              <span class="param-label">Max Tokens</span>
+              <span class="param-value">2048</span>
+            </div>
+            <input type="number" value="2048" style="width:100%;border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px">
+          </div>
+          <div class="param-group">
+            <h3>状态</h3>
+            <div class="param-row">
+              <span class="param-label">Context</span>
+              <span class="badge" style="background:#f0fdf4;color:#166534">On</span>
+            </div>
+            <div class="param-row">
+              <span class="param-label">Context 轮数</span>
+              <span class="param-value">3</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div id="page-history" class="page">
+      <div class="section">
+        <div class="section-header"><h2>消息记录</h2></div>
+        <div style="overflow-x:auto">
+          <table class="table">
+            <thead>
+              <tr><th>发送者</th><th>消息</th><th>回复</th><th>模型</th><th>Token</th><th>时间</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>张三</td><td>你好</td><td>你好！有什么我可以帮你的吗？</td><td>mimo-v2.5-pro</td><td>156</td><td>2026-07-06 12:01:30</td></tr>
+              <tr><td>李四</td><td>帮我写首诗</td><td>春风拂面暖阳斜，桃花枝头笑语哗...</td><td>mimo-v2.5-pro</td><td>342</td><td>2026-07-06 12:05:15</td></tr>
+              <tr><td>王五</td><td>今天天气怎么样</td><td>抱歉，我无法获取实时天气信息...</td><td>mimo-v2.5-pro</td><td>89</td><td>2026-07-06 12:10:22</td></tr>
+              <tr><td>张三</td><td>推荐一本书</td><td>我推荐《百年孤独》...</td><td>mimo-v2.5-pro</td><td>234</td><td>2026-07-06 12:15:45</td></tr>
+              <tr><td>李四</td><td>翻译成英文</td><td>Spring breeze caresses the face...</td><td>mimo-v2.5-pro</td><td>178</td><td>2026-07-06 12:20:30</td></tr>
+              <tr><td>赵六</td><td>解释量子计算</td><td>量子计算是一种利用量子力学原理...</td><td>mimo-v2.5-pro</td><td>456</td><td>2026-07-06 12:25:10</td></tr>
+              <tr><td>张三</td><td>写个Python脚本</td><td>好的，这是一个简单的Python脚本...</td><td>mimo-v2.5-pro</td><td>567</td><td>2026-07-06 12:30:55</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="padding:12px 20px;display:flex;justify-content:space-between;border-top:1px solid var(--border)">
+          <span style="font-size:13px;color:var(--text-muted)">共 1,287 条记录</span>
+          <div style="display:flex;gap:4px">
+            <button class="btn" disabled>上一页</button>
+            <button class="btn">下一页</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Logs -->
+    <div id="page-logs" class="page">
+      <div class="section">
+        <div class="section-header">
+          <h2>系统日志</h2>
+          <button class="btn">刷新</button>
+        </div>
+        <div class="section-body" style="font-family:monospace;font-size:12px;line-height:1.8;max-height:calc(100vh - 200px);overflow-y:auto">
+          <div>2026-07-06 12:00:01 INFO provider: openaicompat, model=mimo-v2.5-pro, vision=false</div>
+          <div>2026-07-06 12:00:02 INFO web UI at http://localhost:8080</div>
+          <div>2026-07-06 12:00:03 INFO database opened: ./data.db</div>
+          <div>2026-07-06 12:00:05 INFO [scan] QR code displayed, scan with WeChat</div>
+          <div>2026-07-06 12:01:28 INFO [login] WeChat login successful</div>
+          <div>2026-07-06 12:01:30 INFO [text] 张三: 你好</div>
+          <div>2026-07-06 12:01:32 INFO [text] reply to 张三 (1.2s, 156 tokens)</div>
+          <div>2026-07-06 12:05:15 INFO [text] 李四: 帮我写首诗</div>
+          <div>2026-07-06 12:05:18 INFO [text] reply to 李四 (2.8s, 342 tokens)</div>
+          <div>2026-07-06 12:10:22 INFO [text] 王五: 今天天气怎么样</div>
+          <div>2026-07-06 12:10:23 INFO [text] reply to 王五 (0.9s, 89 tokens)</div>
+          <div>2026-07-06 12:15:45 INFO [text] 张三: 推荐一本书</div>
+          <div>2026-07-06 12:15:47 INFO [text] reply to 张三 (2.1s, 234 tokens)</div>
+          <div>2026-07-06 12:20:30 INFO [text] 李四: 翻译成英文</div>
+          <div>2026-07-06 12:20:32 INFO [text] reply to 李四 (1.5s, 178 tokens)</div>
+          <div>2026-07-06 12:25:10 INFO [text] 赵六: 解释量子计算</div>
+          <div>2026-07-06 12:25:14 INFO [text] reply to 赵六 (3.6s, 456 tokens)</div>
+          <div>2026-07-06 12:30:55 INFO [text] 张三: 写个Python脚本</div>
+          <div>2026-07-06 12:30:59 INFO [text] reply to 张三 (4.2s, 567 tokens)</div>
+          <div>2026-07-06 12:35:20 INFO [image] cached for 王五, no @, no reply</div>
+          <div>2026-07-06 12:40:00 INFO session cleanup: 0 expired</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div id="page-settings" class="page">
+      <div class="settings-form">
+        <div class="section" style="margin-bottom:20px">
+          <div class="section-header"><h2>Provider</h2></div>
+          <div class="section-body">
+            <div class="form-group">
+              <label>服务商</label>
+              <select>
+                <option>OpenAI Compatible</option>
+                <option>MiniMax</option>
+                <option>DeepSeek</option>
+                <option>OpenAI</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Base URL</label>
+              <input type="text" value="https://token-plan-cn.xiaomimimo.com/v1">
+            </div>
+            <div class="form-group">
+              <label>Model</label>
+              <div style="display:flex;gap:8px">
+                <input type="text" value="mimo-v2.5-pro" style="flex:1">
+                <button class="btn">获取模型列表</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>API Key</label>
+              <div style="display:flex;gap:8px">
+                <input type="password" value="tp-clxe2z8ovdmzcvn4u7ap6bpy1snh8m47bh5q8of5t37lyf5b" style="flex:1">
+                <button class="btn">显示</button>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-primary">保存 Provider</button>
+              <button class="btn">测试连接</button>
+            </div>
+            <div class="test-result ok" style="margin-top:12px">
+              <strong>✓ 连接成功</strong><br>
+              <span style="font-size:12px;opacity:0.8">Provider: openaicompat<br>Model: mimo-v2.5-pro<br>延迟: 214ms</span>
+            </div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-header"><h2>系统提示词</h2></div>
+          <div class="section-body">
+            <div class="form-group">
+              <label>System Prompt</label>
+              <textarea rows="8">You are a helpful AI assistant. You are knowledgeable, friendly, and always try to provide accurate and helpful responses.</textarea>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-primary">保存提示词</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelector('[data-page="' + page + '"]').classList.add('active');
+  const titles = { dashboard: '仪表盘', chat: '聊天会话', history: '消息记录', logs: '系统日志', settings: '配置' };
+  const metas = { dashboard: '实时更新 · 5s', chat: '', history: '', logs: '', settings: '' };
+  document.getElementById('pageTitle').textContent = titles[page];
+  document.getElementById('pageMeta').textContent = metas[page];
+}
+</script>
+</body>
+</html>
