@@ -20,6 +20,19 @@ export default defineNuxtConfig({
     buildAssetsDir: 'assets/'
   },
 
+  vite: {
+    build: {
+      rollupOptions: {
+        output: {
+          // Go embed ignores files starting with _ — force all chunks to start with c
+          chunkFileNames: 'assets/c[hash].js',
+          entryFileNames: 'assets/e[hash].js',
+          assetFileNames: 'assets/a[hash][extname]',
+        }
+      }
+    }
+  },
+
   routeRules: {
     '/api/**': {
       cors: true

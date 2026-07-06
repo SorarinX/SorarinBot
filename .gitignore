@@ -30,7 +30,6 @@ config.yaml.tmp
 web/node_modules/
 web/.nuxt/
 web/.output/
-web/dist/assets/
 
 # Logs
 *.log
