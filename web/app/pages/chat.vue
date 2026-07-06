@@ -1,6 +1,7 @@
 <script setup lang="ts">
-const { status } = useStatus()
-const { messages } = useHistory(20)
+const { status, refresh: refreshStatus } = useStatus()
+const { messages, refresh: refreshHistory } = useHistory(50)
+const scrollRef = ref<HTMLElement>()
 
 const sessions = computed(() => status.value?.sessions ?? [])
 
@@ -25,9 +26,34 @@ const sessionList = computed(() => {
 const selectedUser = ref('')
 
 const userMessages = computed(() => {
-  if (!selectedUser.value) return messages.value as Record<string, unknown>[]
-  return (messages.value as Record<string, unknown>[]).filter(m => m.sender === selectedUser.value)
+  const list = selectedUser.value
+    ? (messages.value as Record<string, unknown>[]).filter(m => m.sender === selectedUser.value)
+    : messages.value as Record<string, unknown>[]
+  // Oldest first, newest at bottom
+  return [...list].reverse()
 })
+
+// Auto-scroll to bottom
+watch(userMessages, () => {
+  nextTick(() => {
+    if (scrollRef.value) {
+      scrollRef.value.scrollTop = scrollRef.value.scrollHeight
+    }
+  })
+}, { immediate: true })
+
+// Auto-refresh every 10s
+onMounted(() => {
+  setInterval(() => {
+    refreshStatus()
+    refreshHistory()
+  }, 10000)
+})
+
+async function handleRefresh() {
+  await refreshStatus()
+  await refreshHistory()
+}
 </script>
 
 <template>
@@ -36,6 +62,17 @@ const userMessages = computed(() => {
       <UDashboardNavbar title="聊天会话" :ui="{ right: 'gap-3' }">
         <template #leading>
           <UDashboardSidebarCollapse />
+        </template>
+        <template #right>
+          <UButton
+            icon="i-lucide-refresh-cw"
+            variant="outline"
+            color="neutral"
+            size="sm"
+            @click="handleRefresh"
+          >
+            刷新
+          </UButton>
         </template>
       </UDashboardNavbar>
     </template>
@@ -77,48 +114,33 @@ const userMessages = computed(() => {
 
         <!-- Messages -->
         <div class="flex-1 flex flex-col min-w-0">
-          <div class="flex-1 overflow-y-auto p-4 space-y-4">
-            <div
-              v-for="msg in userMessages"
-              :key="msg.id"
-              class="flex gap-3"
-              :class="msg.sender === selectedUser && selectedUser ? 'justify-start' : ''"
-            >
-              <div
-                v-if="msg.bot_reply"
-                class="size-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0"
-              >
-                <UIcon name="i-lucide-bot" class="size-4 text-primary" />
-              </div>
-              <div
-                v-if="msg.bot_reply"
-                class="max-w-[70%] rounded-lg px-3 py-2 bg-elevated"
-              >
-                <p class="text-sm whitespace-pre-wrap">{{ msg.bot_reply }}</p>
-                <div class="flex items-center gap-2 mt-1">
-                  <span class="text-xs text-muted">{{ msg.created_at }}</span>
-                  <span class="text-xs text-muted">{{ msg.total_tokens }} tokens</span>
+          <div ref="scrollRef" class="flex-1 overflow-y-auto p-4 space-y-4">
+            <template v-for="msg in userMessages" :key="msg.id">
+              <!-- User message (right, first) -->
+              <div v-if="msg.user_message" class="flex gap-3 items-end justify-end">
+                <div class="rounded-lg px-3 py-2 bg-primary text-primary-foreground" style="max-width: fit-content;">
+                  <p class="text-sm whitespace-pre-wrap">{{ msg.user_message }}</p>
+                  <div class="flex items-center gap-2 mt-1 justify-end">
+                    <span class="text-xs opacity-60">{{ msg.sender }}</span>
+                  </div>
+                </div>
+                <div class="size-8 rounded-full bg-neutral/20 flex items-center justify-center shrink-0">
+                  <UIcon name="i-lucide-user" class="size-4 text-muted" />
                 </div>
               </div>
 
-              <div class="flex-1" />
-
-              <div
-                v-if="msg.user_message"
-                class="max-w-[70%] rounded-lg px-3 py-2 bg-primary text-primary-foreground"
-              >
-                <p class="text-sm whitespace-pre-wrap">{{ msg.user_message }}</p>
-                <div class="flex items-center gap-2 mt-1 justify-end">
-                  <span class="text-xs opacity-60">{{ msg.sender }}</span>
+              <!-- Bot reply (left, below user message) -->
+              <div v-if="msg.bot_reply" class="flex gap-3 items-end">
+                <img src="/logo.png" alt="SorarinBot" class="size-8 rounded-full shrink-0 object-cover" />
+                <div class="rounded-lg px-3 py-2 bg-elevated max-w-[70%]">
+                  <p class="text-sm whitespace-pre-wrap">{{ msg.bot_reply }}</p>
+                  <div class="flex items-center gap-2 mt-1">
+                    <span class="text-xs text-muted">{{ msg.created_at }}</span>
+                    <span class="text-xs text-muted">{{ msg.total_tokens }} tokens</span>
+                  </div>
                 </div>
               </div>
-              <div
-                v-if="msg.user_message"
-                class="size-8 rounded-full bg-neutral/20 flex items-center justify-center shrink-0"
-              >
-                <UIcon name="i-lucide-user" class="size-4 text-muted" />
-              </div>
-            </div>
+            </template>
 
             <div v-if="userMessages.length === 0" class="flex items-center justify-center h-full">
               <div class="text-center space-y-2">

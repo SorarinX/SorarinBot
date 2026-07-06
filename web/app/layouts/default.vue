@@ -15,11 +15,6 @@ const links = [[{
   to: '/chat',
   onSelect: () => { open.value = false }
 }, {
-  label: '消息记录',
-  icon: 'i-lucide-history',
-  to: '/history',
-  onSelect: () => { open.value = false }
-}, {
   label: '系统日志',
   icon: 'i-lucide-file-text',
   to: '/logs',

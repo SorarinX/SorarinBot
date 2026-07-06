@@ -23,10 +23,16 @@ var replied sync.Map
 
 // Adapter wraps the openwechat bot and registers handlers.
 type Adapter struct {
-	Bot      *ow.Bot
-	Handler  *message.Handler
-	Sessions *session.Manager
-	ctx      context.Context
+	Bot            *ow.Bot
+	Handler        *message.Handler
+	Sessions       *session.Manager
+	ctx            context.Context
+	onLoginSuccess func()
+}
+
+// SetOnLoginSuccess sets the callback for successful login.
+func (a *Adapter) SetOnLoginSuccess(fn func()) {
+	a.onLoginSuccess = fn
 }
 
 // NewAdapter creates the wechat adapter.
@@ -40,6 +46,17 @@ func NewAdapter(ctx context.Context, cfg *config.Config, handler *message.Handle
 	}
 	bot.UUIDCallback = a.onQR
 	bot.MessageHandler = a.dispatch()
+
+	// 扫码登录成功后隐藏终端窗口
+	bot.LoginCallBack = func(resp ow.CheckLoginResponse) {
+		logrus.Infof("[login] WeChat login successful")
+		// hideConsoleWindow is defined in main package platform_windows.go
+		// We signal via a channel instead
+		if a.onLoginSuccess != nil {
+			a.onLoginSuccess()
+		}
+	}
+
 	return a, nil
 }
 
@@ -68,7 +85,18 @@ func (a *Adapter) dispatch() ow.MessageHandler {
 	dispatcher.OnImage(a.onImage)
 	dispatcher.OnEmoticon(a.onImage)
 
+	// 拍一拍 (tickle/pat) — 只回复拍自己的
+	dispatcher.RegisterHandler(
+		func(msg *ow.Message) bool { return msg.IsTickledMe() },
+		a.onTickle,
+	)
+
 	return dispatcher.AsMessageHandler()
+}
+
+func (a *Adapter) onTickle(ctx *ow.MessageContext) {
+	logrus.Infof("[tickle] detected in group=%v, replying", ctx.IsSendByGroup())
+	ctx.ReplyText(randomTrickReply())
 }
 
 func (a *Adapter) checkNeedReply(msg *ow.Message) (need bool, isimg bool) {
@@ -77,20 +105,27 @@ func (a *Adapter) checkNeedReply(msg *ow.Message) (need bool, isimg bool) {
 		return false, false
 	}
 	if !msg.IsSendByGroup() {
+		// 私聊：非公众号消息都回复
 		sender, _ := msg.Sender()
 		if sender != nil && sender.IsMP() {
 			return false, false
 		}
+		logrus.Debugf("[check] private chat from %s, reply", sender.NickName)
 		return true, false
 	}
+	// 群聊：只回复 @机器人 或 trigger_prefix
 	if msg.IsAt() {
 		msg.Content = strings.Replace(msg.Content, "@"+msg.Owner().NickName, "", 1)
 		msg.Content = strings.TrimSpace(msg.Content)
+		logrus.Debugf("[check] group @mention, reply")
 		return true, false
 	}
-	if strings.HasPrefix(msg.Content, config.Snapshot().WeChat.TriggerPrefix) {
+	prefix := config.Snapshot().WeChat.TriggerPrefix
+	if prefix != "" && strings.HasPrefix(msg.Content, prefix) {
+		logrus.Debugf("[check] group trigger prefix '%s', reply", prefix)
 		return true, false
 	}
+	logrus.Debugf("[check] group msg ignored (no @, no prefix)")
 	return false, false
 }
 
@@ -100,21 +135,11 @@ func (a *Adapter) onText(ctx *ow.MessageContext) {
 		return
 	}
 
-	// Handle tickle and join group inside the text handler
-	if ctx.IsTickled() {
-		ctx.ReplyText(randomTrickReply())
-		return
-	}
+	// Handle join group
 	if ctx.IsJoinGroup() {
 		ctx.ReplyText("欢迎欢迎～")
 		return
 	}
-
-	sender, _ := ctx.Sender()
-	if ctx.IsSendByGroup() {
-		sender, _ = ctx.SenderInGroup()
-	}
-	nick := sender.NickName
 
 	// Deduplicate: same msg id already replied
 	msgID := ctx.MsgId
@@ -123,7 +148,7 @@ func (a *Adapter) onText(ctx *ow.MessageContext) {
 	}
 	if msgID != "" {
 		if _, loaded := replied.LoadOrStore(msgID, true); loaded {
-			logrus.Debugf("[text] duplicate msgId=%s from %s, skipping", msgID, nick)
+			logrus.Debugf("[text] duplicate msgId=%s, skipping", msgID)
 			return
 		}
 	}
@@ -132,6 +157,12 @@ func (a *Adapter) onText(ctx *ow.MessageContext) {
 	if !need {
 		return
 	}
+
+	sender, _ := ctx.Sender()
+	if ctx.IsSendByGroup() {
+		sender, _ = ctx.SenderInGroup()
+	}
+	nick := sender.NickName
 
 	// leak check
 	for _, kw := range message.LeakKeywords {
@@ -143,6 +174,9 @@ func (a *Adapter) onText(ctx *ow.MessageContext) {
 
 	txt := ctx.Content
 	reply := a.Handler.HandleText(a.ctx, nick, txt)
+	if reply == "" {
+		return // duplicate message, skip
+	}
 	ctx.ReplyText(reply)
 
 	if message.WantsVoiceReply(txt) {

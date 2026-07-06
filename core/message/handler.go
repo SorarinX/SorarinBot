@@ -20,6 +20,7 @@ type Handler struct {
 	DB        interface {
 		InsertMessage(sender, room, userMsg, botReply, model string, promptTokens, completionTokens, totalTokens int)
 	}
+	recentMsg sync.Map // sender+msg dedup to prevent double-processing
 }
 
 // SetProvider swaps the LLM provider at runtime (thread-safe).
@@ -59,6 +60,16 @@ func PopImage(sender string, ttl time.Duration) ([]byte, string, bool) {
 
 // HandleText processes a text message and returns the reply.
 func (h *Handler) HandleText(ctx context.Context, sender, msg string) string {
+	// Dedup: prevent processing the same sender+message twice within 5s
+	dedupKey := sender + ":" + msg
+	now := time.Now()
+	if v, loaded := h.recentMsg.Load(dedupKey); loaded {
+		if t, ok := v.(time.Time); ok && now.Sub(t) < 5*time.Second {
+			return "" // duplicate, skip
+		}
+	}
+	h.recentMsg.Store(dedupKey, now)
+
 	// Build context messages
 	imgData, imgMime, hasImage := PopImage(sender, h.ImageTTL)
 

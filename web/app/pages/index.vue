@@ -1,23 +1,9 @@
 <script setup lang="ts">
 const { status, isRunning, uptime, refresh: refreshStatus } = useStatus()
 const { config, refresh: refreshConfig } = useConfig()
-const { messages, total, refresh: refreshHistory } = useHistory(50)
 const { logs, refresh: refreshLogs } = useLogs(50)
 
 const sessions = computed(() => status.value?.sessions ?? [])
-
-const todayCount = computed(() => {
-  const rows = messages.value as Record<string, unknown>[]
-  if (!rows.length) return 0
-  const d = new Date()
-  const ymd = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-  return rows.filter(r => String(r.created_at || '').startsWith(ymd)).length
-})
-
-const totalTokens = computed(() => {
-  const rows = messages.value as Record<string, unknown>[]
-  return rows.reduce((s, r) => s + (Number(r.total_tokens) || 0), 0)
-})
 
 const startupAt = computed(() => {
   if (!status.value?.startup_at) return '—'
@@ -27,7 +13,6 @@ const startupAt = computed(() => {
 onMounted(() => {
   setInterval(() => {
     refreshStatus()
-    refreshHistory()
     refreshLogs()
   }, 5000)
 })
@@ -83,16 +68,16 @@ onMounted(() => {
             </div>
           </UCard>
 
-          <!-- 今日消息 -->
+          <!-- 活跃会话 -->
           <UCard>
             <div class="flex items-start justify-between">
               <div class="space-y-1">
                 <p class="text-sm text-muted font-medium flex items-center gap-1.5">
-                  <UIcon name="i-lucide-trending-up" class="size-3.5" />
-                  今日消息
+                  <UIcon name="i-lucide-users" class="size-3.5" />
+                  活跃会话
                 </p>
-                <p class="text-2xl font-semibold tracking-tight">{{ todayCount }}</p>
-                <p class="text-xs text-muted">总计 {{ total }} 条记录</p>
+                <p class="text-2xl font-semibold tracking-tight">{{ sessions.length }}</p>
+                <p class="text-xs text-muted">当前连接</p>
               </div>
               <div class="flex items-center justify-center size-10 rounded-lg bg-primary/10 text-primary">
                 <UIcon name="i-lucide-message-square" class="size-5" />
@@ -106,10 +91,10 @@ onMounted(() => {
               <div class="space-y-1">
                 <p class="text-sm text-muted font-medium flex items-center gap-1.5">
                   <UIcon name="i-lucide-coins" class="size-3.5" />
-                  Token 消耗
+                  日志条数
                 </p>
-                <p class="text-2xl font-semibold tracking-tight">{{ totalTokens }}</p>
-                <p class="text-xs text-muted">包含 prompt + completion</p>
+                <p class="text-2xl font-semibold tracking-tight">{{ (logs ?? []).length }}</p>
+                <p class="text-xs text-muted">系统运行日志</p>
               </div>
               <div class="flex items-center justify-center size-10 rounded-lg bg-warning/10 text-warning">
                 <UIcon name="i-lucide-bar-chart" class="size-5" />
@@ -117,16 +102,16 @@ onMounted(() => {
             </div>
           </UCard>
 
-          <!-- 响应成功率 -->
+          <!-- 响应状态 -->
           <UCard>
             <div class="flex items-start justify-between">
               <div class="space-y-1">
                 <p class="text-sm text-muted font-medium flex items-center gap-1.5">
                   <UIcon name="i-lucide-check-circle" class="size-3.5" />
-                  响应成功率
+                  服务状态
                 </p>
-                <p class="text-lg font-semibold">{{ total ? '100%' : '—' }}</p>
-                <p class="text-xs text-muted">基于 {{ total }} 次对话</p>
+                <p class="text-lg font-semibold">{{ isRunning ? '正常' : '异常' }}</p>
+                <p class="text-xs text-muted">{{ status?.provider || '—' }}</p>
               </div>
               <div class="flex items-center justify-center size-10 rounded-lg bg-success/10 text-success">
                 <UIcon name="i-lucide-shield-check" class="size-5" />

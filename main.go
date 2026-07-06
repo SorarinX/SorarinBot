@@ -49,14 +49,43 @@ func main() {
 	}
 	cfg := &config.Cfg
 
-	fmt.Println("  ___            _           ___     _   ")
-	fmt.Println(" / _ \\          (_)         | _ )___| |_ ")
-	fmt.Println("/ (_) |_ __ ___  _ _ __ ___ | _ \\___|  _|")
-	fmt.Println("\\___/| '__| '_ \\| | '_ ` _ \\|   /   |_|  ")
-	fmt.Println("     | |  | | | | | | | | | |_|_\\   |_\\  ")
-	fmt.Println("     |_|  |_| |_|_|_| |_| |_(_)         ")
-	fmt.Println("")
-	fmt.Println(" SorarinBot v1.0.0 — starting ...")
+	banner := []string{
+		"███████╗ ██████╗ ██████╗  █████╗ ██████╗ ██╗███╗   ██╗",
+		"██╔════╝██╔═══██╗██╔══██╗██╔══██╗██╔══██╗██║████╗  ██║",
+		"███████╗██║   ██║██████╔╝███████║██████╔╝██║██╔██╗ ██║",
+		"╚════██║██║   ██║██╔══██╗██╔══██║██╔══██╗██║██║╚██╗██║",
+		"███████║╚██████╔╝██║  ██║██║  ██║██║  ██║██║██║ ╚████║",
+		"╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝",
+		"",
+		"                ██████╗  ██████╗ ████████╗",
+		"                ██╔══██╗██╔═══██╗╚══██╔══╝",
+		"                ██████╔╝██║   ██║   ██║",
+		"                ██╔══██╗██║   ██║   ██║",
+		"                ██████╔╝╚██████╔╝   ██║",
+		"                ╚═════╝  ╚═════╝    ╚═╝",
+		"",
+		"              ✦ SorarinBot AI Assistant ✦",
+		"         Modern · Fast · OpenAI Compatible",
+	}
+
+	// Find max line width for centering
+	maxWidth := 0
+	for _, line := range banner {
+		if len(line) > maxWidth {
+			maxWidth = len(line)
+		}
+	}
+	// Terminal width (default 120, can adjust)
+	termWidth := 120
+	padding := (termWidth - maxWidth) / 2
+	if padding < 0 {
+		padding = 0
+	}
+	fmt.Println()
+	for _, line := range banner {
+		fmt.Printf("%*s%s\n", padding, "", line)
+	}
+	fmt.Println()
 
 	// Build provider from config
 	p := buildProviderFromCfg(cfg)
@@ -68,6 +97,9 @@ func main() {
 	if err := database.Open(cfg.DB.Path); err != nil {
 		logrus.Fatalf("database open: %v", err)
 	}
+
+	// Enable logrus → database hook so all logs appear in web UI
+	database.InitLogrusHook()
 
 	h := &message.Handler{
 		Provider: p,
@@ -83,6 +115,11 @@ func main() {
 	if err != nil {
 		logrus.Fatalf("adapter init: %v", err)
 	}
+
+	// Hide console on successful WeChat login
+	adapter.SetOnLoginSuccess(func() {
+		hideConsoleWindow()
+	})
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {
@@ -109,7 +146,13 @@ func main() {
 		openBrowser("http://" + cfg.Web.Listen)
 	}()
 
-	<-ch
+	// Exit when either OS signal or browser heartbeat timeout
+	select {
+	case <-ch:
+		logrus.Info("shutting down (signal)...")
+	case <-heartbeat.Done():
+		logrus.Info("shutting down (browser closed)...")
+	}
 	logrus.Info("shutting down...")
 	adapter.Bot.Exit()
 	cancel()
@@ -505,6 +548,9 @@ func buildMux(h *message.Handler, sm *session.Manager) http.Handler {
 			http.Error(w, "method not allowed", 405)
 		}
 	})
+
+	// WebSocket heartbeat for browser close detection
+	mux.HandleFunc("/ws", heartbeat.handleWS)
 
 	return mux
 }

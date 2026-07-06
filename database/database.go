@@ -135,8 +135,26 @@ func InsertLog(level, message string) {
 	}
 	_, err := db.Exec(`INSERT INTO logs(level, message) VALUES(?, ?)`, level, message)
 	if err != nil {
-		logrus.Errorf("db InsertLog: %v", err)
+		// Avoid infinite recursion — don't use logrus here
+		return
 	}
+}
+
+// LogrusHook sends logrus entries to the database.
+type LogrusHook struct{}
+
+func (h *LogrusHook) Levels() []logrus.Level {
+	return logrus.AllLevels
+}
+
+func (h *LogrusHook) Fire(entry *logrus.Entry) error {
+	InsertLog(entry.Level.String(), entry.Message)
+	return nil
+}
+
+// InitLogrusHook installs the database logrus hook.
+func InitLogrusHook() {
+	logrus.AddHook(&LogrusHook{})
 }
 
 // QueryLogs returns recent log entries.
