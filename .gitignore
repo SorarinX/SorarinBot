@@ -1,0 +1,40 @@
+# Binaries
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Go
+*.test
+*.out
+*.syso
+go.work
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data
+*.db
+token.json
+config.yaml.bak
+config.yaml.tmp
+
+# Frontend
+web/node_modules/
+web/.nuxt/
+web/.output/
+web/dist/assets/
+
+# Logs
+*.log
+
+# Claude Code
+.claude/
+.learnings/
