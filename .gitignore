@@ -24,13 +24,15 @@ Thumbs.db
 *.db
 token.json
 config.yaml
-config.yaml.bak
-config.yaml.tmp
 
 # Frontend
 web/node_modules/
 web/.nuxt/
 web/.output/
+
+# Electron
+electron/node_modules/
+electron/release/
 
 # Logs
 *.log
