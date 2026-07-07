@@ -1,42 +1,111 @@
-# Binaries
-*.exe~
-*.dll
-*.so
-*.dylib
+# ============================================
+# SorarinBot .gitignore
+# ============================================
 
-# Go
-*.test
-*.out
-*.syso
-go.work
-
-# IDE
-.idea/
-.vscode/
+# === OS System Files ===
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+*~
 *.swp
 *.swo
 
-# OS
-.DS_Store
-Thumbs.db
+# === IDE & Editors ===
+.idea/
+.vscode/
+*.sublime-workspace
+*.code-workspace
+.project
+.classpath
+.settings/
 
-# Data
+# === Go ===
+*.test
+*.out
+*.exe
+*.dll
+*.so
+*.dylib
+*.syso
+go.work
+vendor/
+coverage.out
+cpu.out
+*.prof
+/bin/
+
+# === Node.js / Frontend ===
+node_modules/
+package-lock.json
+*.tsbuildinfo
+*.tgz
+.npm/
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+
+# === Build Outputs ===
+/dist/
+/build/
+/out/
+.next/
+*.snap
+
+# === Environment & Secrets ===
+.env
+.env.local
+.env*.local
+*.pem
+*.key
+
+# === Data & Runtime ===
 *.db
+*.sqlite
+*.sqlite3
 token.json
 config.yaml
+config.yaml.bak
+config.yaml.tmp
 
-# Frontend
-web/node_modules/
-web/.nuxt/
-web/.output/
+# === Logs ===
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Electron
+# === Testing & Coverage ===
+coverage/
+.nyc_output/
+.eslintcache
+
+# === Electron (project-specific) ===
 electron/node_modules/
 electron/release/
+electron/dist/
+electron/web_dist/
+electron/*.zip
+electron/*.db
+electron/config.yaml
 
-# Logs
-*.log
+# === Release Artifacts ===
+release/
 
-# Claude Code
+# === Windows Resources Build ===
+winres/
+
+# === Internal Docs ===
+docs/
+
+# === Claude Code / AI Tools ===
 .claude/
 .learnings/
+.agents/
+.cursor/
+.codex/
+
+# === Misc ===
+*.pdf
+TODO.md

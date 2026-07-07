@@ -1,0 +1,63 @@
+{
+  "name": "sorarinbot",
+  "version": "2.0.0",
+  "description": "SorarinBot - WeChat AI Assistant",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win",
+    "build:dir": "electron-builder --win --dir"
+  },
+  "build": {
+    "appId": "com.sorarin.bot",
+    "productName": "SorarinBot",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "config.yaml",
+      "logo.png",
+      "!node_modules",
+      "!*.zip",
+      "!data.db",
+      "!release",
+      "!web_dist",
+      "!dist"
+    ],
+    "extraResources": [
+      {
+        "from": "SorarinBot.exe",
+        "to": "SorarinBot.exe"
+      },
+      {
+        "from": "config.yaml",
+        "to": "config.yaml"
+      }
+    ],
+    "electronVersion": "43.0.0",
+    "electronDist": "dist",
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "icon.ico",
+      "uninstallerIcon": "icon.ico",
+      "installerHeaderIcon": "icon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "SorarinBot"
+    }
+  },
+  "devDependencies": {
+    "electron": "^43.0.0",
+    "electron-builder": "^26.15.3"
+  }
+}
