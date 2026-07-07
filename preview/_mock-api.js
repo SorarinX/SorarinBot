@@ -79,8 +79,15 @@
     const url = typeof input === 'string' ? input : input.url;
     const method = (init?.method || 'GET').toUpperCase();
 
-    if (url.startsWith('/api/') || url === '/_heartbeat.js') {
-      const mock = mockResponse(url, method);
+    // Match both /api/* and /SorarinBot/api/* (baseURL may inject prefix)
+    const apiPrefixes = ['/api/', '/SorarinBot/api/'];
+    const isApi = apiPrefixes.some(p => url.startsWith(p));
+    const isHeartbeat = url === '/_heartbeat.js' || url === '/SorarinBot/_heartbeat.js';
+
+    if (isApi || isHeartbeat) {
+      // Normalize: strip /SorarinBot prefix for routing
+      const normalized = url.replace(/^\/SorarinBot/, '');
+      const mock = mockResponse(normalized, method);
       if (mock !== null) {
         return Promise.resolve(new Response(JSON.stringify(mock), {
           status: 200,
