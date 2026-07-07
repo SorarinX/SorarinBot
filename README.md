@@ -34,6 +34,18 @@
 | ⚙️ **Hot Reload** | Change API key, model, or system prompt via Web UI — no restart needed |
 | 🌙 **Dark Mode** | Light/dark theme toggle with responsive layout |
 
+## 📸 Screenshots
+
+> 🔗 **[Live Preview](https://sorarinx.github.io/SorarinBot/)** — Try the dashboard with simulated data
+
+| Dashboard | Chat History |
+|:---------:|:----------:|
+| ![Dashboard](.github/images/dashboard.png) | ![Chat](.github/images/chat.png) |
+
+| System Logs | Settings |
+|:---------:|:----------:|
+| ![Logs](.github/images/logs.png) | ![Settings](.github/images/settings.png) |
+
 ## 🚀 Quick Start
 
 ### Download Installer (Recommended)
@@ -248,6 +260,22 @@ Issues and pull requests are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING
 | 📊 **管理后台** | 实时监控会话、查看聊天记录、系统日志、在线修改配置 |
 | ⚙️ **热更新** | 通过 Web UI 修改 API Key、模型、提示词，即时生效无需重启 |
 | 🌙 **暗色模式** | 支持明暗主题切换，响应式布局 |
+
+## 📸 界面预览
+
+> 🔗 **[在线预览](https://sorarinx.github.io/SorarinBot/)** — 使用模拟数据体验完整界面
+
+| 仪表盘 | 聊天记录 |
+|:------:|:------:|
+| ![仪表盘](.github/images/dashboard.png) | ![聊天](.github/images/chat.png) |
+
+| 系统日志 | 配置管理 |
+|:------:|:------:|
+| ![日志](.github/images/logs.png) | ![配置](.github/images/settings.png) |
+
+| 系统提示词 |
+|:--------:|
+| ![提示词](.github/images/prompt.png) |
 
 ## 🚀 快速开始
 
