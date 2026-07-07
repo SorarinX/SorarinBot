@@ -140,12 +140,10 @@ func main() {
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
 
-	// Auto-open browser shortly after startup (skip if running inside Electron)
+	// Auto-open browser shortly after startup
 	go func() {
 		time.Sleep(1 * time.Second)
-		if os.Getenv("SORARINBOT_ELECTRON") == "" {
-			openBrowser("http://" + cfg.Web.Listen)
-		}
+		openBrowser("http://" + cfg.Web.Listen)
 	}()
 
 	// Exit when either OS signal or browser heartbeat timeout
@@ -199,15 +197,11 @@ func buildProviderFromCfg(cfg *config.Config) providers.Provider {
 	var c openaicompat.Config
 	switch name {
 	case "minimax":
-		model := pc.Model
-		if model == "" {
-			model = "MiniMax-M3"
-		}
 		c = openaicompat.Config{
 			Name:    "minimax",
 			BaseURL: "https://api.minimaxi.com/v1",
 			APIKey:  pickKey(pc.APIKey, "MINIMAX_API_KEY"),
-			Model:   model,
+			Model:   "MiniMax-M3",
 		}
 	case "deepseek":
 		c = openaicompat.Config{
@@ -217,15 +211,11 @@ func buildProviderFromCfg(cfg *config.Config) providers.Provider {
 			Model:   pc.Model,
 		}
 	case "openai":
-		model := pc.Model
-		if model == "" {
-			model = "gpt-4o"
-		}
 		c = openaicompat.Config{
 			Name:    "openai",
 			BaseURL: "https://api.openai.com/v1",
 			APIKey:  pickKey(pc.APIKey, "OPENAI_API_KEY"),
-			Model:   model,
+			Model:   "gpt-4o",
 		}
 	default: // openaicompat — user fills everything
 		c = openaicompat.Config{
@@ -244,10 +234,7 @@ func buildMux(h *message.Handler, sm *session.Manager) http.Handler {
 	mux := http.NewServeMux()
 
 	// SPA: serve static files from web/dist/, fallback to index.html
-	distFS, err := fs.Sub(uiFS, "web/dist")
-	if err != nil {
-		logrus.Fatalf("embed fs: %v", err)
-	}
+	distFS, _ := fs.Sub(uiFS, "web/dist")
 
 	// Serve static files with proper MIME types
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -367,11 +354,6 @@ func buildMux(h *message.Handler, sm *session.Manager) http.Handler {
 
 	// Logs
 	mux.HandleFunc("/api/logs", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodDelete {
-			database.ClearLogs()
-			json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
-			return
-		}
 		limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
 		if limit <= 0 {
 			limit = 100
@@ -583,14 +565,11 @@ func parsePagination(r *http.Request) (limit, offset int) {
 }
 
 func startWeb(ctx context.Context, listen string, h *message.Handler, sm *session.Manager) {
-	// Fix-24: build mux once, reuse for all port attempts
-	handler := buildMux(h, sm)
-
 	// Auto-retry with next port if current one is busy
 	tryPort := func(addr string) bool {
 		srv := &http.Server{
 			Addr:    addr,
-			Handler: handler,
+			Handler: buildMux(h, sm),
 		}
 		logrus.Infof("web UI at http://%s", addr)
 
@@ -624,8 +603,5 @@ func startWeb(ctx context.Context, listen string, h *message.Handler, sm *sessio
 	if port == 0 {
 		port = 8080
 	}
-	nextAddr := fmt.Sprintf("%s:%d", host, port+1)
-	if !tryPort(nextAddr) {
-		logrus.Fatalf("failed to listen on %s and %s", listen, nextAddr)
-	}
+	tryPort(fmt.Sprintf("%s:%d", host, port+1))
 }

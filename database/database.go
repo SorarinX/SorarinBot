@@ -33,7 +33,6 @@ type Row struct {
 	PromptTokens     int    `json:"prompt_tokens"`
 	CompletionTokens int    `json:"completion_tokens"`
 	TotalTokens      int    `json:"total_tokens"`
-	CreatedAt        string `json:"created_at"`
 }
 
 // Open initializes the SQLite database and runs migrations.
@@ -62,13 +61,13 @@ func migrate() error {
 			prompt_tokens INTEGER DEFAULT 0,
 			completion_tokens INTEGER DEFAULT 0,
 			total_tokens INTEGER DEFAULT 0,
-			created_at TEXT DEFAULT (datetime('now', 'localtime'))
+			created_at TEXT DEFAULT (datetime('now'))
 		)`,
 		`CREATE TABLE IF NOT EXISTS logs (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			level TEXT NOT NULL,
 			message TEXT NOT NULL,
-			created_at TEXT DEFAULT (datetime('now', 'localtime'))
+			created_at TEXT DEFAULT (datetime('now'))
 		)`,
 	}
 	for _, q := range queries {
@@ -108,7 +107,7 @@ func QueryMessages(limit, offset int) ([]Row, int) {
 
 	rows, err := db.Query(
 		`SELECT id, sender, room, user_message, bot_reply, model,
-		        prompt_tokens, completion_tokens, total_tokens, created_at
+		        prompt_tokens, completion_tokens, total_tokens
 		 FROM messages ORDER BY id DESC LIMIT ? OFFSET ?`, limit, offset)
 	if err != nil {
 		logrus.Errorf("db QueryMessages: %v", err)
@@ -120,7 +119,7 @@ func QueryMessages(limit, offset int) ([]Row, int) {
 	for rows.Next() {
 		var r Row
 		if err := rows.Scan(&r.ID, &r.Sender, &r.Room, &r.UserMessage, &r.BotReply,
-			&r.Model, &r.PromptTokens, &r.CompletionTokens, &r.TotalTokens, &r.CreatedAt); err != nil {
+			&r.Model, &r.PromptTokens, &r.CompletionTokens, &r.TotalTokens); err != nil {
 			logrus.Errorf("db scan: %v", err)
 			continue
 		}
@@ -156,14 +155,6 @@ func (h *LogrusHook) Fire(entry *logrus.Entry) error {
 // InitLogrusHook installs the database logrus hook.
 func InitLogrusHook() {
 	logrus.AddHook(&LogrusHook{})
-}
-
-// ClearLogs deletes all log entries.
-func ClearLogs() {
-	if db == nil {
-		return
-	}
-	_, _ = db.Exec("DELETE FROM logs")
 }
 
 // QueryLogs returns recent log entries.
