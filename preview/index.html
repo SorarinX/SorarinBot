@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SorarinBot - Dashboard Preview</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a' }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="icon" href="https://raw.githubusercontent.com/SorarinX/SorarinBot/main/logo.png">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.06); }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+    .stat-card { transition: all 0.2s ease; }
+    .chat-bubble-bot { background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(147,51,234,0.1)); }
+    .pulse-dot { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+    .sidebar-link.active { background: rgba(59,130,246,0.15); color: #60a5fa; border-right: 2px solid #3b82f6; }
+  </style>
+</head>
+<body class="bg-gray-950 text-gray-200 min-h-screen flex">
+
+  <!-- Sidebar -->
+  <aside class="w-64 bg-gray-900/80 border-r border-gray-800 flex flex-col fixed h-full z-10">
+    <div class="p-4 border-b border-gray-800">
+      <div class="flex items-center gap-3">
+        <img src="https://raw.githubusercontent.com/SorarinX/SorarinBot/main/logo.png" class="w-10 h-10 rounded-xl" alt="Logo">
+        <div>
+          <h1 class="font-bold text-white text-lg leading-tight">SorarinBot</h1>
+          <span class="text-xs text-green-400 flex items-center gap-1"><span class="w-2 h-2 bg-green-400 rounded-full pulse-dot inline-block"></span> Running</span>
+        </div>
+      </div>
+    </div>
+    <nav class="flex-1 py-3">
+      <a href="#" class="sidebar-link active flex items-center gap-3 px-4 py-2.5 text-sm" onclick="showPage('dashboard')">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+        Dashboard
+      </a>
+      <a href="#" class="sidebar-link flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400 hover:text-white hover:bg-white/5" onclick="showPage('chat')">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+        Chat History
+      </a>
+      <a href="#" class="sidebar-link flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400 hover:text-white hover:bg-white/5" onclick="showPage('logs')">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        System Logs
+      </a>
+      <a href="#" class="sidebar-link flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400 hover:text-white hover:bg-white/5" onclick="showPage('settings')">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Settings
+      </a>
+    </nav>
+    <div class="p-4 border-t border-gray-800 text-xs text-gray-500">
+      <div>v2.0.0 · Electron</div>
+      <div class="mt-1">Preview Mode</div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 ml-64 p-6 overflow-auto">
+
+    <!-- Dashboard Page -->
+    <div id="page-dashboard">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-2xl font-bold text-white">Dashboard</h2>
+          <p class="text-sm text-gray-400 mt-1">System overview and real-time monitoring</p>
+        </div>
+        <div class="flex items-center gap-2 text-sm text-gray-400">
+          <span class="w-2 h-2 bg-green-400 rounded-full pulse-dot"></span>
+          Uptime: 2h 34m
+        </div>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="stat-card glass rounded-xl p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs text-gray-400 uppercase tracking-wider">Provider</span>
+            <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full">Connected</span>
+          </div>
+          <div class="text-xl font-bold text-white">DeepSeek</div>
+          <div class="text-sm text-gray-400 mt-1">deepseek-chat</div>
+        </div>
+        <div class="stat-card glass rounded-xl p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs text-gray-400 uppercase tracking-wider">Active Sessions</span>
+            <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          </div>
+          <div class="text-3xl font-bold text-white">5</div>
+          <div class="text-sm text-gray-400 mt-1">users online</div>
+        </div>
+        <div class="stat-card glass rounded-xl p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs text-gray-400 uppercase tracking-wider">Messages Today</span>
+            <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+          </div>
+          <div class="text-3xl font-bold text-white">128</div>
+          <div class="text-sm text-gray-400 mt-1">+23 from yesterday</div>
+        </div>
+        <div class="stat-card glass rounded-xl p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs text-gray-400 uppercase tracking-wider">Tokens Used</span>
+            <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </div>
+          <div class="text-3xl font-bold text-white">45.2K</div>
+          <div class="text-sm text-gray-400 mt-1">prompt: 32.1K · completion: 13.1K</div>
+        </div>
+      </div>
+
+      <!-- Sessions + Logs -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Active Sessions -->
+        <div class="glass rounded-xl">
+          <div class="px-5 py-4 border-b border-gray-800 flex items-center justify-between">
+            <h3 class="font-semibold text-white">Active Sessions</h3>
+            <span class="text-xs text-gray-400">5 online</span>
+          </div>
+          <div class="divide-y divide-gray-800/50">
+            <div class="px-5 py-3 flex items-center gap-3 hover:bg-white/[0.02]">
+              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm font-bold text-white">小</div>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-medium text-white truncate">小明</div>
+                <div class="text-xs text-gray-400 truncate">3 pairs · last: 2 min ago</div>
+              </div>
+              <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+            </div>
+            <div class="px-5 py-3 flex items-center gap-3 hover:bg-white/[0.02]">
+              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-sm font-bold text-white">A</div>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-medium text-white truncate">Alice</div>
+                <div class="text-xs text-gray-400 truncate">5 pairs · last: 8 min ago</div>
+              </div>
+              <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+            </div>
+            <div class="px-5 py-3 flex items-center gap-3 hover:bg-white/[0.02]">
+              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center text-sm font-bold text-white">张</div>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-medium text-white truncate">张伟</div>
+                <div class="text-xs text-gray-400 truncate">2 pairs · last: 15 min ago</div>
+              </div>
+              <span class="w-2 h-2 bg-yellow-400 rounded-full"></span>
+            </div>
+            <div class="px-5 py-3 flex items-center gap-3 hover:bg-white/[0.02]">
+              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center text-sm font-bold text-white">B</div>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-medium text-white truncate">Bob</div>
+                <div class="text-xs text-gray-400 truncate">1 pair · last: 32 min ago</div>
+              </div>
+              <span class="w-2 h-2 bg-gray-500 rounded-full"></span>
+            </div>
+            <div class="px-5 py-3 flex items-center gap-3 hover:bg-white/[0.02]">
+              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-sm font-bold text-white">李</div>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-medium text-white truncate">李华</div>
+                <div class="text-xs text-gray-400 truncate">4 pairs · last: 1h ago</div>
+              </div>
+              <span class="w-2 h-2 bg-gray-500 rounded-full"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Logs -->
+        <div class="glass rounded-xl">
+          <div class="px-5 py-4 border-b border-gray-800 flex items-center justify-between">
+            <h3 class="font-semibold text-white">System Logs</h3>
+            <span class="text-xs text-gray-400">Recent 8</span>
+          </div>
+          <div class="p-4 font-mono text-xs space-y-1.5 max-h-80 overflow-auto">
+            <div class="text-green-400">INFO  [login] WeChat login successful</div>
+            <div class="text-gray-400">DEBUG [ws] browser connected, total: 1</div>
+            <div class="text-green-400">INFO  [text] reply to 小明: 你好！有什么我可以帮你的吗...</div>
+            <div class="text-blue-400">INFO  [image] cached for Alice, no @, no reply</div>
+            <div class="text-green-400">INFO  [text] reply to Alice: 这张图片显示的是一只...</div>
+            <div class="text-yellow-400">WARN  [text] slow response: 3.2s (provider latency)</div>
+            <div class="text-green-400">INFO  [tickle] detected in group=AI测试群, replying</div>
+            <div class="text-green-400">INFO  [text] reply to 张伟: 当前支持的模型包括...</div>
+            <div class="text-gray-400">DEBUG [check] group @mention, reply</div>
+            <div class="text-green-400">INFO  [text] reply to Bob: Go 1.25 的主要新特性...</div>
+            <div class="text-blue-400">INFO  provider: deepseek, model=deepseek-chat, vision=true</div>
+            <div class="text-green-400">INFO  web UI at http://localhost:8080</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat History Page -->
+    <div id="page-chat" class="hidden">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-2xl font-bold text-white">Chat History</h2>
+          <p class="text-sm text-gray-400 mt-1">Browse conversation records</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <select class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-blue-500">
+            <option>All Users</option>
+            <option>小明</option>
+            <option>Alice</option>
+            <option>张伟</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Chat 1 -->
+        <div class="glass rounded-xl overflow-hidden">
+          <div class="px-5 py-3 border-b border-gray-800 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white">小</div>
+              <div>
+                <span class="text-sm font-medium text-white">小明</span>
+                <span class="text-xs text-gray-400 ml-2">deepseek-chat</span>
+              </div>
+            </div>
+            <span class="text-xs text-gray-500">2 min ago</span>
+          </div>
+          <div class="p-5 space-y-4">
+            <div class="flex gap-3">
+              <div class="w-7 h-7 rounded-full bg-gray-700 flex items-center justify-center text-xs font-bold shrink-0">小</div>
+              <div class="bg-gray-800 rounded-2xl rounded-tl-md px-4 py-2.5 max-w-lg text-sm">你好，你能做什么？</div>
+            </div>
+            <div class="flex gap-3 justify-end">
+              <div class="chat-bubble-bot rounded-2xl rounded-tr-md px-4 py-2.5 max-w-lg text-sm border border-blue-500/10">你好！我是 SorarinBot，一个 AI 助手。我可以帮你：<br><br>💬 回答各种问题<br>🖼️ 识别图片内容<br>📝 翻译和写作<br>💡 提供建议和想法<br><br>有什么需要帮忙的吗？</div>
+              <div class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xs shrink-0">🤖</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat 2 -->
+        <div class="glass rounded-xl overflow-hidden">
+          <div class="px-5 py-3 border-b border-gray-800 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-xs font-bold text-white">A</div>
+              <div>
+                <span class="text-sm font-medium text-white">Alice</span>
+                <span class="text-xs text-gray-400 ml-2">deepseek-chat · vision</span>
+              </div>
+            </div>
+            <span class="text-xs text-gray-500">8 min ago</span>
+          </div>
+          <div class="p-5 space-y-4">
+            <div class="flex gap-3">
+              <div class="w-7 h-7 rounded-full bg-gray-700 flex items-center justify-center text-xs font-bold shrink-0">A</div>
+              <div>
+                <div class="bg-gray-800 rounded-2xl rounded-tl-md px-4 py-2.5 max-w-lg text-sm">
+                  <div class="mb-2 w-48 h-32 bg-gray-700 rounded-lg flex items-center justify-center text-gray-500 text-xs">📷 cat-photo.jpg</div>
+                  这是什么品种的猫？
+                </div>
+              </div>
+            </div>
+            <div class="flex gap-3 justify-end">
+              <div class="chat-bubble-bot rounded-2xl rounded-tr-md px-4 py-2.5 max-w-lg text-sm border border-blue-500/10">这是一只英国短毛猫（British Shorthair），特征是：<br><br>🐱 圆润的脸庞和大眼睛<br>🔵 蓝灰色的毛发（最经典的颜色）<br>🐾 短而密的被毛<br><br>英短性格温顺、安静，是非常受欢迎的家养猫品种。</div>
+              <div class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xs shrink-0">🤖</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat 3 -->
+        <div class="glass rounded-xl overflow-hidden">
+          <div class="px-5 py-3 border-b border-gray-800 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center text-xs font-bold text-white">张</div>
+              <div>
+                <span class="text-sm font-medium text-white">张伟</span>
+                <span class="text-xs text-gray-400 ml-2">deepseek-chat</span>
+              </div>
+            </div>
+            <span class="text-xs text-gray-500">15 min ago</span>
+          </div>
+          <div class="p-5 space-y-4">
+            <div class="flex gap-3">
+              <div class="w-7 h-7 rounded-full bg-gray-700 flex items-center justify-center text-xs font-bold shrink-0">张</div>
+              <div class="bg-gray-800 rounded-2xl rounded-tl-md px-4 py-2.5 max-w-lg text-sm">帮我写一首关于春天的五言绝句</div>
+            </div>
+            <div class="flex gap-3 justify-end">
+              <div class="chat-bubble-bot rounded-2xl rounded-tr-md px-4 py-2.5 max-w-lg text-sm border border-blue-500/10">
+                <div class="font-serif text-base leading-relaxed">
+                  春风拂柳岸，<br>
+                  细雨润花田。<br>
+                  燕子归来早，<br>
+                  人间四月天。
+                </div>
+                <div class="mt-3 text-xs text-gray-400">这首诗描绘了春天的典型意象：春风、细雨、燕子，最后一句化用林徽因名句，点出四月春光之美。</div>
+              </div>
+              <div class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xs shrink-0">🤖</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Logs Page -->
+    <div id="page-logs" class="hidden">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-2xl font-bold text-white">System Logs</h2>
+          <p class="text-sm text-gray-400 mt-1">Real-time system event log</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <select class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-blue-500">
+            <option>All Levels</option>
+            <option>INFO</option>
+            <option>WARN</option>
+            <option>ERROR</option>
+            <option>DEBUG</option>
+          </select>
+        </div>
+      </div>
+      <div class="glass rounded-xl overflow-hidden">
+        <div class="font-mono text-xs divide-y divide-gray-800/30">
+          <div class="px-5 py-2.5 flex gap-4 hover:bg-white/[0.02]"><span class="text-gray-500 w-44 shrink-0">2026-07-07 22:13:41</span><span class="text-green-400 w-12 shrink-0">INFO</span><span class="text-gray-300">[login] WeChat login successful</span></div>
+          <div class="px-5 py-2.5 flex gap-4 hover:bg-white/[0.02]"><span class="text-gray-500 w-44 shrink-0">2026-07-07 22:13:42</span><span class="text-gray-400 w-12 shrink-0">DEBUG</span><span class="text-gray-300">[ws] browser connected, total: 1</span></div>
+          <div class="px-5 py-2.5 flex gap-4 hover:bg-white/[0.02]"><span class="text-gray-500 w-44 shrink-0">2026-07-07 22:14:15</span><span class="text-blue-400 w-12 shrink-0">INFO</span><span class="text-gray-300">provider: deepseek, model=deepseek-chat, vision=true</span></div>
+          <div class="px-5 py-2.5 flex gap-4 hover:bg-white/[0.02]"><span class="text-gray-500 w-44 shrink-0">2026-07-07 22:14:16</span><span class="text-green-400 w-12 shrink-0">INFO</span><span class="text-gray-300">web UI at http://localhost:8080</span></div>
+          <div class="px-5 py-2.5 flex gap-4 hover:bg-white/[0.02]"><span class="text-gray-500 w-44 shrink-0">2026-07-07 22:15:03</span><span class="text-gray-400 w-12 shrink-0">DEBUG</span><span class="text-gray-300">[check] private chat from 小明, reply</span></div>
+          <div class="px-5 py-2.5 flex gap-4 hover:bg-white/[0.02]"><span class="text-gray-500 w-44 shrink-0">2026-07-07 22:15:06</span><span class="text-green-400 w-12 shrink-0">INFO</span><span class="text-gray-300">[text] reply to 小明: 你好！有什么我可以帮你的吗...</span></div>
+          <div class="px-5 py-2.5 flex gap-4 hover:bg-white/[0.02]"><span class="text-gray-500 w-44 shrink-0">2026-07-07 22:16:22</span><span class="text-blue-400 w-12 shrink-0">INFO</span><span class="text-gray-300">[image] cached for Alice, no @, no reply</span></div>
+          <div class="px-5 py-2.5 flex gap-4 hover:bg-white/[0.02]"><span class="text-gray-500 w-44 shrink-0">2026-07-07 22:16:45</span><span class="text-gray-400 w-12 shrink-0">DEBUG</span><span class="text-gray-300">[check] group @mention, reply</span></div>
+          <div class="px-5 py-2.5 flex gap-4 hover:bg-white/[0.02]"><span class="text-gray-500 w-44 shrink-0">2026-07-07 22:16:48</span><span class="text-green-400 w-12 shrink-0">INFO</span><span class="text-gray-300">[text] reply to Alice: 这张图片显示的是一只英国短毛猫...</span></div>
+          <div class="px-5 py-2.5 flex gap-4 hover:bg-white/[0.02]"><span class="text-gray-500 w-44 shrink-0">2026-07-07 22:17:30</span><span class="text-yellow-400 w-12 shrink-0">WARN</span><span class="text-gray-300">[text] slow response: 3.2s (provider latency)</span></div>
+          <div class="px-5 py-2.5 flex gap-4 hover:bg-white/[0.02]"><span class="text-gray-500 w-44 shrink-0">2026-07-07 22:18:11</span><span class="text-green-400 w-12 shrink-0">INFO</span><span class="text-gray-300">[tickle] detected in group=AI测试群, replying</span></div>
+          <div class="px-5 py-2.5 flex gap-4 hover:bg-white/[0.02]"><span class="text-gray-500 w-44 shrink-0">2026-07-07 22:19:55</span><span class="text-green-400 w-12 shrink-0">INFO</span><span class="text-gray-300">[text] reply to 张伟: 春风拂柳岸，细雨润花田...</span></div>
+          <div class="px-5 py-2.5 flex gap-4 hover:bg-white/[0.02]"><span class="text-gray-500 w-44 shrink-0">2026-07-07 22:20:03</span><span class="text-green-400 w-12 shrink-0">INFO</span><span class="text-gray-300">[text] reply to Bob: Go 1.25 的主要新特性包括...</span></div>
+          <div class="px-5 py-2.5 flex gap-4 hover:bg-white/[0.02]"><span class="text-gray-500 w-44 shrink-0">2026-07-07 22:21:44</span><span class="text-gray-400 w-12 shrink-0">DEBUG</span><span class="text-gray-300">[check] group msg ignored (no @, no prefix)</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Page -->
+    <div id="page-settings" class="hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-white">Settings</h2>
+        <p class="text-sm text-gray-400 mt-1">Configure provider, model, and system prompt</p>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Provider Config -->
+        <div class="glass rounded-xl p-6">
+          <h3 class="font-semibold text-white mb-5 flex items-center gap-2">
+            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            Provider Configuration
+          </h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">Provider</label>
+              <select class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                <option>openaicompat</option>
+                <option>deepseek</option>
+                <option>minimax</option>
+                <option>openai</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">Base URL</label>
+              <input type="text" value="https://api.deepseek.com" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">Model</label>
+              <input type="text" value="deepseek-chat" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1.5 uppercase tracking-wider">API Key</label>
+              <input type="password" value="sk-••••••••••••" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+            </div>
+            <div class="flex gap-3 pt-2">
+              <button class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition">Save</button>
+              <button class="bg-gray-700 hover:bg-gray-600 text-gray-300 px-5 py-2.5 rounded-lg text-sm font-medium transition">Test Connection</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Prompt -->
+        <div class="glass rounded-xl p-6">
+          <h3 class="font-semibold text-white mb-5 flex items-center gap-2">
+            <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            System Prompt
+          </h3>
+          <textarea rows="10" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-sm text-white font-mono focus:outline-none focus:border-blue-500 resize-none">你是一个有用的 AI 助手，名叫小绒。你的性格活泼可爱，喜欢用表情符号。回答问题时要简洁明了，必要时使用 Markdown 格式化内容。
+
+你的特点：
+- 语气友好亲切，像朋友一样
+- 擅长中文和英文
+- 能识别图片内容
+- 会用 emoji 表达情感</textarea>
+          <div class="flex gap-3 mt-4">
+            <button class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition">Save Prompt</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview Badge -->
+    <div class="fixed bottom-4 right-4 z-50">
+      <div class="glass rounded-full px-4 py-2 flex items-center gap-2 text-sm">
+        <span class="w-2 h-2 bg-yellow-400 rounded-full pulse-dot"></span>
+        <span class="text-gray-300">Preview Mode · Demo Data</span>
+        <a href="https://github.com/SorarinX/SorarinBot" target="_blank" class="text-blue-400 hover:text-blue-300 ml-1">GitHub →</a>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    function showPage(name) {
+      document.querySelectorAll('[id^="page-"]').forEach(el => el.classList.add('hidden'));
+      document.getElementById('page-' + name).classList.remove('hidden');
+      document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active'));
+      event.target.closest('.sidebar-link').classList.add('active');
+    }
+  </script>
+</body>
+</html>
