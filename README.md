@@ -7,7 +7,8 @@
 **微信 AI 智能助手 · WeChat AI Assistant Powered by LLM**
 
 [![Version](https://img.shields.io/badge/version-2.0.0-3B82F6?style=flat-square)](https://github.com/SorarinX/SorarinBot/releases)
-[![License](https://img.shields.io/badge/license-MIT-22C55E?style=flat-square)](LICENSE)
+[![License](https://img.shields.io/badge/license-PolyForm%20NC-3B82F6?style=flat-square)](LICENSE)
+[![Commercial](https://img.shields.io/badge/commercial-license-F59E0B?style=flat-square)](mailto:zyc2597376118@gmail.com)
 [![Go](https://img.shields.io/badge/Go-1.25-00ADD8?style=flat-square&logo=go&logoColor=white)](https://go.dev/)
 [![Electron](https://img.shields.io/badge/Electron-43-47848F?style=flat-square&logo=electron&logoColor=white)](https://www.electronjs.org/)
 [![Vue](https://img.shields.io/badge/Vue-3-4FC08D?style=flat-square&logo=vue.js&logoColor=white)](https://vuejs.org/)
@@ -236,7 +237,12 @@ Issues and pull requests are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING
 
 ## 📄 License
 
-[MIT](LICENSE) · Copyright © 2026 [Sorarin](https://github.com/SorarinX)
+This project is licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE).
+
+- **Noncommercial use** — Free (personal, education, research, charity, government)
+- **Commercial use** — Requires a separate license. Contact: **zyc2597376118@gmail.com**
+
+See [LICENSE](LICENSE) for full terms.
 
 ## 🙏 Acknowledgements
 
@@ -465,7 +471,12 @@ cd electron && npm install && npm start
 
 ## 📄 许可证
 
-[MIT](LICENSE) · Copyright © 2026 [Sorarin](https://github.com/SorarinX)
+本项目基于 [PolyForm Noncommercial License 1.0.0](LICENSE) 授权。
+
+- **非商业用途** — 免费（个人学习、教育研究、公益机构、政府部门）
+- **商业用途** — 需取得书面商业授权。联系邮箱：**zyc2597376118@gmail.com**
+
+完整条款详见 [LICENSE](LICENSE)。
 
 ## 🙏 致谢
 
