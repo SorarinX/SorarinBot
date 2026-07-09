@@ -1,4 +1,4 @@
-const { app, BrowserWindow, shell } = require('electron')
+const { app, BrowserWindow, shell, dialog } = require('electron')
 const { spawn } = require('child_process')
 const path = require('path')
 const fs = require('fs')
@@ -28,7 +28,6 @@ function waitForServer(url, timeout = 30000) {
 }
 
 function startGoBackend() {
-  // Try multiple possible locations for the Go binary
   const possiblePaths = [
     path.join(__dirname, 'SorarinBot.exe'),
     path.join(process.resourcesPath || __dirname, 'SorarinBot.exe'),
@@ -37,15 +36,16 @@ function startGoBackend() {
 
   let exePath = null
   for (const p of possiblePaths) {
+    console.log('[electron] checking:', p, fs.existsSync(p) ? 'FOUND' : 'not found')
     if (fs.existsSync(p)) { exePath = p; break }
   }
 
   if (!exePath) {
-    console.error('SorarinBot.exe not found in any of:', possiblePaths)
-    return
+    console.error('[electron] SorarinBot.exe not found in any of:', possiblePaths)
+    return false
   }
 
-  console.log('Starting Go backend from:', exePath)
+  console.log('[electron] starting Go backend from:', exePath)
 
   goProcess = spawn(exePath, [], {
     cwd: path.dirname(exePath),
@@ -54,10 +54,29 @@ function startGoBackend() {
     windowsHide: true
   })
 
-  goProcess.stdout.on('data', (data) => console.log('[go]', data.toString().trim()))
-  goProcess.stderr.on('data', (data) => console.error('[go]', data.toString().trim()))
-  goProcess.on('error', (err) => console.error('Go backend error:', err))
-  goProcess.on('exit', (code) => { console.log('Go backend exited:', code); goProcess = null })
+  goProcess.stdout.on('data', (data) => {
+    const lines = data.toString().trim().split('\n')
+    lines.forEach(line => console.log('[go]', line))
+  })
+  goProcess.stderr.on('data', (data) => {
+    const lines = data.toString().trim().split('\n')
+    lines.forEach(line => console.error('[go:err]', line))
+  })
+  goProcess.on('error', (err) => {
+    console.error('[electron] Go backend spawn error:', err)
+  })
+  goProcess.on('exit', (code, signal) => {
+    console.error('[electron] Go backend exited: code=' + code + ' signal=' + signal)
+    goProcess = null
+    // If window is still open, show error
+    if (mainWindow) {
+      mainWindow.webContents.executeJavaScript(
+        `document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:#666;"><div style="text-align:center"><h2>后端已断开</h2><p>Go backend exited with code ${code}</p><p>请重新启动应用</p></div></div>'`
+      ).catch(() => {})
+    }
+  })
+
+  return true
 }
 
 function createWindow() {
@@ -69,11 +88,26 @@ function createWindow() {
     title: 'SorarinBot',
     icon: path.join(__dirname, 'logo.png'),
     autoHideMenuBar: true,
+    show: false, // don't show until ready
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
       contextIsolation: true
     }
+  })
+
+  // Show window only when content is ready
+  mainWindow.webContents.on('did-finish-load', () => {
+    console.log('[electron] page loaded, showing window')
+    mainWindow.show()
+  })
+
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDesc) => {
+    console.error('[electron] page load failed:', errorCode, errorDesc)
+  })
+
+  mainWindow.webContents.on('render-process-gone', (event, details) => {
+    console.error('[electron] renderer crashed:', details)
   })
 
   mainWindow.loadURL(GO_URL)
@@ -87,12 +121,23 @@ function createWindow() {
 }
 
 app.whenReady().then(async () => {
-  startGoBackend()
+  console.log('[electron] app ready, starting Go backend...')
+
+  const started = startGoBackend()
+  if (!started) {
+    dialog.showErrorBox('SorarinBot', '找不到 SorarinBot.exe，请重新安装。')
+    app.quit()
+    return
+  }
+
   try {
+    console.log('[electron] waiting for Go server at', GO_URL)
     await waitForServer(GO_URL)
+    console.log('[electron] Go server ready, creating window')
     createWindow()
   } catch (err) {
-    console.error('Failed to start:', err)
+    console.error('[electron] server timeout:', err)
+    dialog.showErrorBox('SorarinBot', '后端启动超时，请检查端口 ' + GO_PORT + ' 是否被占用。')
     app.quit()
   }
 })
