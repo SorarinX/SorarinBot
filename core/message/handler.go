@@ -76,14 +76,15 @@ func PopImage(sender string, ttl time.Duration) ([]byte, string, bool) {
 }
 
 // HandleText processes a text message and returns the reply.
-func (h *Handler) HandleText(ctx context.Context, sender, msg string) string {
+// uid is the unique user identifier (for image cache), sender is the display name (for session).
+func (h *Handler) HandleText(ctx context.Context, uid, sender, msg string) string {
 	// Fix-1: copy Provider reference under lock to avoid data race
 	h.mu.Lock()
 	provider := h.Provider
 	h.mu.Unlock()
 
 	// Build context messages
-	imgData, imgMime, hasImage := PopImage(sender, h.ImageTTL)
+	imgData, imgMime, hasImage := PopImage(uid, h.ImageTTL)
 
 	sess := h.Sessions.Get(sender)
 	msgs := sess.BuildMessages(msg, nil)

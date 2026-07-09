@@ -28,6 +28,7 @@ function waitForServer(url, timeout = 30000) {
 }
 
 function startGoBackend() {
+  // Try multiple possible locations for the Go binary
   const possiblePaths = [
     path.join(__dirname, 'SorarinBot.exe'),
     path.join(process.resourcesPath || __dirname, 'SorarinBot.exe'),

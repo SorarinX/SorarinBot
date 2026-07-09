@@ -1,6 +1,6 @@
 {
   "name": "sorarinbot",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "SorarinBot - WeChat AI Assistant",
   "main": "main.js",
   "scripts": {
@@ -17,14 +17,10 @@
     "files": [
       "main.js",
       "preload.js",
+      "dist/**",
       "config.yaml",
       "logo.png",
-      "!node_modules",
-      "!*.zip",
-      "!data.db",
-      "!release",
-      "!web_dist",
-      "!dist"
+      "!node_modules"
     ],
     "extraResources": [
       {
@@ -36,8 +32,6 @@
         "to": "config.yaml"
       }
     ],
-    "electronVersion": "43.0.0",
-    "electronDist": "dist",
     "win": {
       "target": [
         "nsis"

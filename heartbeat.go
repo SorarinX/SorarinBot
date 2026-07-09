@@ -68,15 +68,12 @@ func (h *BrowserHeartbeat) gracefulShutdown() {
 	time.Sleep(30 * time.Second)
 
 	h.mu.Lock()
-	count := len(h.clients)
-	h.mu.Unlock()
+	defer h.mu.Unlock()
 
-	if count == 0 && !h.closed {
+	if len(h.clients) == 0 && !h.closed {
 		h.closed = true
 		logrus.Info("[ws] no browser connected for 30s, shutting down")
-		// Show console window before exit so user sees the message
 		showConsoleWindow()
-		// Signal main to exit
 		close(h.done)
 	}
 }

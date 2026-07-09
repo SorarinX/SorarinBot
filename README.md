@@ -6,7 +6,7 @@
 
 **微信 AI 智能助手 · WeChat AI Assistant Powered by LLM**
 
-[![Version](https://img.shields.io/badge/version-2.0.0-3B82F6?style=flat-square)](https://github.com/SorarinX/SorarinBot/releases)
+[![Version](https://img.shields.io/badge/version-2.1.0-3B82F6?style=flat-square)](https://github.com/SorarinX/SorarinBot/releases)
 [![License](https://img.shields.io/badge/license-PolyForm%20NC-3B82F6?style=flat-square)](LICENSE)
 [![Commercial](https://img.shields.io/badge/commercial-license-F59E0B?style=flat-square)](mailto:zyc2597376118@gmail.com)
 [![Go](https://img.shields.io/badge/Go-1.25-00ADD8?style=flat-square&logo=go&logoColor=white)](https://go.dev/)
@@ -51,7 +51,7 @@
 
 ### Download Installer (Recommended)
 
-Grab `SorarinBot Setup 2.0.0.exe` from [Releases](https://github.com/SorarinX/SorarinBot/releases) and run it.
+Grab `SorarinBot Setup 2.1.0.exe` from [Releases](https://github.com/SorarinX/SorarinBot/releases) and run it.
 
 ### Portable
 
@@ -287,7 +287,7 @@ See [LICENSE](LICENSE) for full terms.
 
 ### 下载安装包（推荐）
 
-从 [Releases](https://github.com/SorarinX/SorarinBot/releases) 下载 `SorarinBot Setup 2.0.0.exe`，双击安装即可。
+从 [Releases](https://github.com/SorarinX/SorarinBot/releases) 下载 `SorarinBot Setup 2.1.0.exe`，双击安装即可。
 
 ### 便携版
 

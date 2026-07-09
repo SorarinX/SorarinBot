@@ -1,8 +1,42 @@
 <script setup lang="ts">
 const { logs, loading, refresh: fetchLogs } = useLogs(500)
+const toast = useToast()
 
 async function handleRefresh() {
   await fetchLogs()
+}
+
+async function handleClear() {
+  try {
+    await $fetch('/api/logs', { method: 'DELETE' })
+    await fetchLogs()
+    toast.add({ title: '日志已清空', color: 'success' })
+  } catch {
+    toast.add({ title: '清空失败', color: 'error' })
+  }
+}
+
+// Parse log string "level | message | timestamp"
+function parseLog(raw: string) {
+  const parts = raw.split(' | ')
+  if (parts.length >= 3) {
+    return {
+      level: parts[0],
+      message: parts.slice(1, -1).join(' | '),
+      time: parts[parts.length - 1],
+    }
+  }
+  return { level: '', message: raw, time: '' }
+}
+
+function levelColor(level: string) {
+  switch (level) {
+    case 'error': return 'text-error'
+    case 'warn': return 'text-warning'
+    case 'info': return 'text-primary'
+    case 'debug': return 'text-muted'
+    default: return 'text-muted'
+  }
 }
 </script>
 
@@ -14,6 +48,15 @@ async function handleRefresh() {
           <UDashboardSidebarCollapse />
         </template>
         <template #right>
+          <UButton
+            icon="i-lucide-trash-2"
+            variant="outline"
+            color="error"
+            size="sm"
+            @click="handleClear"
+          >
+            清空
+          </UButton>
           <UButton
             icon="i-lucide-refresh-cw"
             variant="outline"
@@ -43,9 +86,13 @@ async function handleRefresh() {
           <div
             v-for="(l, i) in logs"
             :key="i"
-            class="py-1 px-2 rounded hover:bg-elevated transition-colors"
+            class="flex gap-2 py-1 px-2 rounded hover:bg-elevated transition-colors"
           >
-            {{ l }}
+            <span class="text-muted shrink-0 w-20 text-right">{{ parseLog(l).time?.slice(11, 19) }}</span>
+            <span class="shrink-0 w-10 uppercase font-medium" :class="levelColor(parseLog(l).level ?? '')">
+              {{ parseLog(l).level }}
+            </span>
+            <span class="break-all">{{ parseLog(l).message }}</span>
           </div>
         </div>
       </UCard>

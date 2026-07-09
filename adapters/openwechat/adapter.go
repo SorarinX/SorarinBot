@@ -190,6 +190,7 @@ func (a *Adapter) onText(ctx *ow.MessageContext) {
 		}
 	}
 	nick := sender.NickName
+	uid := sender.UserName
 	contentKey := nick + "|" + ctx.Content
 	if _, loaded := replied.LoadOrStore(contentKey, time.Now()); loaded {
 		return
@@ -209,7 +210,7 @@ func (a *Adapter) onText(ctx *ow.MessageContext) {
 	}
 
 	txt := ctx.Content
-	reply := a.Handler.HandleText(a.ctx, nick, txt)
+	reply := a.Handler.HandleText(a.ctx, uid, nick, txt)
 	if reply == "" {
 		return
 	}
@@ -237,6 +238,7 @@ func (a *Adapter) onImage(ctx *ow.MessageContext) {
 		}
 	}
 	nick := sender.NickName
+	uid := sender.UserName
 
 	resp, err := ctx.GetPicture()
 	if err != nil {
@@ -250,8 +252,8 @@ func (a *Adapter) onImage(ctx *ow.MessageContext) {
 		return
 	}
 
-	// Cache for the text handler
-	message.CacheImage(nick, data, mime)
+	// Cache keyed by unique UserName (not NickName, which can collide)
+	message.CacheImage(uid, data, mime)
 
 	// Only auto‑reply if explicitly triggered
 	isTriggered := ctx.IsAt()
