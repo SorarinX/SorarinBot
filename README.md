@@ -279,6 +279,16 @@ See [LICENSE](LICENSE) for full terms.
 - [Nuxt UI](https://ui.nuxt.com) — UI Component Library
 - [electron-builder](https://www.electron.build) — Electron Packaging
 
+## ☕ Support
+
+If you find SorarinBot useful, consider buying the author a coffee!
+
+<div align="center">
+<img src=".github/images/donate.jpg" width="200" alt="WeChat Pay">
+<br>
+<sub>WeChat Pay / 微信支付</sub>
+</div>
+
 ---
 
 <a id="中文"></a>
@@ -569,3 +579,13 @@ cd electron && npm install && npm start
 - [openwechat](https://github.com/eatmoreapple/openwechat) — 微信 Web 协议
 - [Nuxt UI](https://ui.nuxt.com) — UI 组件库
 - [electron-builder](https://www.electron.build) — Electron 打包工具
+
+## ☕ 打赏
+
+如果你觉得 SorarinBot 有用，请作者喝杯咖啡！
+
+<div align="center">
+<img src=".github/images/donate.jpg" width="200" alt="微信收款码">
+<br>
+<sub>微信支付</sub>
+</div>
