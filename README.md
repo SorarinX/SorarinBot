@@ -56,33 +56,22 @@ Grab `SorarinBot Setup 2.2.0.exe` from [Releases](https://github.com/SorarinX/So
 
 ### Linux
 
-Download `SorarinBot-2.2.0.AppImage` from [Releases](https://github.com/SorarinX/SorarinBot/releases):
+Download `sorarinbot-v2.2.0-linux-amd64.tar.gz` from [Releases](https://github.com/SorarinX/SorarinBot/releases):
 
 ```bash
-# 1. Download and make executable
-mkdir -p ~/SorarinBot
-curl -L -o ~/SorarinBot/SorarinBot.AppImage \
-  "https://github.com/SorarinX/SorarinBot/releases/download/v2.2.0/SorarinBot-2.2.0.AppImage"
-chmod +x ~/SorarinBot/SorarinBot.AppImage
+# 1. Download and extract
+mkdir -p ~/SorarinBot && cd ~/SorarinBot
+curl -L -o sorarinbot.tar.gz \
+  https://github.com/SorarinX/SorarinBot/releases/download/v2.2.0/sorarinbot-v2.2.0-linux-amd64.tar.gz
+tar -xzf sorarinbot.tar.gz --strip-components=1
+rm sorarinbot.tar.gz
 
-# 2. Install FUSE if needed (Ubuntu/Debian)
-sudo apt install -y fuse libfuse2
+# 2. Configure — edit config.yaml, set your API key
+nano config.yaml
 
-# 3. Create config.yaml with your API key
-cat > ~/SorarinBot/config.yaml << 'EOF'
-web:
-    listen: localhost:8080
-provider:
-    name: deepseek
-    base_url: https://api.deepseek.com
-    model: deepseek-chat
-    api_key: YOUR_API_KEY
-prompt: "You are a helpful AI assistant."
-EOF
-
-# 4. Run
-cd ~/SorarinBot
-./SorarinBot.AppImage
+# 3. Run
+chmod +x SorarinBot
+./SorarinBot
 ```
 
 Then open **http://localhost:8080** in your browser.
@@ -115,7 +104,7 @@ cd linux/src && bash scripts/build.sh
 | Platform | Status | Package | Notes |
 |----------|--------|---------|-------|
 | **Windows** | ✅ Stable | NSIS installer (.exe) | Desktop use |
-| **Linux** | ✅ Available | tar.gz (14MB, zero dependencies) | Desktop & **server** deployment |
+| **Linux** | ✅ Available | tar.gz (7MB, zero dependencies) | Desktop & **server** deployment |
 | **macOS** | 🔜 Planned | - | Community contributions welcome |
 
 > **v2.2.0 新增 Linux 桌面端支持！** 详见 [linux/](linux/) 目录。
@@ -339,33 +328,29 @@ See [LICENSE](LICENSE) for full terms.
 
 ### Linux
 
-从 [Releases](https://github.com/SorarinX/SorarinBot/releases) 下载 `SorarinBot-2.2.0.AppImage`：
+从 [Releases](https://github.com/SorarinX/SorarinBot/releases) 下载 `sorarinbot-v2.2.0-linux-amd64.tar.gz`：
 
 ```bash
-# 1. 下载并赋予执行权限
-mkdir -p ~/SorarinBot
-curl -L -o ~/SorarinBot/SorarinBot.AppImage \
-  "https://github.com/SorarinX/SorarinBot/releases/download/v2.2.0/SorarinBot-2.2.0.AppImage"
-chmod +x ~/SorarinBot/SorarinBot.AppImage
+# 1. 下载解压
+mkdir -p ~/SorarinBot && cd ~/SorarinBot
+curl -L -o sorarinbot.tar.gz \
+  https://github.com/SorarinX/SorarinBot/releases/download/v2.2.0/sorarinbot-v2.2.0-linux-amd64.tar.gz
+tar -xzf sorarinbot.tar.gz --strip-components=1
+rm sorarinbot.tar.gz
 
-# 2. 安装 FUSE（Ubuntu/Debian 需要）
-sudo apt install -y fuse libfuse2
+# 2. 编辑配置文件，填入 API Key
+nano config.yaml
 
-# 3. 创建配置文件，填入你的 API Key
-cat > ~/SorarinBot/config.yaml << 'EOF'
-web:
-    listen: localhost:8080
-provider:
-    name: deepseek
-    base_url: https://api.deepseek.com
-    model: deepseek-chat
-    api_key: YOUR_API_KEY
-prompt: "You are a helpful AI assistant."
-EOF
+# 3. 启动
+chmod +x SorarinBot
+./SorarinBot
+```
+
+然后在浏览器打开 **http://localhost:8080**。
 
 # 4. 启动
 cd ~/SorarinBot
-./SorarinBot.AppImage
+./SorarinBot
 ```
 
 然后在浏览器打开 **http://localhost:8080**。

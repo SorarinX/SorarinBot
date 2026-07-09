@@ -1,4 +1,3 @@
-//go:build ignore
 package main
 
 import (
@@ -45,14 +44,13 @@ func main() {
 		_ = os.Chdir(exeDir)
 	}
 
-	// If exe directory is not writable (e.g. Program Files or /usr/bin), use platform data dir
+	// If exe directory is not writable (e.g. Program Files), use %APPDATA%/SorarinBot
 	dataDir := exeDir
 	if !isDirWritable(exeDir) {
-		dataDir = defaultDataDir()
-		if dataDir != "" {
+		appData := os.Getenv("APPDATA")
+		if appData != "" {
+			dataDir = filepath.Join(appData, "SorarinBot")
 			os.MkdirAll(dataDir, 0755)
-		} else {
-			dataDir = exeDir // fallback, may fail later
 		}
 	}
 	if dataDir != exeDir {
@@ -161,6 +159,31 @@ func main() {
 	// Graceful shutdown
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
+
+	// System tray (skip inside Electron)
+	if os.Getenv("SORARINBOT_ELECTRON") == "" {
+		go func() {
+			iconPath := filepath.Join(filepath.Dir(os.Args[0]), "icon.ico")
+			InitTray(TrayConfig{
+				WebURL:   "http://" + cfg.Web.Listen,
+				IconPath: iconPath,
+				OnExit: func() {
+					logrus.Info("[tray] quit requested")
+					ch <- syscall.SIGTERM
+				},
+				OnAutoStart: func(enabled bool) {
+					if err := setAutostart(enabled); err != nil {
+						logrus.Errorf("[tray] autostart error: %v", err)
+					} else {
+						logrus.Infof("[tray] autostart: %v", enabled)
+					}
+				},
+				IsAutoStart: func() bool {
+					return getAutostart()
+				},
+			})
+		}()
+	}
 
 	// Auto-open browser shortly after startup (skip if running inside Electron)
 	go func() {
@@ -356,6 +379,7 @@ func buildMux(h *message.Handler, sm *session.Manager) http.Handler {
 			"model":              cfg.Provider.Model,
 			"startup_at":         startupTime.Format(time.RFC3339),
 			"api_key_configured": apiKeyCfg,
+			"electron":           os.Getenv("SORARINBOT_ELECTRON") != "",
 		})
 	})
 
@@ -589,6 +613,37 @@ func buildMux(h *message.Handler, sm *session.Manager) http.Handler {
 		}
 	})
 
+	// Auto-start management
+	mux.HandleFunc("/api/autostart", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"enabled": getAutostart(),
+			})
+		case http.MethodPut:
+			var body struct {
+				Enabled bool `json:"enabled"`
+			}
+			if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+				http.Error(w, err.Error(), 400)
+				return
+			}
+			if err := setAutostart(body.Enabled); err != nil {
+				json.NewEncoder(w).Encode(map[string]interface{}{
+					"ok":    false,
+					"error": err.Error(),
+				})
+				return
+			}
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"ok":      true,
+				"enabled": body.Enabled,
+			})
+		default:
+			http.Error(w, "method not allowed", 405)
+		}
+	})
+
 	// WebSocket heartbeat for browser close detection
 	mux.HandleFunc("/ws", heartbeat.handleWS)
 
@@ -659,19 +714,4 @@ func isDirWritable(dir string) bool {
 	}
 	os.Remove(testFile)
 	return true
-}
-
-func defaultDataDir() string {
-	// Windows: %APPDATA%/SorarinBot
-	if appData := os.Getenv("APPDATA"); appData != "" {
-		return filepath.Join(appData, "SorarinBot")
-	}
-	// Linux/macOS: $XDG_DATA_HOME/SorarinBot or ~/.local/share/SorarinBot
-	if xdg := os.Getenv("XDG_DATA_HOME"); xdg != "" {
-		return filepath.Join(xdg, "SorarinBot")
-	}
-	if home := os.Getenv("HOME"); home != "" {
-		return filepath.Join(home, ".local", "share", "SorarinBot")
-	}
-	return ""
 }
