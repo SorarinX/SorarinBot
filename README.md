@@ -7,6 +7,7 @@
 **微信 AI 智能助手 · WeChat AI Assistant Powered by LLM**
 
 [![Version](https://img.shields.io/badge/version-2.2.0-3B82F6?style=flat-square)](https://github.com/SorarinX/SorarinBot/releases)
+[![CI](https://github.com/SorarinX/SorarinBot/actions/workflows/ci.yml/badge.svg?style=flat-square)](https://github.com/SorarinX/SorarinBot/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-PolyForm%20NC-3B82F6?style=flat-square)](LICENSE)
 [![Commercial](https://img.shields.io/badge/commercial-license-F59E0B?style=flat-square)](mailto:zyc2597376118@gmail.com)
 [![Go](https://img.shields.io/badge/Go-1.25-00ADD8?style=flat-square&logo=go&logoColor=white)](https://go.dev/)
