@@ -160,6 +160,31 @@ func main() {
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
 
+	// System tray (skip inside Electron)
+	if os.Getenv("SORARINBOT_ELECTRON") == "" {
+		go func() {
+			iconPath := filepath.Join(filepath.Dir(os.Args[0]), "icon.ico")
+			InitTray(TrayConfig{
+				WebURL:   "http://" + cfg.Web.Listen,
+				IconPath: iconPath,
+				OnExit: func() {
+					logrus.Info("[tray] quit requested")
+					ch <- syscall.SIGTERM
+				},
+				OnAutoStart: func(enabled bool) {
+					if err := setAutostart(enabled); err != nil {
+						logrus.Errorf("[tray] autostart error: %v", err)
+					} else {
+						logrus.Infof("[tray] autostart: %v", enabled)
+					}
+				},
+				IsAutoStart: func() bool {
+					return getAutostart()
+				},
+			})
+		}()
+	}
+
 	// Auto-open browser shortly after startup (skip if running inside Electron)
 	go func() {
 		time.Sleep(1 * time.Second)
@@ -354,6 +379,7 @@ func buildMux(h *message.Handler, sm *session.Manager) http.Handler {
 			"model":              cfg.Provider.Model,
 			"startup_at":         startupTime.Format(time.RFC3339),
 			"api_key_configured": apiKeyCfg,
+			"electron":           os.Getenv("SORARINBOT_ELECTRON") != "",
 		})
 	})
 
@@ -582,6 +608,37 @@ func buildMux(h *message.Handler, sm *session.Manager) http.Handler {
 				logrus.Errorf("save config: %v", err)
 			}
 			json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+		default:
+			http.Error(w, "method not allowed", 405)
+		}
+	})
+
+	// Auto-start management
+	mux.HandleFunc("/api/autostart", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"enabled": getAutostart(),
+			})
+		case http.MethodPut:
+			var body struct {
+				Enabled bool `json:"enabled"`
+			}
+			if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+				http.Error(w, err.Error(), 400)
+				return
+			}
+			if err := setAutostart(body.Enabled); err != nil {
+				json.NewEncoder(w).Encode(map[string]interface{}{
+					"ok":    false,
+					"error": err.Error(),
+				})
+				return
+			}
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"ok":      true,
+				"enabled": body.Enabled,
+			})
 		default:
 			http.Error(w, "method not allowed", 405)
 		}

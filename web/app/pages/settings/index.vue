@@ -1,5 +1,7 @@
 <script setup lang="ts">
 const { config, updateConfig, testConnection, fetchModels } = useConfig()
+const { status } = useStatus()
+const { enabled: autoStartEnabled, toggle: toggleAutoStart } = useAutostart()
 const toast = useToast()
 
 const providerOptions = [
@@ -231,6 +233,28 @@ async function handleTest() {
           </div>
         </div>
       </div>
+    </UPageCard>
+
+    <!-- System Settings -->
+    <UPageCard
+      title="System"
+      description="系统设置"
+      variant="naked"
+      orientation="horizontal"
+      class="mt-6 mb-4"
+    />
+
+    <UPageCard variant="subtle">
+      <UFormField
+        label="开机自启动"
+        description="系统启动时自动运行 SorarinBot"
+        class="flex max-sm:flex-col justify-between items-start gap-4"
+      >
+        <USwitch
+          :model-value="autoStartEnabled"
+          @update:model-value="toggleAutoStart($event)"
+        />
+      </UFormField>
     </UPageCard>
   </div>
 </template>

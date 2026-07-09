@@ -6,7 +6,7 @@
 
 **微信 AI 智能助手 · WeChat AI Assistant Powered by LLM**
 
-[![Version](https://img.shields.io/badge/version-2.1.0-3B82F6?style=flat-square)](https://github.com/SorarinX/SorarinBot/releases)
+[![Version](https://img.shields.io/badge/version-2.2.0-3B82F6?style=flat-square)](https://github.com/SorarinX/SorarinBot/releases)
 [![License](https://img.shields.io/badge/license-PolyForm%20NC-3B82F6?style=flat-square)](LICENSE)
 [![Commercial](https://img.shields.io/badge/commercial-license-F59E0B?style=flat-square)](mailto:zyc2597376118@gmail.com)
 [![Go](https://img.shields.io/badge/Go-1.25-00ADD8?style=flat-square&logo=go&logoColor=white)](https://go.dev/)
@@ -52,17 +52,17 @@
 
 ### Windows
 
-Grab `SorarinBot Setup 2.1.0.exe` from [Releases](https://github.com/SorarinX/SorarinBot/releases) and run it.
+Grab `SorarinBot Setup 2.2.0.exe` from [Releases](https://github.com/SorarinX/SorarinBot/releases) and run it.
 
 ### Linux
 
-Download `SorarinBot-2.1.0.AppImage` from [Releases](https://github.com/SorarinX/SorarinBot/releases):
+Download `SorarinBot-2.2.0.AppImage` from [Releases](https://github.com/SorarinX/SorarinBot/releases):
 
 ```bash
 # 1. Download and make executable
 mkdir -p ~/SorarinBot
 curl -L -o ~/SorarinBot/SorarinBot.AppImage \
-  "https://github.com/SorarinX/SorarinBot/releases/download/v2.1.0/SorarinBot-2.1.0.AppImage"
+  "https://github.com/SorarinX/SorarinBot/releases/download/v2.2.0/SorarinBot-2.2.0.AppImage"
 chmod +x ~/SorarinBot/SorarinBot.AppImage
 
 # 2. Install FUSE if needed (Ubuntu/Debian)
@@ -118,7 +118,7 @@ cd linux/src && bash scripts/build.sh
 | **Linux** | ✅ Available | tar.gz (14MB, zero dependencies) | Desktop & **server** deployment |
 | **macOS** | 🔜 Planned | - | Community contributions welcome |
 
-> **v2.1.0 新增 Linux 桌面端支持！** 详见 [linux/](linux/) 目录。
+> **v2.2.0 新增 Linux 桌面端支持！** 详见 [linux/](linux/) 目录。
 
 ## ⚙️ Configuration
 
@@ -335,17 +335,17 @@ See [LICENSE](LICENSE) for full terms.
 
 ### Windows
 
-从 [Releases](https://github.com/SorarinX/SorarinBot/releases) 下载 `SorarinBot Setup 2.1.0.exe`，双击安装即可。
+从 [Releases](https://github.com/SorarinX/SorarinBot/releases) 下载 `SorarinBot Setup 2.2.0.exe`，双击安装即可。
 
 ### Linux
 
-从 [Releases](https://github.com/SorarinX/SorarinBot/releases) 下载 `SorarinBot-2.1.0.AppImage`：
+从 [Releases](https://github.com/SorarinX/SorarinBot/releases) 下载 `SorarinBot-2.2.0.AppImage`：
 
 ```bash
 # 1. 下载并赋予执行权限
 mkdir -p ~/SorarinBot
 curl -L -o ~/SorarinBot/SorarinBot.AppImage \
-  "https://github.com/SorarinX/SorarinBot/releases/download/v2.1.0/SorarinBot-2.1.0.AppImage"
+  "https://github.com/SorarinX/SorarinBot/releases/download/v2.2.0/SorarinBot-2.2.0.AppImage"
 chmod +x ~/SorarinBot/SorarinBot.AppImage
 
 # 2. 安装 FUSE（Ubuntu/Debian 需要）
@@ -438,7 +438,7 @@ SorarinBot/
 │   ├── main.js                # 主进程
 │   ├── preload.js             # 预加载脚本
 │   └── package.json           # 构建配置
-├── linux/                     # Linux 桌面端（v2.1.0 新增）
+├── linux/                     # Linux 桌面端（v2.2.0 新增）
 │   ├── platform_linux.go      # 平台适配
 │   ├── electron/              # Linux Electron 配置
 │   └── scripts/               # 构建脚本

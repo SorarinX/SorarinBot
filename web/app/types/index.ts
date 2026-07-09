@@ -9,6 +9,7 @@ export interface SystemStatus {
   startup_at: string
   api_key_configured: boolean
   sessions: string[]
+  electron?: boolean
 }
 
 // === Provider ===
