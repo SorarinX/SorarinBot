@@ -45,13 +45,17 @@ function startGoBackend() {
     return
   }
 
-  goProcess = spawn('cmd.exe', ['/c', 'start', 'SorarinBot.exe'], {
+  console.log('Starting Go backend from:', exePath)
+
+  goProcess = spawn(exePath, [], {
     cwd: path.dirname(exePath),
     env: { ...process.env, SORARINBOT_ELECTRON: '1' },
-    detached: true
+    stdio: ['ignore', 'pipe', 'pipe'],
+    windowsHide: true
   })
-  goProcess.unref()
 
+  goProcess.stdout.on('data', (data) => console.log('[go]', data.toString().trim()))
+  goProcess.stderr.on('data', (data) => console.error('[go]', data.toString().trim()))
   goProcess.on('error', (err) => console.error('Go backend error:', err))
   goProcess.on('exit', (code) => { console.log('Go backend exited:', code); goProcess = null })
 }
