@@ -59,9 +59,35 @@ Grab `SorarinBot Setup 2.1.0.exe` from [Releases](https://github.com/SorarinX/So
 Download `SorarinBot-2.1.0.AppImage` from [Releases](https://github.com/SorarinX/SorarinBot/releases):
 
 ```bash
-chmod +x SorarinBot-2.1.0.AppImage
-./SorarinBot-2.1.0.AppImage
+# 1. Download and make executable
+mkdir -p ~/SorarinBot
+curl -L -o ~/SorarinBot/SorarinBot.AppImage \
+  "https://github.com/SorarinX/SorarinBot/releases/download/v2.1.0/SorarinBot-2.1.0.AppImage"
+chmod +x ~/SorarinBot/SorarinBot.AppImage
+
+# 2. Install FUSE if needed (Ubuntu/Debian)
+sudo apt install -y fuse libfuse2
+
+# 3. Create config.yaml with your API key
+cat > ~/SorarinBot/config.yaml << 'EOF'
+web:
+    listen: localhost:8080
+provider:
+    name: deepseek
+    base_url: https://api.deepseek.com
+    model: deepseek-chat
+    api_key: YOUR_API_KEY
+prompt: "You are a helpful AI assistant."
+EOF
+
+# 4. Run
+cd ~/SorarinBot
+./SorarinBot.AppImage
 ```
+
+Then open **http://localhost:8080** in your browser.
+
+> 📖 Full tutorial with FAQ: [linux/TUTORIAL.md](linux/TUTORIAL.md)
 
 ### Build from Source
 
@@ -316,9 +342,35 @@ See [LICENSE](LICENSE) for full terms.
 从 [Releases](https://github.com/SorarinX/SorarinBot/releases) 下载 `SorarinBot-2.1.0.AppImage`：
 
 ```bash
-chmod +x SorarinBot-2.1.0.AppImage
-./SorarinBot-2.1.0.AppImage
+# 1. 下载并赋予执行权限
+mkdir -p ~/SorarinBot
+curl -L -o ~/SorarinBot/SorarinBot.AppImage \
+  "https://github.com/SorarinX/SorarinBot/releases/download/v2.1.0/SorarinBot-2.1.0.AppImage"
+chmod +x ~/SorarinBot/SorarinBot.AppImage
+
+# 2. 安装 FUSE（Ubuntu/Debian 需要）
+sudo apt install -y fuse libfuse2
+
+# 3. 创建配置文件，填入你的 API Key
+cat > ~/SorarinBot/config.yaml << 'EOF'
+web:
+    listen: localhost:8080
+provider:
+    name: deepseek
+    base_url: https://api.deepseek.com
+    model: deepseek-chat
+    api_key: YOUR_API_KEY
+prompt: "You are a helpful AI assistant."
+EOF
+
+# 4. 启动
+cd ~/SorarinBot
+./SorarinBot.AppImage
 ```
+
+然后在浏览器打开 **http://localhost:8080**。
+
+> 📖 完整教程（含常见问题）：[linux/TUTORIAL.md](linux/TUTORIAL.md)
 
 ### 从源码构建
 

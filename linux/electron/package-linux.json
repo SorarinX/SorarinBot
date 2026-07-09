@@ -39,12 +39,11 @@
       }
     ],
     "electronVersion": "43.0.0",
-    "electronDist": "dist",
     "linux": {
       "target": [
         "AppImage"
       ],
-      "icon": "icon.ico",
+      "icon": "logo.png",
       "category": "Utility"
     }
   },
