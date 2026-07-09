@@ -90,21 +90,32 @@ func InitTray(cfg TrayConfig) {
 }
 
 func loadIcon(iconPath string) []byte {
+	// Try specified path first
 	if iconPath != "" {
 		if data, err := os.ReadFile(iconPath); err == nil {
 			return data
 		}
 	}
+
+	// Try multiple base directories
 	exe, _ := os.Executable()
 	exeDir := filepath.Dir(exe)
-	for _, name := range []string{"icon.ico", "logo.png", "resources/icon.ico", "resources/logo.png"} {
-		p := filepath.Join(exeDir, name)
-		if data, err := os.ReadFile(p); err == nil {
-			logrus.Infof("[tray] icon loaded from %s", p)
-			return data
+	cwd, _ := os.Getwd()
+
+	bases := []string{exeDir, cwd}
+	names := []string{"icon.ico", "logo.png"}
+
+	for _, base := range bases {
+		for _, name := range names {
+			p := filepath.Join(base, name)
+			if data, err := os.ReadFile(p); err == nil {
+				logrus.Infof("[tray] icon loaded from %s", p)
+				return data
+			}
 		}
 	}
-	logrus.Warn("[tray] no icon found")
+
+	logrus.Warn("[tray] no icon found, tray will use default")
 	return nil
 }
 
