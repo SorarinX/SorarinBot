@@ -13,6 +13,7 @@
 [![Electron](https://img.shields.io/badge/Electron-43-47848F?style=flat-square&logo=electron&logoColor=white)](https://www.electronjs.org/)
 [![Vue](https://img.shields.io/badge/Vue-3-4FC08D?style=flat-square&logo=vue.js&logoColor=white)](https://vuejs.org/)
 [![Nuxt](https://img.shields.io/badge/Nuxt-4-00DC82?style=flat-square&logo=nuxt.js&logoColor=white)](https://nuxt.com/)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-3B82F6?style=flat-square)](#platform-support)
 
 [**English**](#english) · [**中文**](#中文)
 
@@ -30,7 +31,7 @@
 | 💬 **Smart Chat** | Private auto-reply, group @mention trigger, configurable context memory |
 | 🖼️ **Vision** | Send an image + text to invoke Vision models for visual Q&A |
 | 🎯 **Pat-Pat** | Random cat-girl replies on WeChat "pat-pat" interactions |
-| 🖥️ **Desktop App** | Electron wrapper — one-click launch, auto-exit on window close |
+| 🖥️ **Desktop App** | Electron wrapper — Windows + **Linux** support, one-click launch, auto-exit on window close |
 | 📊 **Dashboard** | Real-time session monitor, chat history, system logs, live config editing |
 | ⚙️ **Hot Reload** | Change API key, model, or system prompt via Web UI — no restart needed |
 | 🌙 **Dark Mode** | Light/dark theme toggle with responsive layout |
@@ -49,28 +50,49 @@
 
 ## 🚀 Quick Start
 
-### Download Installer (Recommended)
+### Windows
 
 Grab `SorarinBot Setup 2.1.0.exe` from [Releases](https://github.com/SorarinX/SorarinBot/releases) and run it.
 
-### Portable
+### Linux
 
-Download the portable zip, extract, and double-click `SorarinBot.exe`.
+Download `SorarinBot-2.1.0.AppImage` from [Releases](https://github.com/SorarinX/SorarinBot/releases):
+
+```bash
+chmod +x SorarinBot-2.1.0.AppImage
+./SorarinBot-2.1.0.AppImage
+```
 
 ### Build from Source
 
 ```bash
 git clone https://github.com/SorarinX/SorarinBot.git && cd SorarinBot
 
-# Backend
+# Backend (Windows)
 go build -o SorarinBot.exe .
+
+# Backend (Linux)
+GOOS=linux GOARCH=amd64 go build -o SorarinBot .
 
 # Frontend
 cd web && pnpm install && pnpm build && cd ..
 
-# Electron client (optional)
+# Electron client (Windows)
 cd electron && npm install && npx electron-builder --win && cd ..
+
+# Electron client (Linux) — see linux/README.md
+cd linux/src && bash scripts/build.sh
 ```
+
+## 🖥️ Platform Support
+
+| Platform | Status | Package | Notes |
+|----------|--------|---------|-------|
+| **Windows** | ✅ Stable | NSIS installer (.exe) | Primary platform |
+| **Linux** | ✅ Available | AppImage | See [linux/README.md](linux/README.md) |
+| **macOS** | 🔜 Planned | - | Community contributions welcome |
+
+> **v2.1.0 新增 Linux 桌面端支持！** 详见 [linux/](linux/) 目录。
 
 ## ⚙️ Configuration
 
@@ -262,7 +284,7 @@ See [LICENSE](LICENSE) for full terms.
 | 💬 **智能对话** | 私聊自动回复，群聊 @触发，可配置上下文记忆轮数 |
 | 🖼️ **图片识别** | 发送图片 + 文字，调用 Vision 模型进行视觉问答 |
 | 🎯 **拍一拍互动** | 微信拍一拍随机猫娘回复 |
-| 🖥️ **桌面客户端** | Electron 封装，一键启动，关闭窗口自动退出 |
+| 🖥️ **桌面客户端** | Electron 封装，支持 Windows + **Linux**，一键启动，关闭窗口自动退出 |
 | 📊 **管理后台** | 实时监控会话、查看聊天记录、系统日志、在线修改配置 |
 | ⚙️ **热更新** | 通过 Web UI 修改 API Key、模型、提示词，即时生效无需重启 |
 | 🌙 **暗色模式** | 支持明暗主题切换，响应式布局 |
@@ -285,27 +307,38 @@ See [LICENSE](LICENSE) for full terms.
 
 ## 🚀 快速开始
 
-### 下载安装包（推荐）
+### Windows
 
 从 [Releases](https://github.com/SorarinX/SorarinBot/releases) 下载 `SorarinBot Setup 2.1.0.exe`，双击安装即可。
 
-### 便携版
+### Linux
 
-下载便携版 zip，解压后双击 `SorarinBot.exe` 运行。
+从 [Releases](https://github.com/SorarinX/SorarinBot/releases) 下载 `SorarinBot-2.1.0.AppImage`：
+
+```bash
+chmod +x SorarinBot-2.1.0.AppImage
+./SorarinBot-2.1.0.AppImage
+```
 
 ### 从源码构建
 
 ```bash
 git clone https://github.com/SorarinX/SorarinBot.git && cd SorarinBot
 
-# 构建 Go 后端
+# 构建 Go 后端（Windows）
 go build -o SorarinBot.exe .
+
+# 构建 Go 后端（Linux）
+GOOS=linux GOARCH=amd64 go build -o SorarinBot .
 
 # 构建前端
 cd web && pnpm install && pnpm build && cd ..
 
-# 构建 Electron 客户端（可选）
+# 构建 Electron 客户端（Windows）
 cd electron && npm install && npx electron-builder --win && cd ..
+
+# 构建 Electron 客户端（Linux）— 详见 linux/README.md
+cd linux/src && bash scripts/build.sh
 ```
 
 ## ⚙️ 配置说明
@@ -349,10 +382,14 @@ SorarinBot/
 ├── web/                       # Nuxt 4 前端（SPA，嵌入 Go 二进制）
 │   ├── app/                   # Vue 源码
 │   └── dist/                  # 构建产物（go:embed）
-├── electron/                  # Electron 桌面客户端
+├── electron/                  # Electron 桌面客户端（Windows）
 │   ├── main.js                # 主进程
 │   ├── preload.js             # 预加载脚本
 │   └── package.json           # 构建配置
+├── linux/                     # Linux 桌面端（v2.1.0 新增）
+│   ├── platform_linux.go      # 平台适配
+│   ├── electron/              # Linux Electron 配置
+│   └── scripts/               # 构建脚本
 └── logo.png                   # 项目 Logo
 ```
 

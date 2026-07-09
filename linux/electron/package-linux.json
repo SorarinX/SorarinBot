@@ -1,0 +1,55 @@
+{
+  "name": "sorarinbot",
+  "version": "2.1.0",
+  "description": "SorarinBot - WeChat AI Assistant",
+  "main": "main-linux.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --linux",
+    "build:dir": "electron-builder --linux --dir"
+  },
+  "build": {
+    "appId": "com.sorarin.bot",
+    "productName": "SorarinBot",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main-linux.js",
+      "preload.js",
+      "config.yaml",
+      "logo.png",
+      "!node_modules",
+      "!*.zip",
+      "!data.db",
+      "!release",
+      "!web_dist",
+      "!dist",
+      "!main.js",
+      "!build.bat"
+    ],
+    "extraResources": [
+      {
+        "from": "SorarinBot",
+        "to": "SorarinBot"
+      },
+      {
+        "from": "config.yaml",
+        "to": "config.yaml"
+      }
+    ],
+    "electronVersion": "43.0.0",
+    "electronDist": "dist",
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "icon": "icon.ico",
+      "category": "Utility"
+    }
+  },
+  "devDependencies": {
+    "electron": "43.0.0",
+    "electron-builder": "^26.15.3"
+  }
+}
