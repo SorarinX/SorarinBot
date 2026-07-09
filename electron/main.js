@@ -47,33 +47,19 @@ function startGoBackend() {
 
   console.log('[electron] starting Go backend from:', exePath)
 
-  goProcess = spawn(exePath, [], {
+  goProcess = spawn('cmd.exe', ['/c', 'start', 'SorarinBot.exe'], {
     cwd: path.dirname(exePath),
     env: { ...process.env, SORARINBOT_ELECTRON: '1' },
-    stdio: ['ignore', 'pipe', 'pipe'],
-    windowsHide: true
+    detached: true
   })
+  goProcess.unref()
 
-  goProcess.stdout.on('data', (data) => {
-    const lines = data.toString().trim().split('\n')
-    lines.forEach(line => console.log('[go]', line))
-  })
-  goProcess.stderr.on('data', (data) => {
-    const lines = data.toString().trim().split('\n')
-    lines.forEach(line => console.error('[go:err]', line))
-  })
   goProcess.on('error', (err) => {
     console.error('[electron] Go backend spawn error:', err)
   })
-  goProcess.on('exit', (code, signal) => {
-    console.error('[electron] Go backend exited: code=' + code + ' signal=' + signal)
+  goProcess.on('exit', (code) => {
+    console.log('[electron] Go backend exited:', code)
     goProcess = null
-    // If window is still open, show error
-    if (mainWindow) {
-      mainWindow.webContents.executeJavaScript(
-        `document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:#666;"><div style="text-align:center"><h2>后端已断开</h2><p>Go backend exited with code ${code}</p><p>请重新启动应用</p></div></div>'`
-      ).catch(() => {})
-    }
   })
 
   return true
@@ -88,18 +74,11 @@ function createWindow() {
     title: 'SorarinBot',
     icon: path.join(__dirname, 'logo.png'),
     autoHideMenuBar: true,
-    show: false, // don't show until ready
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
       contextIsolation: true
     }
-  })
-
-  // Show window only when content is ready
-  mainWindow.webContents.on('did-finish-load', () => {
-    console.log('[electron] page loaded, showing window')
-    mainWindow.show()
   })
 
   mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDesc) => {

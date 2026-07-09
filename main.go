@@ -39,8 +39,22 @@ var startupTime = time.Now()
 func main() {
 	// Always run from exe directory so relative paths work on double-click
 	exe, _ := os.Executable()
-	if dir := filepath.Dir(exe); dir != "" {
-		_ = os.Chdir(dir)
+	exeDir := filepath.Dir(exe)
+	if exeDir != "" {
+		_ = os.Chdir(exeDir)
+	}
+
+	// If exe directory is not writable (e.g. Program Files), use %APPDATA%/SorarinBot
+	dataDir := exeDir
+	if !isDirWritable(exeDir) {
+		appData := os.Getenv("APPDATA")
+		if appData != "" {
+			dataDir = filepath.Join(appData, "SorarinBot")
+			os.MkdirAll(dataDir, 0755)
+		}
+	}
+	if dataDir != exeDir {
+		logrus.Infof("data directory: %s", dataDir)
 	}
 
 	// Config
@@ -48,6 +62,12 @@ func main() {
 		logrus.Fatalf("config load: %v", err)
 	}
 	cfg := &config.Cfg
+
+	// Override data paths if exe directory is not writable
+	if dataDir != exeDir {
+		cfg.DB.Path = filepath.Join(dataDir, "data.db")
+		cfg.WeChat.TokenFile = filepath.Join(dataDir, "token.json")
+	}
 
 	banner := []string{
 		"███████╗ ██████╗ ██████╗  █████╗ ██████╗ ██╗███╗   ██╗",
@@ -628,4 +648,13 @@ func startWeb(ctx context.Context, listen string, h *message.Handler, sm *sessio
 	if !tryPort(nextAddr) {
 		logrus.Fatalf("failed to listen on %s and %s", listen, nextAddr)
 	}
+}
+
+func isDirWritable(dir string) bool {
+	testFile := filepath.Join(dir, ".write_test_tmp")
+	if err := os.WriteFile(testFile, []byte("test"), 0644); err != nil {
+		return false
+	}
+	os.Remove(testFile)
+	return true
 }
