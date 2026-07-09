@@ -1,292 +1,98 @@
-# SorarinBot Linux 安装教程
+<div align="center">
 
-> 面向 Linux 初学者的完整安装指南
+# SorarinBot — Linux Installation Guide
 
----
+**SorarinBot — Linux 安装教程**
 
-## 目录
+[![Version](https://img.shields.io/badge/version-2.1.0-3B82F6?style=flat-square)](https://github.com/SorarinX/SorarinBot/releases)
+[![Platform](https://img.shields.io/badge/platform-Linux-FCC624?style=flat-square&logo=linux&logoColor=black)]()
 
-1. [系统要求](#1-系统要求)
-2. [下载安装](#2-下载安装)
-3. [首次配置](#3-首次配置)
-4. [启动运行](#4-启动运行)
-5. [常见问题](#5-常见问题)
-6. [进阶：从源码构建](#6-进阶从源码构建)
+</div>
 
 ---
 
-## 1. 系统要求
+<a id="english"></a>
 
-| 项目 | 要求 |
-|------|------|
-| 系统 | Ubuntu 20.04+ / Debian 11+ / Fedora 36+ / Arch Linux |
-| 架构 | x86_64 (amd64) |
-| 内存 | 512MB 以上 |
-| 磁盘 | 200MB 可用空间 |
-| 网络 | 需要访问微信和 LLM API |
+## System Requirements
 
----
+| Item | Requirement |
+|------|-------------|
+| OS | Ubuntu 20.04+, Debian 11+, Fedora 36+, Arch Linux |
+| Architecture | x86_64 (amd64) |
+| Memory | 512 MB+ |
+| Disk | 50 MB free |
+| Network | Access to WeChat and LLM API |
 
-## 2. 下载安装
+## Quick Start
 
-### 步骤 1：下载 AppImage
-
-打开终端（按 `Ctrl+Alt+T`），执行：
+### Step 1 — Download & Extract
 
 ```bash
-# 创建安装目录
-mkdir -p ~/SorarinBot
-
-# 下载 AppImage（替换为实际下载链接）
-# 方式一：浏览器下载
-# 打开 https://github.com/SorarinX/SorarinBot/releases
-# 下载 SorarinBot-2.1.0.AppImage 到 ~/SorarinBot/
-
-# 方式二：终端下载（需要安装 curl）
-curl -L -o ~/SorarinBot/SorarinBot.AppImage "https://github.com/SorarinX/SorarinBot/releases/download/v2.1.0/SorarinBot-2.1.0.AppImage"
+mkdir -p ~/SorarinBot && cd ~/SorarinBot
+curl -L -o sorarinbot.tar.gz \
+  https://github.com/SorarinX/SorarinBot/releases/download/v2.1.0/sorarinbot-v2.1.0-linux-amd64.tar.gz
+tar -xzf sorarinbot.tar.gz --strip-components=1
+rm sorarinbot.tar.gz
 ```
 
-### 步骤 2：赋予执行权限
+### Step 2 — Configure
 
 ```bash
-chmod +x ~/SorarinBot/SorarinBot.AppImage
+nano config.yaml
 ```
 
-> **什么是 chmod +x？**
-> Linux 中文件默认没有执行权限。`+x` 表示"允许这个文件作为程序运行"。
-> 相当于 Windows 中"以管理员身份运行"的权限设置。
-
-### 步骤 3：安装 FUSE（如果提示缺少）
-
-AppImage 需要 FUSE 才能运行。如果启动时报错 `fusermount: permission denied` 或 `AppImages require FUSE`：
-
-```bash
-# Ubuntu / Debian
-sudo apt update && sudo apt install -y fuse libfuse2
-
-# Fedora
-sudo dnf install -y fuse fuse-libs
-
-# Arch Linux
-sudo pacman -S fuse2
-```
-
-> **什么是 sudo？**
-> `sudo` 表示"以管理员权限执行"。会要求输入你的登录密码（输入时不会显示任何字符，这是正常的）。
-
----
-
-## 3. 首次配置
-
-### 步骤 1：创建配置文件
-
-```bash
-cat > ~/SorarinBot/config.yaml << 'EOF'
-admin:
-    password_hash: ""
-wechat:
-    strict_login: false
-    token_file: ./token.json
-    auto_login: true
-    trigger_prefix: ""
-web:
-    listen: localhost:8080
-chat:
-    context_enabled: true
-    max_context: 3
-    image_ttl: 300
-plugins:
-    enabled: false
-database:
-    path: ./data.db
-provider:
-    name: deepseek
-    base_url: https://api.deepseek.com
-    model: deepseek-chat
-    api_key: YOUR_API_KEY_HERE
-prompt: "你是一个有用的 AI 助手。"
-EOF
-```
-
-### 步骤 2：填入你的 API Key
-
-用任意文本编辑器打开配置文件：
-
-```bash
-# 方式一：用系统默认编辑器
-xdg-open ~/SorarinBot/config.yaml
-
-# 方式二：用 nano（终端内编辑，按 Ctrl+X 保存退出）
-nano ~/SorarinBot/config.yaml
-
-# 方式三：用 gedit（图形界面）
-gedit ~/SorarinBot/config.yaml
-```
-
-找到 `api_key: YOUR_API_KEY_HERE`，替换为你的真实 API Key。
-
-**如何获取 API Key：**
-
-| 平台 | 获取地址 |
-|------|---------|
-| DeepSeek | https://platform.deepseek.com/api_keys |
-| MiniMax | https://platform.minimaxi.com/api_key |
-| OpenAI | https://platform.openai.com/api-keys |
-
-### 步骤 3：配置文件说明
+Edit the `provider` section:
 
 ```yaml
 provider:
-  name: deepseek              # 选择你的 AI 提供商
-  base_url: https://api.deepseek.com  # API 地址
-  model: deepseek-chat        # 使用的模型
-  api_key: sk-xxxxxxxx        # 你的 API Key
+  name: deepseek
+  base_url: https://api.deepseek.com
+  model: deepseek-chat
+  api_key: YOUR_API_KEY_HERE
 
-prompt: "你是一个有用的 AI 助手。"  # AI 的角色设定
-
-chat:
-  context_enabled: true       # 是否记住对话上下文
-  max_context: 3              # 记住最近几轮对话
+prompt: "You are a helpful AI assistant."
 ```
 
----
+Save: `Ctrl+O` → `Enter` → `Ctrl+X`
 
-## 4. 启动运行
-
-### 步骤 1：启动 SorarinBot
+### Step 3 — Run
 
 ```bash
-cd ~/SorarinBot
-./SorarinBot.AppImage
+chmod +x SorarinBot
+./SorarinBot
 ```
 
-启动后你会看到：
+You will see the startup banner and a QR code. Scan it with WeChat to log in.
 
-```
-███████╗ ██████╗ ██████╗  █████╗ ██████╗ ██╗███╗   ██╗
-...
-              ✦ SorarinBot AI Assistant ✦
+Open **http://localhost:8080** in your browser to access the dashboard.
 
-provider: deepseek, model=deepseek-chat, vision=true
-web UI at http://localhost:8080
+## Supported Providers
 
-█████████████████████████
-████ ▄▄▄▄▄ █ ...  ████   ← 二维码
-█████████████████████████
+| Provider | base_url | model |
+|----------|----------|-------|
+| DeepSeek | `https://api.deepseek.com` | `deepseek-chat` |
+| MiniMax | `https://api.minimaxi.com/v1` | `MiniMax-M3` |
+| OpenAI | `https://api.openai.com/v1` | `gpt-4o` |
+| Any OpenAI-compatible | Custom URL | Custom model |
 
-[scan] QR code displayed, scan with WeChat
-```
-
-### 步骤 2：扫码登录
-
-用手机微信扫描终端中的二维码完成登录。
-
-### 步骤 3：打开管理后台
-
-在浏览器中访问：**http://localhost:8080**
-
-你将看到 SorarinBot 管理后台，可以：
-- 查看实时会话
-- 浏览聊天记录
-- 查看系统日志
-- 修改配置（API Key、模型、提示词）
-
-### 步骤 4：开始使用
-
-在微信中给机器人发消息，它会自动回复！
-
-**私聊：** 直接发消息即可
-
-**群聊：** 需要 @机器人 或配置触发前缀
-
----
-
-## 5. 常见问题
-
-### Q1：启动报错 `address already in use`
-
-```
-listen tcp 127.0.0.1:8080: bind: address already in use
-```
-
-**原因：** 8080 端口被其他程序占用。
-
-**解决：**
+## Run in Background
 
 ```bash
-# 查看谁占用了 8080 端口
-lsof -i :8080
+# Start in background
+nohup ./SorarinBot > sorarinbot.log 2>&1 &
 
-# 如果是之前运行的 SorarinBot，杀掉它
-kill $(lsof -t -i :8080)
+# View logs
+tail -f sorarinbot.log
 
-# 或者修改配置文件使用其他端口
-# 将 web.listen 改为 localhost:8081
-```
-
-### Q2：启动报错 `permission denied`
-
-```
-fork/exec ./SorarinBot.AppImage: permission denied
-```
-
-**解决：**
-
-```bash
-chmod +x ~/SorarinBot/SorarinBot.AppImage
-```
-
-### Q3：启动报错 `AppImages require FUSE`
-
-```
-AppImages require FUSE to run
-```
-
-**解决：**
-
-```bash
-sudo apt update && sudo apt install -y fuse libfuse2
-```
-
-### Q4：微信扫码后提示登录失败
-
-**可能原因：**
-- 微信 Web 协议已过期，需要重新扫码
-- 网络不稳定
-
-**解决：**
-- 删除 `token.json` 文件后重新启动
-- 检查网络连接
-
-### Q5：AI 不回复消息
-
-**检查清单：**
-1. API Key 是否正确填写？
-2. API Key 是否有余额？
-3. 网络是否能访问 API 地址？
-
-```bash
-# 测试网络连通性
-curl -s https://api.deepseek.com/v1/models -H "Authorization: Bearer YOUR_API_KEY"
-```
-
-### Q6：如何后台运行？
-
-```bash
-# 使用 nohup 后台运行
-nohup ~/SorarinBot/SorarinBot.AppImage > ~/SorarinBot/sorarinbot.log 2>&1 &
-
-# 查看日志
-tail -f ~/SorarinBot/sorarinbot.log
-
-# 停止运行
+# Stop
 pkill -f SorarinBot
 ```
 
-### Q7：如何开机自启动？
+## Auto-start on Boot (systemd)
 
 ```bash
-# 创建 systemd 服务文件
+mkdir -p ~/.config/systemd/user
+
 cat > ~/.config/systemd/user/sorarinbot.service << 'EOF'
 [Unit]
 Description=SorarinBot WeChat AI Assistant
@@ -295,7 +101,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=%h/SorarinBot
-ExecStart=%h/SorarinBot/SorarinBot.AppImage
+ExecStart=%h/SorarinBot/SorarinBot
 Restart=on-failure
 RestartSec=5
 
@@ -303,7 +109,159 @@ RestartSec=5
 WantedBy=default.target
 EOF
 
-# 启用并启动服务
+systemctl --user daemon-reload
+systemctl --user enable sorarinbot
+systemctl --user start sorarinbot
+
+# Check status
+systemctl --user status sorarinbot
+```
+
+## Build from Source
+
+```bash
+# Prerequisites
+sudo apt install -y golang-go
+
+# Clone and build
+git clone https://github.com/SorarinX/SorarinBot.git
+cd SorarinBot/linux/src
+GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o SorarinBot .
+
+# Run
+cp SorarinBot ~/SorarinBot/
+cd ~/SorarinBot && ./SorarinBot
+```
+
+## Troubleshooting
+
+| Problem | Cause | Solution |
+|---------|-------|----------|
+| `address already in use` | Port 8080 occupied | `kill $(lsof -t -i :8080)` or change port in config |
+| `permission denied` | Binary not executable | `chmod +x SorarinBot` |
+| QR code not scanning | WeChat Web protocol expired | Delete `token.json` and restart |
+| AI not replying | Invalid API key or no balance | Check API key in config.yaml |
+| `No such file` | Wrong directory | `cd ~/SorarinBot` before running |
+
+## File Structure
+
+```
+~/SorarinBot/
+├── SorarinBot          # Main binary (keep this)
+├── config.yaml         # Configuration (contains API key — do not share)
+├── data.db             # Chat database (auto-created)
+├── token.json          # WeChat login token (auto-created — do not share)
+└── sorarinbot.log      # Runtime log (if using nohup)
+```
+
+> ⚠️ **Security:** `config.yaml` contains your API key and `token.json` contains your WeChat login credential. **Never share these files.**
+
+## Help
+
+- [GitHub Issues](https://github.com/SorarinX/SorarinBot/issues) — Report bugs or request features
+- [README](https://github.com/SorarinX/SorarinBot) — Project documentation
+- [Releases](https://github.com/SorarinX/SorarinBot/releases) — Download latest version
+
+---
+
+<a id="中文"></a>
+
+## 系统要求
+
+| 项目 | 要求 |
+|------|------|
+| 系统 | Ubuntu 20.04+ / Debian 11+ / Fedora 36+ / Arch Linux |
+| 架构 | x86_64 (amd64) |
+| 内存 | 512MB 以上 |
+| 磁盘 | 50MB 可用空间 |
+| 网络 | 需要访问微信和 LLM API |
+
+## 快速开始
+
+### 第一步 — 下载解压
+
+```bash
+mkdir -p ~/SorarinBot && cd ~/SorarinBot
+curl -L -o sorarinbot.tar.gz \
+  https://github.com/SorarinX/SorarinBot/releases/download/v2.1.0/sorarinbot-v2.1.0-linux-amd64.tar.gz
+tar -xzf sorarinbot.tar.gz --strip-components=1
+rm sorarinbot.tar.gz
+```
+
+### 第二步 — 配置
+
+```bash
+nano config.yaml
+```
+
+编辑 `provider` 部分：
+
+```yaml
+provider:
+  name: deepseek
+  base_url: https://api.deepseek.com
+  model: deepseek-chat
+  api_key: YOUR_API_KEY_HERE
+
+prompt: "You are a helpful AI 助手。"
+```
+
+保存：`Ctrl+O` → `Enter` → `Ctrl+X`
+
+### 第三步 — 启动
+
+```bash
+chmod +x SorarinBot
+./SorarinBot
+```
+
+启动后会看到启动横幅和二维码，用微信扫码登录。
+
+在浏览器打开 **http://localhost:8080** 访问管理后台。
+
+## 支持的 AI 提供商
+
+| 提供商 | base_url | model |
+|--------|----------|-------|
+| DeepSeek | `https://api.deepseek.com` | `deepseek-chat` |
+| MiniMax | `https://api.minimaxi.com/v1` | `MiniMax-M3` |
+| OpenAI | `https://api.openai.com/v1` | `gpt-4o` |
+| 任意 OpenAI 兼容 | 自定义 URL | 自定义模型 |
+
+## 后台运行
+
+```bash
+# 后台启动
+nohup ./SorarinBot > sorarinbot.log 2>&1 &
+
+# 查看日志
+tail -f sorarinbot.log
+
+# 停止运行
+pkill -f SorarinBot
+```
+
+## 开机自启动（systemd）
+
+```bash
+mkdir -p ~/.config/systemd/user
+
+cat > ~/.config/systemd/user/sorarinbot.service << 'EOF'
+[Unit]
+Description=SorarinBot 微信 AI 助手
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/SorarinBot
+ExecStart=%h/SorarinBot/SorarinBot
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target
+EOF
+
 systemctl --user daemon-reload
 systemctl --user enable sorarinbot
 systemctl --user start sorarinbot
@@ -312,74 +270,47 @@ systemctl --user start sorarinbot
 systemctl --user status sorarinbot
 ```
 
----
-
-## 6. 进阶：从源码构建
-
-如果你想自己编译而不是使用预编译的 AppImage：
-
-### 前置条件
+## 从源码构建
 
 ```bash
-# 安装 Go
-sudo apt update
+# 前置条件
 sudo apt install -y golang-go
 
-# 安装 Node.js
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt install -y nodejs
-
-# 安装 pnpm
-npm install -g pnpm
-```
-
-### 构建步骤
-
-```bash
-# 克隆项目
+# 克隆并构建
 git clone https://github.com/SorarinX/SorarinBot.git
 cd SorarinBot/linux/src
-
-# 编译 Go 后端
 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o SorarinBot .
 
-# 复制到 electron 目录
-cp SorarinBot electron/SorarinBot
-
-# 构建 Electron AppImage
-cd electron
-cp package-linux.json package.json
-npm install
-npx electron-builder --linux
-
-# 或者使用一键脚本
-cd ../..
-bash scripts/build.sh
+# 运行
+cp SorarinBot ~/SorarinBot/
+cd ~/SorarinBot && ./SorarinBot
 ```
 
-输出文件：`electron/release/SorarinBot-2.1.0.AppImage`
+## 常见问题
 
----
+| 问题 | 原因 | 解决方案 |
+|------|------|---------|
+| `address already in use` | 8080 端口被占用 | `kill $(lsof -t -i :8080)` 或修改配置中的端口 |
+| `permission denied` | 二进制无执行权限 | `chmod +x SorarinBot` |
+| 二维码扫不了 | 微信 Web 协议过期 | 删除 `token.json` 后重启 |
+| AI 不回复 | API Key 无效或余额不足 | 检查 config.yaml 中的 API Key |
+| `No such file` | 目录不对 | 先 `cd ~/SorarinBot` 再运行 |
 
-## 目录结构
-
-安装后 `~/SorarinBot/` 目录结构：
+## 文件结构
 
 ```
 ~/SorarinBot/
-├── SorarinBot.AppImage    # 主程序（不要删除）
-├── config.yaml            # 配置文件（包含 API Key，不要分享）
-├── data.db                # 聊天记录数据库（自动生成）
-├── token.json             # 微信登录态（自动生成，不要分享）
-└── sorarinbot.log         # 运行日志（如果使用 nohup 后台运行）
+├── SorarinBot          # 主程序（不要删除）
+├── config.yaml         # 配置文件（含 API Key，不要分享）
+├── data.db             # 聊天记录数据库（自动生成）
+├── token.json          # 微信登录态（自动生成，不要分享）
+└── sorarinbot.log      # 运行日志（后台运行时生成）
 ```
 
-> ⚠️ **安全提示：** `config.yaml` 包含你的 API Key，`token.json` 包含微信登录凭证。**不要分享这些文件给任何人。**
-
----
+> ⚠️ **安全提示：** `config.yaml` 包含你的 API Key，`token.json` 包含微信登录凭证。**不要把这些文件分享给任何人。**
 
 ## 获取帮助
 
-- 📖 [GitHub Issues](https://github.com/SorarinX/SorarinBot/issues) — 提交 Bug 或功能请求
-- 📖 [README](https://github.com/SorarinX/SorarinBot) — 项目文档
-- 📖 [Releases](https://github.com/SorarinX/SorarinBot/releases) — 下载最新版本
+- [GitHub Issues](https://github.com/SorarinX/SorarinBot/issues) — 提交 Bug 或功能请求
+- [README](https://github.com/SorarinX/SorarinBot) — 项目文档
+- [Releases](https://github.com/SorarinX/SorarinBot/releases) — 下载最新版本
