@@ -114,8 +114,8 @@ cd linux/src && bash scripts/build.sh
 
 | Platform | Status | Package | Notes |
 |----------|--------|---------|-------|
-| **Windows** | ✅ Stable | NSIS installer (.exe) | Primary platform |
-| **Linux** | ✅ Available | AppImage | See [linux/README.md](linux/README.md) |
+| **Windows** | ✅ Stable | NSIS installer (.exe) | Desktop use |
+| **Linux** | ✅ Available | tar.gz (14MB, zero dependencies) | Desktop & **server** deployment |
 | **macOS** | 🔜 Planned | - | Community contributions welcome |
 
 > **v2.1.0 新增 Linux 桌面端支持！** 详见 [linux/](linux/) 目录。
