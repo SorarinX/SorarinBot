@@ -1,4 +1,5 @@
 //go:build ignore
+
 package main
 
 import (
@@ -12,8 +13,8 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"os/signal"
 	"os/exec"
+	"os/signal"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -21,13 +22,13 @@ import (
 	"syscall"
 	"time"
 
+	ow_adapter "SorarinBot/adapters/openwechat"
 	"SorarinBot/core/config"
 	"SorarinBot/core/message"
 	"SorarinBot/core/session"
 	"SorarinBot/database"
 	"SorarinBot/providers"
 	"SorarinBot/providers/openaicompat"
-	ow_adapter "SorarinBot/adapters/openwechat"
 
 	"github.com/sirupsen/logrus"
 )
@@ -467,7 +468,7 @@ func buildMux(h *message.Handler, sm *session.Manager) http.Handler {
 
 		start := time.Now()
 		resp, err := client.Chat(chatCtx, providers.ChatRequest{
-			Model:   model,
+			Model: model,
 			Messages: []providers.ChatMessage{
 				{Role: "user", Content: "Hi"},
 			},
@@ -477,8 +478,8 @@ func buildMux(h *message.Handler, sm *session.Manager) http.Handler {
 
 		if err != nil {
 			json.NewEncoder(w).Encode(map[string]interface{}{
-				"ok":       false,
-				"error":    err.Error(),
+				"ok":         false,
+				"error":      err.Error(),
 				"latency_ms": latency,
 			})
 			return
@@ -654,9 +655,15 @@ func buildMux(h *message.Handler, sm *session.Manager) http.Handler {
 func parsePagination(r *http.Request) (limit, offset int) {
 	limit, _ = strconv.Atoi(r.URL.Query().Get("limit"))
 	offset, _ = strconv.Atoi(r.URL.Query().Get("offset"))
-	if limit <= 0 { limit = 100 }
-	if limit > 1000 { limit = 1000 }
-	if offset < 0 { offset = 0 }
+	if limit <= 0 {
+		limit = 100
+	}
+	if limit > 1000 {
+		limit = 1000
+	}
+	if offset < 0 {
+		offset = 0
+	}
 	return
 }
 

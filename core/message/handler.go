@@ -13,11 +13,11 @@ import (
 )
 
 type Handler struct {
-	mu        sync.Mutex
-	Provider  providers.Provider
-	Sessions  *session.Manager
-	ImageTTL  time.Duration
-	DB        interface {
+	mu       sync.Mutex
+	Provider providers.Provider
+	Sessions *session.Manager
+	ImageTTL time.Duration
+	DB       interface {
 		InsertMessage(sender, room, userMsg, botReply, model string, promptTokens, completionTokens, totalTokens int)
 	}
 }
@@ -31,9 +31,9 @@ func (h *Handler) SetProvider(p providers.Provider) {
 
 // imageCache is a simple RAM cache keyed by "sender" (dev‑grade – not for prod).
 type imageCache struct {
-	Data    []byte
-	Mime    string
-	Time    time.Time
+	Data []byte
+	Mime string
+	Time time.Time
 }
 
 var imgCache sync.Map

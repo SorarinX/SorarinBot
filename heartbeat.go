@@ -16,10 +16,10 @@ var upgrader = websocket.Upgrader{
 // BrowserHeartbeat tracks connected browser tabs.
 // When all browsers disconnect, the process exits after a grace period.
 type BrowserHeartbeat struct {
-	mu       sync.Mutex
-	clients  map[*websocket.Conn]bool
-	done     chan struct{}
-	closed   bool
+	mu      sync.Mutex
+	clients map[*websocket.Conn]bool
+	done    chan struct{}
+	closed  bool
 }
 
 var heartbeat = &BrowserHeartbeat{

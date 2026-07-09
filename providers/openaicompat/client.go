@@ -29,9 +29,9 @@ type Config struct {
 
 // Client is the OpenAI-compatible Provider implementation.
 type Client struct {
-	cfg     Config
-	http    *http.Client
-	vision  bool // cached: does the configured model support images
+	cfg    Config
+	http   *http.Client
+	vision bool // cached: does the configured model support images
 }
 
 // New constructs a Client.
@@ -91,7 +91,7 @@ type wireRequest struct {
 }
 
 type wireMessage struct {
-	Role    string           `json:"role"`
+	Role    string            `json:"role"`
 	Content []wireContentPart `json:"-"`
 }
 
@@ -111,15 +111,15 @@ func (m wireMessage) MarshalJSON() ([]byte, error) {
 	}
 	type alias wireMessage
 	return json.Marshal(struct {
-		Role    string           `json:"role"`
+		Role    string            `json:"role"`
 		Content []wireContentPart `json:"content"`
 	}{Role: alias(m).Role, Content: alias(m).Content})
 }
 
 type wireContentPart struct {
-	Type     string          `json:"type"`
-	Text     string          `json:"text,omitempty"`
-	ImageURL *wireImageURL   `json:"image_url,omitempty"`
+	Type     string        `json:"type"`
+	Text     string        `json:"text,omitempty"`
+	ImageURL *wireImageURL `json:"image_url,omitempty"`
 }
 
 type wireImageURL struct {
@@ -166,15 +166,15 @@ func (c *Client) buildBody(req providers.ChatRequest) []byte {
 }
 
 type wireResponse struct {
-	ID      string         `json:"id"`
-	Model   string         `json:"model"`
-	Choices []wireChoice   `json:"choices"`
-	Usage   *wireUsage     `json:"usage"`
+	ID      string       `json:"id"`
+	Model   string       `json:"model"`
+	Choices []wireChoice `json:"choices"`
+	Usage   *wireUsage   `json:"usage"`
 }
 
 type wireChoice struct {
-	Index   int          `json:"index"`
-	Message wireRespMsg  `json:"message"`
+	Index   int         `json:"index"`
+	Message wireRespMsg `json:"message"`
 }
 
 type wireRespMsg struct {

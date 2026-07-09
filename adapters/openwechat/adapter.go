@@ -11,13 +11,13 @@ import (
 	"sync"
 	"time"
 
-	ow "SorarinBot/internal/openwechat"
 	"SorarinBot/core/config"
 	"SorarinBot/core/message"
 	"SorarinBot/core/session"
+	ow "SorarinBot/internal/openwechat"
 
-	"github.com/skip2/go-qrcode"
 	"github.com/sirupsen/logrus"
+	"github.com/skip2/go-qrcode"
 )
 
 var replied sync.Map // msgId → time.Time, with TTL cleanup

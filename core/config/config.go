@@ -3,14 +3,14 @@ package config
 // Config is the top-level project configuration.
 // All user‑facing settings live here; it is persisted as YAML.
 type Config struct {
-	Admin   AdminConfig   `yaml:"admin"`
-	WeChat  WeChatConfig  `yaml:"wechat"`
-	Web     WebConfig     `yaml:"web"`
-	Chat    ChatConfig    `yaml:"chat"`
-	Plugins PluginConfig  `yaml:"plugins"`
-	DB      DatabaseConf  `yaml:"database"`
+	Admin    AdminConfig  `yaml:"admin"`
+	WeChat   WeChatConfig `yaml:"wechat"`
+	Web      WebConfig    `yaml:"web"`
+	Chat     ChatConfig   `yaml:"chat"`
+	Plugins  PluginConfig `yaml:"plugins"`
+	DB       DatabaseConf `yaml:"database"`
 	Provider ProviderConf `yaml:"provider"`
-	Prompt  string        `yaml:"prompt"` // system prompt
+	Prompt   string       `yaml:"prompt"` // system prompt
 }
 
 type AdminConfig struct {
