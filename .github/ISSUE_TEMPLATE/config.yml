@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentation / 文档
+    url: https://github.com/SorarinX/SorarinBot#readme
+    about: Read the README for setup instructions and troubleshooting
+  - name: Security Vulnerability / 安全漏洞
+    url: https://github.com/SorarinX/SorarinBot/blob/main/SECURITY.md
+    about: Report security issues privately via email (do NOT open a public issue)
