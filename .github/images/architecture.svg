@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 600" width="980" height="600" role="img" aria-label="SorarinBot architecture: WeChat and the web dashboard talk to a single static Go binary that owns the WeChat adapter, HTTP server, session manager and message handler, backed by SQLite and an OpenAI-compatible LLM provider.">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0D1522"/>
+      <stop offset="1" stop-color="#111C2C"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#43587A"/>
+    </marker>
+  </defs>
+
+  <rect x="0.5" y="0.5" width="979" height="599" rx="16" fill="url(#bg)" stroke="#1E2A3C"/>
+
+  <!-- ── band 1 : clients ─────────────────────────────────────────── -->
+  <text x="48" y="40" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="11.6" font-weight="600" letter-spacing="1.7" fill="#7C8AA0">CLIENTS</text>
+
+  <rect x="48" y="54" width="420" height="64" rx="10" fill="#16263C" stroke="#2C4060"/>
+  <rect x="48" y="54" width="3" height="64" rx="1.5" fill="#07C160"/>
+  <text x="74" y="83" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#E8EEF6">WeChat</text>
+  <text x="74" y="103" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="11.5" fill="#7C8AA0">private chat &#183; group @mention &#183; pat-pat</text>
+
+  <rect x="512" y="54" width="420" height="64" rx="10" fill="#16263C" stroke="#2C4060"/>
+  <rect x="512" y="54" width="3" height="64" rx="1.5" fill="#3B82F6"/>
+  <text x="538" y="83" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="15" font-weight="600" fill="#E8EEF6">Web dashboard</text>
+  <text x="538" y="103" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="11.5" fill="#7C8AA0">browser &#183; Electron desktop shell</text>
+
+  <path d="M 258 118 L 258 160" stroke="#43587A" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M 722 118 L 722 160" stroke="#43587A" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ── band 2 : the binary ──────────────────────────────────────── -->
+  <rect x="48" y="168" width="884" height="272" rx="14" fill="#131F31" stroke="#23324A"/>
+  <text x="76" y="198" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="11.6" font-weight="600" letter-spacing="1.7" fill="#7C8AA0">SORARINBOT &#8212; ONE STATIC GO BINARY</text>
+  <text x="904" y="198" text-anchor="end" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="10.5" fill="#6E7E96">no runtime dependencies &#183; pure-Go SQLite</text>
+
+  <rect x="76" y="214" width="398" height="88" rx="9" fill="#17263A" stroke="#2A3B54"/>
+  <text x="100" y="244" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#E8EEF6">WeChat adapter</text>
+  <text x="100" y="265" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="11.6" fill="#7C8AA0">openwechat fork</text>
+  <text x="100" y="283" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="11.6" fill="#7C8AA0">6-state login machine &#183; token first, scan fallback</text>
+
+  <rect x="506" y="214" width="398" height="88" rx="9" fill="#17263A" stroke="#2A3B54"/>
+  <text x="530" y="244" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#E8EEF6">HTTP server :8080</text>
+  <text x="530" y="265" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="11.6" fill="#7C8AA0">REST API &#183; WebSocket heartbeat</text>
+  <text x="530" y="283" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="11.6" fill="#7C8AA0">Nuxt SPA embedded with go:embed</text>
+
+  <rect x="76" y="326" width="398" height="88" rx="9" fill="#17263A" stroke="#2A3B54"/>
+  <text x="100" y="356" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#E8EEF6">Session manager</text>
+  <text x="100" y="377" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="11.6" fill="#7C8AA0">one strict serial worker per conversation</text>
+  <text x="100" y="395" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="11.6" fill="#7C8AA0">bounded 16-deep queue &#183; panic isolation</text>
+
+  <rect x="506" y="326" width="398" height="88" rx="9" fill="#17263A" stroke="#2A3B54"/>
+  <text x="530" y="356" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#E8EEF6">Message handler</text>
+  <text x="530" y="377" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="11.6" fill="#7C8AA0">context window &#183; vision &#183; dedup</text>
+  <text x="530" y="395" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="11.6" fill="#7C8AA0">at most 8 provider calls in flight</text>
+
+  <!-- ── band 3 : what it talks to ────────────────────────────────── -->
+  <path d="M 258 440 L 258 492" stroke="#43587A" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M 722 440 L 722 492" stroke="#43587A" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="48" y="500" width="420" height="64" rx="10" fill="#152437" stroke="#2A3B54"/>
+  <text x="74" y="529" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#E8EEF6">LLM provider</text>
+  <text x="74" y="549" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="11.6" fill="#7C8AA0">any OpenAI-compatible endpoint &#183; HTTPS</text>
+
+  <rect x="512" y="500" width="420" height="64" rx="10" fill="#152437" stroke="#2A3B54"/>
+  <text x="538" y="529" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#E8EEF6">SQLite &#183; ./data.db</text>
+  <text x="538" y="549" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="11.6" fill="#7C8AA0">chat history &#183; system logs &#183; sessions</text>
+</svg>
