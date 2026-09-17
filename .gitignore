@@ -109,3 +109,9 @@ docs/
 # === Misc ===
 *.pdf
 TODO.md
+
+# === Verification / Packaging Temp (Gate workflow) ===
+dist.bak-*/
+runtime-test-*/
+.pkgstage/
+backup/

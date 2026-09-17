@@ -1,6 +1,7 @@
 package session
 
 import (
+	"encoding/json"
 	"testing"
 
 	"SorarinBot/providers"
@@ -163,5 +164,187 @@ func TestDumpOddHistory(t *testing.T) {
 	dump := s.Dump()
 	if dump != "" {
 		t.Errorf("Dump should be empty for odd history, got %q", dump)
+	}
+}
+
+// ── Gate-1 (P5-5): session isolation and identity metadata ──────────
+
+// The same user must get one session per isolated dimension: private
+// chat, and each distinct room.
+func TestSessionIsolationByKey(t *testing.T) {
+	m := NewManager("p", 5)
+	private := m.Get("private:wxid_alice")
+	roomA := m.Get("group:@@roomA:wxid_alice")
+	roomB := m.Get("group:@@roomB:wxid_alice")
+
+	if private == roomA || private == roomB || roomA == roomB {
+		t.Fatal("sessions for distinct keys must be distinct objects")
+	}
+	private.Append("q-private", "a-private")
+	roomA.Append("q-a", "a-a")
+
+	if private.PairCount() != 1 || roomA.PairCount() != 1 || roomB.PairCount() != 0 {
+		t.Fatalf("histories leaked across sessions: private=%d roomA=%d roomB=%d",
+			private.PairCount(), roomA.PairCount(), roomB.PairCount())
+	}
+	if got := private.History[0].Content; got != "q-private" {
+		t.Errorf("private history contaminated: %q", got)
+	}
+	if got := roomA.History[0].Content; got != "q-a" {
+		t.Errorf("roomA history contaminated: %q", got)
+	}
+}
+
+func TestSetMetaAndMeta(t *testing.T) {
+	m := NewManager("p", 5)
+	s := m.Get("group:@@roomA:wxid_alice")
+	s.SetMeta("群昵称", "@@roomA", "group")
+
+	got := s.Meta()
+	if got.Key != "group:@@roomA:wxid_alice" || got.Display != "群昵称" ||
+		got.Room != "@@roomA" || got.Kind != "group" {
+		t.Errorf("Meta() = %+v", got)
+	}
+	if got.Pairs != 0 {
+		t.Errorf("Meta().Pairs = %d, want 0", got.Pairs)
+	}
+}
+
+func TestSetMetaDefaults(t *testing.T) {
+	m := NewManager("p", 5)
+	s := m.Get("private:wxid_a")
+
+	// Empty kind must default to "private" so a session is never untyped.
+	s.SetMeta("", "", "")
+	if got := s.Meta(); got.Kind != "private" {
+		t.Errorf("Kind = %q, want private", got.Kind)
+	}
+	// An empty display name must not erase a previously known one.
+	s.SetMeta("Alice", "", "private")
+	s.SetMeta("", "", "private")
+	if got := s.Meta().Display; got != "Alice" {
+		t.Errorf("Display = %q, want Alice", got)
+	}
+}
+
+func TestRender(t *testing.T) {
+	m := NewManager("p", 5)
+	s := m.Get("private:wxid_a")
+	s.SetMeta("Alice", "", "private")
+	s.Append("q", "a")
+
+	all := m.Render()
+	if len(all) != 1 {
+		t.Fatalf("Render() returned %d sessions, want 1", len(all))
+	}
+	if all[0].Key != "private:wxid_a" || all[0].Display != "Alice" ||
+		all[0].Kind != "private" || all[0].Pairs != 1 {
+		t.Errorf("Render()[0] = %+v", all[0])
+	}
+}
+
+// Detail must not create a session as a side effect of being asked.
+func TestDetailDoesNotCreate(t *testing.T) {
+	m := NewManager("p", 5)
+	if _, _, ok := m.Detail("private:nobody"); ok {
+		t.Error("Detail reported a session that does not exist")
+	}
+	if len(m.Names()) != 0 {
+		t.Errorf("Detail created a session as a side effect: %v", m.Names())
+	}
+
+	s := m.Get("private:wxid_a")
+	s.SetMeta("Alice", "", "private")
+	s.Append("q", "a")
+
+	meta, dump, ok := m.Detail("private:wxid_a")
+	if !ok {
+		t.Fatal("Detail did not find an existing session")
+	}
+	if meta.Display != "Alice" || meta.Pairs != 1 {
+		t.Errorf("meta = %+v", meta)
+	}
+	if dump == "" {
+		t.Error("dump should not be empty for a session with history")
+	}
+}
+
+// SetMax must clamp non-positive values so History cannot grow unbounded,
+// matching the guarantee made by Manager.Get.
+func TestSetMaxClamps(t *testing.T) {
+	m := NewManager("p", 5)
+	s := m.Get("user1")
+	s.SetMax(0)
+	for i := 0; i < 10; i++ {
+		s.Append("q", "a")
+	}
+	if got := s.PairCount(); got != 1 {
+		t.Errorf("PairCount = %d after SetMax(0), want 1", got)
+	}
+}
+
+// ── P5-10: frontend contract guard ──────────────────────────────────
+
+// Meta is serialised straight into /api/status.sessions and consumed by
+// web/app/types/index.ts as SessionInfo. Renaming a field here silently
+// breaks the dashboard, so the wire keys are pinned by this test.
+func TestMetaJSONContract(t *testing.T) {
+	m := NewManager("p", 5)
+	s := m.Get("group:@@room:wxid_a")
+	s.SetMeta("Alice", "@@room", "group")
+
+	raw, err := json.Marshal(s.Meta())
+	if err != nil {
+		t.Fatalf("marshal Meta: %v", err)
+	}
+
+	var got map[string]any
+	if err := json.Unmarshal(raw, &got); err != nil {
+		t.Fatalf("unmarshal Meta: %v", err)
+	}
+
+	// Exact key set expected by the TypeScript SessionInfo interface.
+	want := []string{"key", "display", "kind", "room", "pairs"}
+	for _, k := range want {
+		if _, ok := got[k]; !ok {
+			t.Errorf("SessionInfo is missing wire key %q (frontend expects it)", k)
+		}
+	}
+	if len(got) != len(want) {
+		t.Errorf("Meta has %d wire keys, want %d: %v", len(got), len(want), got)
+	}
+	if got["kind"] != "group" {
+		t.Errorf("kind = %v, want group", got["kind"])
+	}
+	if got["room"] != "@@room" {
+		t.Errorf("room = %v, want @@room", got["room"])
+	}
+	if got["display"] != "Alice" {
+		t.Errorf("display = %v, want Alice", got["display"])
+	}
+}
+
+// Render must be JSON-serialisable as an array of SessionInfo, which is
+// what /api/status and /api/sessions return.
+func TestRenderJSONIsArray(t *testing.T) {
+	m := NewManager("p", 5)
+	m.Get("private:a").SetMeta("A", "", "private")
+	m.Get("group:@@r:b").SetMeta("B", "@@r", "group")
+
+	raw, err := json.Marshal(m.Render())
+	if err != nil {
+		t.Fatalf("marshal Render: %v", err)
+	}
+	var arr []map[string]any
+	if err := json.Unmarshal(raw, &arr); err != nil {
+		t.Fatalf("Render is not a JSON array: %v", err)
+	}
+	if len(arr) != 2 {
+		t.Fatalf("Render returned %d entries, want 2", len(arr))
+	}
+	for _, e := range arr {
+		if _, ok := e["key"]; !ok {
+			t.Errorf("entry missing key: %v", e)
+		}
 	}
 }

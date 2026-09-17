@@ -2,14 +2,44 @@
 
 // === System ===
 
+// SessionInfo mirrors Go session.Meta (P5-5): sessions are keyed by a
+// stable isolation key, with a human-readable label carried separately.
+export interface SessionInfo {
+  key: string
+  display: string
+  kind: 'private' | 'group' | string
+  room: string
+  pairs: number
+}
+
 export interface SystemStatus {
   status: string
   provider: string
   model: string
   startup_at: string
   api_key_configured: boolean
-  sessions: string[]
+  sessions: SessionInfo[]
   electron?: boolean
+  // P5-3 login state machine.
+  wechat_state: LoginState
+}
+
+// === Login state machine (P5-3) ===
+
+export type LoginState =
+  | 'idle'
+  | 'hot_logging_in'
+  | 'waiting_scan'
+  | 'scanned'
+  | 'logged_in'
+  | 'failed'
+
+export interface LoginStatus {
+  state: LoginState
+  attempts: number
+  qr_url?: string
+  last_error?: string
+  next_retry_at?: string
 }
 
 // === Provider ===
@@ -73,6 +103,7 @@ export interface MessageRow {
   prompt_tokens: number
   completion_tokens: number
   total_tokens: number
+  created_at: string
 }
 
 // === Logs (Go returns []string) ===

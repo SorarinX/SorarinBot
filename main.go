@@ -140,20 +140,18 @@ func main() {
 	adapter.SetOnLoginSuccess(func() {
 		hideConsoleWindow()
 	})
+	// P5-3: the login state machine runs in the background so that a
+	// WeChat login failure can never take down the web UI. It never
+	// returns a fatal error; it parks in "failed" and waits for an
+	// explicit retry via POST /api/login/retry.
+	adapter.StartAsync()
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		if err := adapter.Start(); err != nil {
-			logrus.Fatalf("wechat start: %v", err)
-		}
-	}()
 
 	// Start web server
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		startWeb(ctx, cfg.Web.Listen, h, sessMgr)
+		startWeb(ctx, cfg.Web.Listen, h, sessMgr, adapter)
 	}()
 
 	// Graceful shutdown
@@ -201,9 +199,21 @@ func main() {
 		logrus.Info("shutting down (browser closed)...")
 	}
 	logrus.Info("shutting down...")
-	adapter.Bot.Exit()
 	cancel()
-	_ = adapter.Bot.Block()
+	if b := adapter.Bot(); b != nil {
+		b.Exit()
+	}
+	adapter.StopLoginLoop()
+
+	// Gate-2 (P5-2) shutdown order. Stop accepting first so the inflight
+	// set cannot grow while we drain it, then let the cancelled context
+	// abort in-flight provider calls, then wait a bounded time.
+	adapter.StopAccepting()
+	adapter.WaitInflight()
+
+	if b := adapter.Bot(); b != nil {
+		_ = b.Block()
+	}
 	wg.Wait()
 	logrus.Info("bye")
 }
@@ -285,7 +295,7 @@ func buildProviderFromCfg(cfg *config.Config) providers.Provider {
 	return p
 }
 
-func buildMux(h *message.Handler, sm *session.Manager) http.Handler {
+func buildMux(h *message.Handler, sm *session.Manager, adapter *ow_adapter.Adapter) http.Handler {
 	mux := http.NewServeMux()
 
 	// SPA: serve static files from web/dist/, fallback to index.html
@@ -372,32 +382,69 @@ func buildMux(h *message.Handler, sm *session.Manager) http.Handler {
 	mux.HandleFunc("/api/status", func(w http.ResponseWriter, r *http.Request) {
 		cfg := config.Snapshot()
 		apiKeyCfg := cfg.Provider.APIKey != ""
+		wechatState := string(ow_adapter.LoginIdle)
+		if adapter != nil {
+			wechatState = string(adapter.LoginStatus().State)
+		}
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"status":             "running",
-			"sessions":           sm.Names(),
+			"sessions":           sm.Render(),
 			"provider":           cfg.Provider.Name,
 			"model":              cfg.Provider.Model,
 			"startup_at":         startupTime.Format(time.RFC3339),
 			"api_key_configured": apiKeyCfg,
 			"electron":           os.Getenv("SORARINBOT_ELECTRON") != "",
+			"wechat_state":       wechatState,
+		})
+	})
+
+	// API — login state machine (P5-3)
+	mux.HandleFunc("/api/login", func(w http.ResponseWriter, r *http.Request) {
+		if adapter == nil {
+			http.Error(w, "adapter unavailable", 503)
+			return
+		}
+		json.NewEncoder(w).Encode(adapter.LoginStatus())
+	})
+	mux.HandleFunc("/api/login/retry", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "method not allowed", 405)
+			return
+		}
+		if adapter == nil {
+			http.Error(w, "adapter unavailable", 503)
+			return
+		}
+		if !adapter.RetryLogin() {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"ok":    false,
+				"error": "已有重试请求在处理中",
+			})
+			return
+		}
+		w.WriteHeader(http.StatusAccepted)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"ok":    true,
+			"state": adapter.LoginStatus().State,
 		})
 	})
 
 	// API — sessions
 	mux.HandleFunc("/api/sessions", func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(sm.Names())
+		json.NewEncoder(w).Encode(sm.Render())
 	})
 	mux.HandleFunc("/api/session", func(w http.ResponseWriter, r *http.Request) {
 		user := r.URL.Query().Get("user")
-		sess := sm.Get(user)
-		if sess == nil {
+		meta, dump, ok := sm.Detail(user)
+		if !ok {
 			http.NotFound(w, r)
 			return
 		}
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"user":  user,
-			"pairs": sess.PairCount(),
-			"dump":  sess.Dump(),
+			"meta":  meta,
+			"pairs": meta.Pairs,
+			"dump":  dump,
 		})
 	})
 
@@ -665,9 +712,9 @@ func parsePagination(r *http.Request) (limit, offset int) {
 	return
 }
 
-func startWeb(ctx context.Context, listen string, h *message.Handler, sm *session.Manager) {
+func startWeb(ctx context.Context, listen string, h *message.Handler, sm *session.Manager, adapter *ow_adapter.Adapter) {
 	// Fix-24: build mux once, reuse for all port attempts
-	handler := buildMux(h, sm)
+	handler := buildMux(h, sm, adapter)
 
 	// Auto-retry with next port if current one is busy
 	tryPort := func(addr string) bool {

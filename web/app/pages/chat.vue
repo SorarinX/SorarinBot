@@ -1,9 +1,7 @@
 <script setup lang="ts">
-const { status, refresh: refreshStatus } = useStatus()
+const { refresh: refreshStatus } = useStatus()
 const { messages, refresh: refreshHistory } = useHistory(100)
 const scrollRef = ref<HTMLElement>()
-
-const sessions = computed(() => status.value?.sessions ?? [])
 
 type SessionItem = { user: string; room: string; lastMsg: string; count: number; time: string; isGroup: boolean }
 
