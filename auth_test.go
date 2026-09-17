@@ -374,3 +374,49 @@ func TestThrottleMapStaysBounded(t *testing.T) {
 		t.Errorf("failure map grew to %d entries, want at most %d", size, maxThrottleEntries)
 	}
 }
+
+func TestCleanPassword(t *testing.T) {
+	// What Windows PowerShell 5.1 actually puts on the pipe: a UTF-8 BOM
+	// followed by the text. Without cleaning, the stored hash would be of
+	// "\ufeffpassword" and the operator could never log in with what they typed.
+	const piped = "\ufeffcorrect-horse\r\n"
+
+	cases := map[string]struct {
+		in      string
+		want    string
+		wantErr bool
+	}{
+		"plain line":        {"correct-horse\n", "correct-horse", false},
+		"crlf line":         {"correct-horse\r\n", "correct-horse", false},
+		"piped from shell":  {piped, "correct-horse", false},
+		"utf16 residue":     {"t\x00e\x00s\x00t\x00\r\x00\n\x00", "test", false},
+		"empty":             {"\n", "", false},
+		"only nuls":         {"\x00\x00\n", "", false},
+		"only a bom":        {"\ufeff\n", "", false},
+		"inner newline":     {"pass\nword", "", true},
+		"tab character":     {"pass\tword", "", true},
+		"bell character":    {"pass\aword", "", true},
+		"bom in the middle": {"pass\ufeffword", "", true},
+		"invalid utf-8":     {string([]byte{0xff, 0xfe, 'a', 'b'}), "", true},
+		"unicode is fine":   {"密码密码密码", "密码密码密码", false},
+		"emoji is fine":     {"correct-horse-🐴", "correct-horse-🐴", false},
+		"spaces are kept":   {"pass word", "pass word", false},
+	}
+
+	for name, tc := range cases {
+		got, err := cleanPassword(tc.in)
+		if tc.wantErr {
+			if err == nil {
+				t.Errorf("%s: expected an error, got %q", name, got)
+			}
+			continue
+		}
+		if err != nil {
+			t.Errorf("%s: unexpected error: %v", name, err)
+			continue
+		}
+		if got != tc.want {
+			t.Errorf("%s: got %q, want %q", name, got, tc.want)
+		}
+	}
+}

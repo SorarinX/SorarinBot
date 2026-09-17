@@ -62,6 +62,12 @@ config keys that never did anything.
 
 ### Fixed
 
+- `SorarinBot -set-password` no longer stores a password it cannot verify. A
+  shell that prefixes what it pipes in — Windows PowerShell 5.1 writes a UTF-8
+  BOM — produced a hash of something the operator never typed, and the only
+  symptom was "密码错误" at the login screen with no way to tell why. A leading
+  BOM and NUL bytes are now dropped, and any other non-printable character is
+  reported instead of hashed.
 - Path traversal in `web/preview-server.cjs`: a request such as
   `/../../secret` resolved outside the served directory. Paths are now decoded,
   resolved, and rejected unless they land inside the distribution folder.
