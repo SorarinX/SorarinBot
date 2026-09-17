@@ -9,10 +9,8 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
-	"syscall"
 	"testing"
 	"time"
-	"unsafe"
 
 	"SorarinBot/core/message"
 	"SorarinBot/core/session"
@@ -59,27 +57,6 @@ func offlineBotFactory(counter *int64) func() *ow.Bot {
 // SAFETY: never contacts WeChat, never reads the real token.json, never
 // logs in. It measures bot construction, which is the per-attempt cost the
 // retry loop pays.
-
-// winHandleCount returns the process's open handle count (Windows only).
-func winHandleCount(t *testing.T) (uint32, bool) {
-	t.Helper()
-	if runtime.GOOS != "windows" {
-		return 0, false
-	}
-	kernel32 := syscall.NewLazyDLL("kernel32.dll")
-	getProcessHandleCount := kernel32.NewProc("GetProcessHandleCount")
-	var count uint32
-	const currentProcess = ^uintptr(0) // pseudo-handle for this process
-	r, _, err := getProcessHandleCount.Call(
-		currentProcess,
-		uintptr(unsafe.Pointer(&count)),
-	)
-	if r == 0 {
-		t.Logf("GetProcessHandleCount failed: %v", err)
-		return 0, false
-	}
-	return count, true
-}
 
 // memStorage is an in-memory HotReloadStorage that yields EOF on read, so
 // botReload fails while decoding and the earliest failure branch is taken.
