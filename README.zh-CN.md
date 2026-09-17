@@ -231,6 +231,10 @@ cd web && pnpm install && pnpm dev
 cd electron && npm install && npm start
 ```
 
+> 请构建根包 —— 用 `go build .`，不要用 `go build ./...`。`linux/` 目录是根目录文件的
+> 历史副本：它的 `main.go` 带 `//go:build ignore`，其余文件又没有 `main`，因此递归构建会
+> 报 `function main is undeclared`。Linux 版本由根包构建：`GOOS=linux go build .`。
+
 **调试**
 
 - 后端：设置环境变量 `SORARINBOT_DEBUG=1` 输出详细日志。

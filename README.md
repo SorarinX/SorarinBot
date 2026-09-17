@@ -246,6 +246,12 @@ cd web && pnpm install && pnpm dev
 cd electron && npm install && npm start
 ```
 
+> Build the root package — `go build .` — rather than `go build ./...`. The
+> `linux/` directory is a legacy duplicate of the root files; its `main.go` is
+> behind `//go:build ignore` and the rest has no `main`, so a recursive build
+> stops with `function main is undeclared`. Linux builds come from the root
+> package: `GOOS=linux go build .`.
+
 **Debugging**
 
 - Backend: set `SORARINBOT_DEBUG=1` for verbose logs.
