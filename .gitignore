@@ -54,6 +54,11 @@ package-lock.json
 .next/
 *.snap
 
+# === Nuxt generated (rebuilt by `nuxt prepare` / `nuxt generate`) ===
+# web/dist is NOT ignored on purpose: go:embed reads it, so it ships.
+web/.nuxt/
+web/.output/
+
 # === Environment & Secrets ===
 .env
 .env.local

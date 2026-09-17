@@ -7,6 +7,12 @@ defineProps<{
 
 const colorMode = useColorMode()
 const appConfig = useAppConfig()
+const { required: authRequired, logout } = useAuth()
+
+async function signOut() {
+  await logout()
+  await navigateTo('/login')
+}
 
 // 持久化主题设置
 const savedPrimary = useLocalStorage('sorarinbot-primary-color', 'blue')
@@ -109,7 +115,11 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
       e.preventDefault()
     }
   }]
-}]]))
+}], ...(authRequired.value ? [[{
+  label: '退出登录',
+  icon: 'i-lucide-log-out',
+  onSelect: () => { signOut() }
+}]] : [])] as DropdownMenuItem[][]))
 </script>
 
 <template>

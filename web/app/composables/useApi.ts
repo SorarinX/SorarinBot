@@ -46,6 +46,14 @@ export function useApi<T>(
       const response = await fetch(resolvedUrl, fetchOptions)
 
       if (!response.ok) {
+        // 401 means the session expired or was never established. Bounce to the
+        // login screen rather than letting every panel render a bare error.
+        if (response.status === 401) {
+          const { markUnauthenticated } = useAuth()
+          markUnauthenticated()
+          await navigateTo('/login')
+          throw new Error('登录已过期，请重新登录')
+        }
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
 

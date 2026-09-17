@@ -3,21 +3,59 @@ const { spawn } = require('child_process')
 const path = require('path')
 const fs = require('fs')
 const http = require('http')
+const net = require('net')
 
 let goProcess = null
 let mainWindow = null
+let backendPort = null
 
-const GO_PORT = 8080
-const GO_URL = `http://localhost:${GO_PORT}`
+// The backend falls back to the next port when the configured one is busy, so
+// hardcoding a port here meant the window could load a stranger's server or time
+// out waiting for a backend that had moved. Instead we pick a free port, hand it
+// to the backend with -listen, and then talk to that exact port.
+const PORT_RANGE_START = 8080
+const PORT_RANGE_END = 8180
 
-function waitForServer(url, timeout = 30000) {
+function isPortFree(port) {
+  return new Promise((resolve) => {
+    const probe = net.createServer()
+    probe.once('error', () => resolve(false))
+    probe.once('listening', () => probe.close(() => resolve(true)))
+    probe.listen(port, '127.0.0.1')
+  })
+}
+
+async function findFreePort() {
+  for (let port = PORT_RANGE_START; port <= PORT_RANGE_END; port++) {
+    if (await isPortFree(port)) return port
+  }
+  throw new Error(`no free port in ${PORT_RANGE_START}-${PORT_RANGE_END}`)
+}
+
+// waitForServer polls /api/status and requires our own status payload, so a
+// different application squatting on the port can never be mistaken for the
+// backend.
+function waitForServer(baseUrl, timeout = 30000) {
   return new Promise((resolve, reject) => {
     const start = Date.now()
     const check = () => {
-      http.get(url, (res) => {
-        if (res.statusCode === 200) resolve()
-        else retry()
-      }).on('error', retry)
+      http
+        .get(`${baseUrl}/api/status`, (res) => {
+          let body = ''
+          res.setEncoding('utf8')
+          res.on('data', (chunk) => { body += chunk })
+          res.on('end', () => {
+            if (res.statusCode === 200) {
+              try {
+                if (JSON.parse(body).status === 'running') { resolve(); return }
+              } catch {
+                // Not our server; keep waiting.
+              }
+            }
+            retry()
+          })
+        })
+        .on('error', retry)
     }
     const retry = () => {
       if (Date.now() - start > timeout) { reject(new Error('Server timeout')); return }
@@ -27,42 +65,64 @@ function waitForServer(url, timeout = 30000) {
   })
 }
 
-function startGoBackend() {
-  const possiblePaths = [
+function locateBackend() {
+  const candidates = [
     path.join(__dirname, 'SorarinBot.exe'),
     path.join(process.resourcesPath || __dirname, 'SorarinBot.exe'),
     path.join(path.dirname(process.execPath), 'SorarinBot.exe'),
   ]
-
-  let exePath = null
-  for (const p of possiblePaths) {
-    console.log('[electron] checking:', p, fs.existsSync(p) ? 'FOUND' : 'not found')
-    if (fs.existsSync(p)) { exePath = p; break }
+  for (const candidate of candidates) {
+    console.log('[electron] checking:', candidate, fs.existsSync(candidate) ? 'FOUND' : 'not found')
+    if (fs.existsSync(candidate)) return candidate
   }
+  return null
+}
 
+function startGoBackend(port) {
+  const exePath = locateBackend()
   if (!exePath) {
-    console.error('[electron] SorarinBot.exe not found in any of:', possiblePaths)
+    console.error('[electron] SorarinBot.exe not found')
     return false
   }
 
-  console.log('[electron] starting Go backend from:', exePath)
+  console.log('[electron] starting Go backend from:', exePath, 'on port', port)
 
-  goProcess = spawn('cmd.exe', ['/c', 'start', 'SorarinBot.exe'], {
+  // Spawned directly rather than through `cmd /c start`: a `start` child exits
+  // immediately, so goProcess referred to a dead shell and the backend survived
+  // as an orphan that outlived the window. A direct child is killable, and
+  // windowsHide keeps the console from flashing.
+  goProcess = spawn(exePath, ['-listen', `127.0.0.1:${port}`], {
     cwd: path.dirname(exePath),
     env: { ...process.env, SORARINBOT_ELECTRON: '1' },
-    detached: true
+    windowsHide: true,
+    stdio: ['ignore', 'pipe', 'pipe'],
   })
-  goProcess.unref()
+
+  goProcess.stdout.setEncoding('utf8')
+  goProcess.stderr.setEncoding('utf8')
+  goProcess.stdout.on('data', (data) => process.stdout.write(`[backend] ${data}`))
+  goProcess.stderr.on('data', (data) => process.stderr.write(`[backend] ${data}`))
 
   goProcess.on('error', (err) => {
     console.error('[electron] Go backend spawn error:', err)
   })
-  goProcess.on('exit', (code) => {
-    console.log('[electron] Go backend exited:', code)
+  goProcess.on('exit', (code, signal) => {
+    console.log('[electron] Go backend exited:', code, signal)
     goProcess = null
   })
 
   return true
+}
+
+function stopGoBackend() {
+  if (!goProcess) return
+  console.log('[electron] stopping Go backend')
+  try {
+    goProcess.kill()
+  } catch (err) {
+    console.error('[electron] failed to stop Go backend:', err)
+  }
+  goProcess = null
 }
 
 function createWindow() {
@@ -89,10 +149,12 @@ function createWindow() {
     console.error('[electron] renderer crashed:', details)
   })
 
-  mainWindow.loadURL(GO_URL)
+  mainWindow.loadURL(`http://127.0.0.1:${backendPort}`)
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    if (url.startsWith('http') && !url.includes('localhost')) shell.openExternal(url)
+    if (url.startsWith('http') && !url.includes('127.0.0.1') && !url.includes('localhost')) {
+      shell.openExternal(url)
+    }
     return { action: 'deny' }
   })
 
@@ -102,32 +164,44 @@ function createWindow() {
 app.whenReady().then(async () => {
   console.log('[electron] app ready, starting Go backend...')
 
-  const started = startGoBackend()
-  if (!started) {
+  try {
+    backendPort = await findFreePort()
+  } catch (err) {
+    dialog.showErrorBox('SorarinBot', '找不到可用端口：' + err.message)
+    app.quit()
+    return
+  }
+
+  if (!startGoBackend(backendPort)) {
     dialog.showErrorBox('SorarinBot', '找不到 SorarinBot.exe，请重新安装。')
     app.quit()
     return
   }
 
   try {
-    console.log('[electron] waiting for Go server at', GO_URL)
-    await waitForServer(GO_URL)
+    await waitForServer(`http://127.0.0.1:${backendPort}`)
     console.log('[electron] Go server ready, creating window')
     createWindow()
   } catch (err) {
     console.error('[electron] server timeout:', err)
-    dialog.showErrorBox('SorarinBot', '后端启动超时，请检查端口 ' + GO_PORT + ' 是否被占用。')
+    stopGoBackend()
+    dialog.showErrorBox('SorarinBot', '后端启动超时，请查看日志了解详情。')
     app.quit()
   }
 })
 
 app.on('window-all-closed', () => {
-  if (goProcess) { goProcess.kill(); goProcess = null }
+  stopGoBackend()
   app.quit()
 })
 
 app.on('activate', () => { if (mainWindow === null) createWindow() })
 
-app.on('before-quit', () => {
-  if (goProcess) { goProcess.kill(); goProcess = null }
-})
+app.on('before-quit', stopGoBackend)
+
+for (const signal of ['SIGINT', 'SIGTERM']) {
+  process.on(signal, () => {
+    stopGoBackend()
+    app.quit()
+  })
+}

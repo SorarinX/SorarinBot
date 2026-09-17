@@ -34,6 +34,7 @@
 - 🧠 **会话级隔离记忆** — 会话以 `private:<用户>` 与 `group:<群ID>:<用户>` 为键，同一个人在不同群里拥有彼此独立的两份上下文。
 - ⚡ **异步分发** — 大模型调用不会阻塞微信消息同步循环。每个会话一个严格串行的 worker，不同会话并行执行，全局并发上限为 8。
 - 🔐 **可观测的登录** — 六态登录状态机（`idle` → `hot_logging_in` → `waiting_scan` → `scanned` → `logged_in` / `failed`），后台展示并附带**重新登录**按钮。登录失败不再导致进程退出。
+- 🔑 **后台密码** — 可选、默认关闭；一旦设置，所有 API 路由与心跳连接都需要登录。失败尝试按来源地址限流。
 - 🖼️ **图片识别** — 发送图片 + 文字，自动交给支持 Vision 的模型。
 - 👋 **入群欢迎** — 新成员入群时自动打招呼。
 - 📊 **Web 管理后台** — 实时会话、分页聊天记录、系统日志、Provider 连通性测试，支持明暗主题。
@@ -70,6 +71,10 @@
 4. **登录微信。** 回到仪表盘首页，用微信扫描二维码完成登录；同一个二维码也会打印在控制台。状态标签变绿即表示登录成功。
 
 现在用微信给自己发一条消息，机器人就会回复了。
+
+> ⚠️ **开放给他人访问之前，请先读[安全说明](#-安全)。** 默认状态下后台没有密码：
+> 谁能打开这个端口，谁就能读取你的聊天记录、改掉你的 API Key。而且本项目使用
+> 非官方微信协议，登录所用的账号本身就有被限制的风险。
 
 <details>
 <summary><b>其他运行方式</b> —— Linux、一键安装包、从源码构建</summary>
@@ -111,6 +116,9 @@ GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o SorarinBot .
 所有配置都在 `config.yaml` 中，首次运行时自动生成在程序同级目录。全部配置项也可以在后台界面中修改。`data.db` 与 `token.json` 同样保存在该目录；当安装目录不可写时，会改用 `%APPDATA%\SorarinBot`（Windows）或 `~/.local/share/SorarinBot`（Linux）。
 
 ```yaml
+admin:
+  password_hash: ""           # 留空表示无密码；用 `SorarinBot -set-password` 设置
+
 provider:
   name: openaicompat          # 任意 OpenAI 兼容接口
   base_url: https://api.deepseek.com
@@ -121,8 +129,10 @@ prompt: "你是一个有用的 AI 助手。"
 
 chat:
   max_context: 3              # 作为上下文回放的历史轮数；0 表示关闭记忆
+  image_ttl: 300              # 上传的图片可被使用的秒数
 
 wechat:
+  auto_login: true            # 先复用已保存的 token，失败再要求扫码
   trigger_prefix: ""          # 群聊附加触发前缀，例如 "/ai"
 
 web:
@@ -133,16 +143,33 @@ web:
 
 | 配置项 | 默认值 | 说明 |
 | --- | --- | --- |
+| `admin.password_hash` | – | 保护后台。留空意味着谁能打开端口谁就能进。 |
 | `provider.name` | `openaicompat` | Provider 实现。 |
 | `provider.base_url` | – | OpenAI 兼容 API 的基础地址。 |
 | `provider.model` | – | 每次请求使用的模型名。 |
 | `provider.api_key` | – | 留空时依次回退到 `DEEPSEEK_API_KEY`、`MINIMAX_API_KEY`、`OPENAI_API_KEY` 环境变量。 |
 | `prompt` | – | 系统提示词。 |
 | `chat.max_context` | `3` | 回放给模型的历史「用户/助手」对话轮数，设为 `0` 即关闭上下文记忆。 |
+| `chat.image_ttl` | `300` | 上传的图片可被下一条消息使用的秒数。 |
+| `wechat.auto_login` | `true` | 先复用 `token.json`，失败再回退到扫码。设为 `false` 则始终扫码，这是更换登录账号的方式。 |
 | `wechat.trigger_prefix` | – | 除 `@机器人` 之外，另一个可触发群聊回复的前缀。 |
 | `web.listen` | `localhost:8080` | 后台监听地址。填 `0.0.0.0:8080` 可供其他机器访问；端口被占用时会自动顺延到下一个端口。 |
 
-> 🔒 `config.yaml` 与 `token.json` 保存着你的 API Key 和微信登录态。两者都已被 git 忽略 —— 请不要破坏这一点，更不要把内容贴进 Issue。
+## 🔒 安全说明
+
+**不设置密码就等于没有密码。** 当 `admin.password_hash` 为空时，后台对任何能访问该端口的人都是敞开的 —— 他们可以读取你的聊天记录和系统日志，并修改你的 Provider API Key。这在 `localhost` 上没问题；一旦端口能被其他设备访问，就不再没问题。
+
+```bash
+SorarinBot -set-password      # 把 PBKDF2-SHA256 哈希写入 config.yaml
+```
+
+设置后需要重启。此后所有 `/api` 路由与心跳连接都要求会话 Cookie；登录失败会按来源地址限流；会话有效期 7 天，重启即失效。再运行一次该命令并留空输入即可关闭密码。
+
+**后台走的是明文 HTTP。** 会话 Cookie 在传输中不加密，所以密码能挡住同网络上的陌生人，挡不住能抓包的人。不要把端口映射到公网 —— 需要远程访问就套一层带 TLS 的反向代理。
+
+**你的微信账号有风险。** 本项目通过非官方客户端使用微信 Web 协议，这违反微信的服务条款，也已经有过账号因此被限制的先例。请使用一个你可以承受损失的账号。
+
+**磁盘上的敏感文件。** `config.yaml` 存着 API Key，`token.json` 存着微信登录态。两者都在程序同级目录，且都已被 git 忽略 —— 请不要破坏这一点，更不要把内容贴进 Issue。
 
 ## 🏗️ 项目架构
 
@@ -171,10 +198,13 @@ web:
 
 ## 📡 API 端点
 
-所有接口都由与后台界面相同的那个二进制提供。
+所有接口都由与后台界面相同的那个二进制提供。设置了 `admin.password_hash` 后，除三个 `auth` 接口外，其余接口在登录前一律返回 `401`。
 
 | 方法 | 端点 | 说明 |
 | --- | --- | --- |
+| `GET` | `/api/auth/status` | 是否需要密码，以及当前浏览器是否已登录。始终公开。 |
+| `POST` | `/api/auth/login` | 用密码换取会话 Cookie。始终公开。 |
+| `POST` | `/api/auth/logout` | 清除会话 Cookie。始终公开。 |
 | `GET` | `/api/status` | 运行时长、Provider、模型、`wechat_state` 以及结构化会话列表。 |
 | `GET` | `/api/login` | 登录状态机快照 —— `state`、`attempts`、`qr_url`、`last_error`。 |
 | `POST` | `/api/login/retry` | 开启新一轮登录。受理时返回 `202`。 |
@@ -207,7 +237,7 @@ cd electron && npm install && npm start
 - Electron 主进程：`console.log` 会输出到启动它的终端。
 - 渲染进程：在 `electron/main.js` 中调用 `mainWindow.webContents.openDevTools()`。
 
-**测试** —— CI 会在每次推送时执行前三条；建议本地额外跑一次 `-race`。
+**测试** —— CI 每次推送都会执行 `go vet ./...`、`go test ./...` 和 `gofmt -l .`；建议本地额外跑一次 `-race`。
 
 ```bash
 go vet ./...
@@ -218,6 +248,8 @@ gofmt -l .
 ## 🤝 参与贡献
 
 欢迎提交 Issue、想法和 Pull Request。如果改动大于一个 Bug 修复，请先开 Issue 讨论方案，并在提交补丁前阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。
+
+逐版本的变更记录见 [CHANGELOG.md](CHANGELOG.md)。
 
 ## ☕ 支持作者
 
@@ -233,7 +265,7 @@ gofmt -l .
 
 ## 🙏 致谢
 
-- [openwechat](https://github.com/eatmoreapple/openwechat) —— 本项目所依赖的微信 Web 协议实现。
+- [openwechat](https://github.com/eatmoreapple/openwechat) —— 本项目所依赖的微信 Web 协议实现。`internal/openwechat/` 是它的一个 fork，仍适用 Apache License 2.0；与上游的差异详见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 - [Nuxt UI](https://ui.nuxt.com) —— 后台界面所用的组件库。
 - [electron-builder](https://www.electron.build) —— 桌面端打包工具。
 - 以及每一位提交 Issue 和 Pull Request 的朋友。
@@ -243,5 +275,7 @@ gofmt -l .
 SorarinBot 基于 [PolyForm Noncommercial License 1.0.0](LICENSE) 发布 —— 个人学习、教育、研究、公益机构与政府部门均可免费使用。
 
 **商业用途需另行取得授权。** 请邮件联系 **zyc2597376118@gmail.com**。
+
+第三方组件保留各自的许可证。其中 `internal/openwechat/` 仍适用 Apache License 2.0，许可证原文随附于 [`internal/openwechat/LICENSE`](internal/openwechat/LICENSE)；完整清单见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 
 > 本项目与腾讯公司无关，未获得其认可或授权。「WeChat」与「微信」是腾讯控股有限公司的商标。

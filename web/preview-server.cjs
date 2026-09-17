@@ -18,8 +18,8 @@ const mockData = {
   '/api/config': {
     provider: { name: 'openaicompat', base_url: 'https://api.example.com/v1', model: 'mimo-v2.5-pro', api_key: 'sk-••••••••' },
     prompt: 'You are a helpful AI assistant.',
-    chat: { context_enabled: true, max_context: 3, image_ttl: 300 },
-    wechat: { strict_login: false, token_file: './token.json', auto_login: true, trigger_prefix: '' },
+    chat: { max_context: 3, image_ttl: 300 },
+    wechat: { token_file: './token.json', auto_login: true, trigger_prefix: '' },
     web: { listen: 'localhost:8080' },
     database: { path: './data.db' }
   },
@@ -75,9 +75,31 @@ const server = http.createServer((req, res) => {
   }
 
   // Static files
-  let filePath = path.join(DIST, urlPath === '/' ? 'index.html' : urlPath)
+  //
+  // urlPath is attacker-controlled, and path.join happily walks out of DIST
+  // with a request like /../../secret. Decode first, then resolve, then refuse
+  // anything that does not land inside DIST.
+  let decoded
+  try {
+    decoded = decodeURIComponent(urlPath)
+  } catch {
+    res.writeHead(400)
+    res.end('Bad request')
+    return
+  }
+  if (decoded.includes('\0')) {
+    res.writeHead(400)
+    res.end('Bad request')
+    return
+  }
+
+  const distRoot = path.resolve(DIST)
+  const requested = path.resolve(distRoot, '.' + decoded)
+  const insideDist = requested === distRoot || requested.startsWith(distRoot + path.sep)
+
+  let filePath = insideDist ? requested : path.join(distRoot, 'index.html')
   if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
-    filePath = path.join(DIST, 'index.html') // SPA fallback
+    filePath = path.join(distRoot, 'index.html') // SPA fallback
   }
 
   const ext = path.extname(filePath)

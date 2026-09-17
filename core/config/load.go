@@ -22,12 +22,11 @@ func defaultConfigPath() string {
 
 func defaultConfig() Config {
 	return Config{
-		Admin:   AdminConfig{PasswordHash: ""},
-		WeChat:  WeChatConfig{StrictLogin: false, TokenFile: filepath.Join(filepath.Dir(defaultConfigPath()), "token.json"), AutoLogin: true, TriggerPrefix: ""},
-		Web:     WebConfig{Listen: "localhost:8080"},
-		Chat:    ChatConfig{ContextEnabled: true, MaxContext: 3, ImageTTL: 300},
-		Plugins: PluginConfig{Enabled: false},
-		DB:      DatabaseConf{Path: filepath.Join(filepath.Dir(defaultConfigPath()), "data.db")},
+		Admin:  AdminConfig{PasswordHash: ""},
+		WeChat: WeChatConfig{TokenFile: filepath.Join(filepath.Dir(defaultConfigPath()), "token.json"), AutoLogin: true, TriggerPrefix: ""},
+		Web:    WebConfig{Listen: "localhost:8080"},
+		Chat:   ChatConfig{MaxContext: 3, ImageTTL: 300},
+		DB:     DatabaseConf{Path: filepath.Join(filepath.Dir(defaultConfigPath()), "data.db")},
 		Provider: ProviderConf{
 			Name:    "openaicompat",
 			BaseURL: "",

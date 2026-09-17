@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"io/fs"
@@ -37,6 +38,12 @@ var uiFS embed.FS
 var startupTime = time.Now()
 
 func main() {
+	setPassword := flag.Bool("set-password", false,
+		"prompt for a dashboard password, store its hash in config.yaml, and exit")
+	listen := flag.String("listen", "",
+		"override web.listen for this run only, e.g. 127.0.0.1:8081")
+	flag.Parse()
+
 	// Always run from exe directory so relative paths work on double-click
 	exe, _ := os.Executable()
 	exeDir := filepath.Dir(exe)
@@ -67,6 +74,21 @@ func main() {
 	if dataDir != exeDir {
 		cfg.DB.Path = filepath.Join(dataDir, "data.db")
 		cfg.WeChat.TokenFile = filepath.Join(dataDir, "token.json")
+	}
+
+	// `-set-password` is a one-shot maintenance command: write the hash and
+	// stop before any listener, tray icon or WeChat session is created.
+	if *setPassword {
+		if err := runSetPassword(); err != nil {
+			logrus.Fatalf("set password: %v", err)
+		}
+		return
+	}
+
+	// `-listen` lets the Electron shell pick a free port and tell us about it,
+	// instead of both sides guessing at 8080. It is never persisted.
+	if *listen != "" {
+		cfg.Web.Listen = *listen
 	}
 
 	banner := []string{
@@ -110,7 +132,7 @@ func main() {
 	// Build provider from config
 	p := buildProviderFromCfg(cfg)
 
-	// Sessions
+	// Sessions. MaxContext counts user/assistant pairs; zero turns memory off.
 	sessMgr := session.NewManager(cfg.Prompt, cfg.Chat.MaxContext)
 
 	// Database
@@ -121,10 +143,17 @@ func main() {
 	// Enable logrus → database hook so all logs appear in web UI
 	database.InitLogrusHook()
 
+	// chat.image_ttl is expressed in seconds and was previously ignored in
+	// favour of a hardcoded constant, so the config key did nothing.
+	imageTTL := time.Duration(cfg.Chat.ImageTTL) * time.Second
+	if imageTTL <= 0 {
+		imageTTL = 5 * time.Minute
+	}
+
 	h := &message.Handler{
 		Provider: p,
 		Sessions: sessMgr,
-		ImageTTL: 5 * time.Minute,
+		ImageTTL: imageTTL,
 		DB:       database.Store,
 	}
 
@@ -295,8 +324,15 @@ func buildProviderFromCfg(cfg *config.Config) providers.Provider {
 	return p
 }
 
-func buildMux(h *message.Handler, sm *session.Manager, adapter *ow_adapter.Adapter) http.Handler {
+func buildMux(h *message.Handler, sm *session.Manager, adapter *ow_adapter.Adapter, auth *authenticator) http.Handler {
 	mux := http.NewServeMux()
+
+	// Dashboard authentication. These three routes stay public so the SPA can
+	// work out whether to render a login screen; auth.middleware gates every
+	// other /api route and the heartbeat socket.
+	mux.HandleFunc("/api/auth/status", auth.handleStatus)
+	mux.HandleFunc("/api/auth/login", auth.handleLogin)
+	mux.HandleFunc("/api/auth/logout", auth.handleLogout)
 
 	// SPA: serve static files from web/dist/, fallback to index.html
 	distFS, err := fs.Sub(uiFS, "web/dist")
@@ -714,7 +750,10 @@ func parsePagination(r *http.Request) (limit, offset int) {
 
 func startWeb(ctx context.Context, listen string, h *message.Handler, sm *session.Manager, adapter *ow_adapter.Adapter) {
 	// Fix-24: build mux once, reuse for all port attempts
-	handler := buildMux(h, sm, adapter)
+	// Authentication wraps the whole mux, so the port fallback below cannot
+	// accidentally expose an unguarded listener.
+	auth := newAuthenticator()
+	handler := auth.middleware(buildMux(h, sm, adapter, auth))
 
 	// Auto-retry with next port if current one is busy
 	tryPort := func(addr string) bool {

@@ -140,34 +140,41 @@ func (a *Adapter) StartAsync() {
 }
 
 func (a *Adapter) loginLoop() {
-	// 1. Token path with bounded retries.
-	for attempt := 1; attempt <= maxHotLoginAttempts; attempt++ {
-		a.setLogin(func(s *LoginStatus) {
-			s.State = LoginHotLoggingIn
-			s.Attempts = attempt
-			s.QRURL = ""
-		})
-
-		if d := hotLoginBackoff(attempt); d > 0 {
+	// 1. Token path with bounded retries. Skipped entirely when auto_login is
+	//    off, so an operator who wants a fresh session gets a QR code straight
+	//    away instead of five failed token attempts first. The key used to be
+	//    parsed and ignored.
+	if config.Snapshot().WeChat.AutoLogin {
+		for attempt := 1; attempt <= maxHotLoginAttempts; attempt++ {
 			a.setLogin(func(s *LoginStatus) {
-				s.NextRetry = time.Now().Add(d).Format(time.RFC3339)
+				s.State = LoginHotLoggingIn
+				s.Attempts = attempt
+				s.QRURL = ""
 			})
-			if !a.sleep(d) {
+
+			if d := hotLoginBackoff(attempt); d > 0 {
+				a.setLogin(func(s *LoginStatus) {
+					s.NextRetry = time.Now().Add(d).Format(time.RFC3339)
+				})
+				if !a.sleep(d) {
+					return
+				}
+			}
+
+			err := a.tryHotLogin()
+			if err == nil {
+				a.markLoggedIn()
 				return
 			}
-		}
 
-		err := a.tryHotLogin()
-		if err == nil {
-			a.markLoggedIn()
-			return
+			logrus.Warnf("[login] hot login attempt %d/%d failed: %v", attempt, maxHotLoginAttempts, err)
+			a.setLogin(func(s *LoginStatus) {
+				s.LastError = err.Error()
+				s.NextRetry = ""
+			})
 		}
-
-		logrus.Warnf("[login] hot login attempt %d/%d failed: %v", attempt, maxHotLoginAttempts, err)
-		a.setLogin(func(s *LoginStatus) {
-			s.LastError = err.Error()
-			s.NextRetry = ""
-		})
+	} else {
+		logrus.Info("[login] auto_login is off; going straight to a QR scan")
 	}
 
 	// 2. One automatic scan-login fallback.
