@@ -109,6 +109,19 @@ func (a *Adapter) RetryLogin() bool {
 	}
 }
 
+// RetryScan asks the login loop for a fresh QR code. This is what the
+// dashboard's "重新登录" and the welcome page's refresh button use: a human
+// pressing that button wants a scannable code, not another silent token
+// attempt that fails with "invalid storage" on a fresh install.
+func (a *Adapter) RetryScan() bool {
+	select {
+	case a.loginReq <- LoginWaitingScan:
+		return true
+	default:
+		return false // a request is already pending
+	}
+}
+
 // setLogin mutates the snapshot under lock.
 func (a *Adapter) setLogin(fn func(*LoginStatus)) {
 	a.loginmu.Lock()

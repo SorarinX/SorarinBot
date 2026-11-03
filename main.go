@@ -530,7 +530,7 @@ func buildMux(h *message.Handler, sm *session.Manager, adapter *ow_adapter.Adapt
 			http.Error(w, "adapter unavailable", 503)
 			return
 		}
-		if !adapter.RetryLogin() {
+		if !adapter.RetryScan() {
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"ok":    false,
 				"error": "已有重试请求在处理中",

@@ -33,6 +33,9 @@ config keys that never did anything.
 
 ### Changed
 
+- **重新登录 starts a fresh QR scan.** The button used to retry the token
+  path, which on a fresh install failed with `invalid storage` and never
+  produced a new code.
 - **The console window hides itself once the dashboard is up.** People were
   closing the black window and stopping the bot; the tray icon and the web UI
   remain. `-console` keeps it visible, and a console shared with a shell is
