@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   useLoginStatus,
   type LoginSnapshot,
@@ -254,6 +254,13 @@ export default function WelcomePage() {
                     <span>进入工作台</span>
                     <ArrowIcon />
                   </button>
+
+                  {!isLoggedIn ? (
+                    <Link to="/settings" className="welcome-skip">
+                      先不扫码，去配置
+                      <span aria-hidden="true">→</span>
+                    </Link>
+                  ) : null}
                 </div>
               </div>
             </div>

@@ -73,6 +73,13 @@ export default function DashboardPage() {
         <p className="dash-subtitle">微信连接、模型与会话的实时状态</p>
       </header>
 
+      {!connecting && wechat.tone !== "brand" ? (
+        <div className="dash-offline-note" role="status">
+          <span>微信尚未连接。可以先完成模型配置，扫码后即可在微信里对话。</span>
+          <Link to="/welcome">去扫码 →</Link>
+        </div>
+      ) : null}
+
       {connecting ? (
         <DashboardSkeleton />
       ) : (

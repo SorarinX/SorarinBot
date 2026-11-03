@@ -291,6 +291,22 @@ html.welcome-active body {
   animation: welcome-copy-in 500ms var(--ease-out) 240ms both;
 }
 
+.welcome-skip {
+  display: block;
+  width: fit-content;
+  margin: 14px auto 0;
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  line-height: 1;
+  text-decoration: none;
+  transition: color var(--dur-hover) var(--ease-out);
+}
+
+.welcome-skip:hover {
+  color: var(--brand);
+}
+
 .welcome-footer {
   display: flex;
   flex-wrap: wrap;
