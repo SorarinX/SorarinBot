@@ -27,7 +27,7 @@ Thank you for your interest in contributing! / 感谢你对 SorarinBot 的关注
 
 - Go 1.25+
 - Node.js 20+
-- pnpm
+- npm
 
 ### Backend / 后端
 
@@ -39,7 +39,7 @@ go run .
 ### Frontend / 前端
 
 ```bash
-cd web && pnpm install && pnpm dev
+cd web && npm install && npm run dev
 ```
 
 ### Electron / 桌面客户端
@@ -121,7 +121,7 @@ providers/openaicompat/          → OpenAI-compatible API client
 adapters/openwechat/             → WeChat message adapter
 database/                        → SQLite storage layer
 internal/openwechat/             → WeChat protocol (fork)
-web/                             → Nuxt 4 frontend (SPA)
+web/                             → React 19 + Vite frontend (SPA)
 web/dist/                        → Built frontend (go:embed)
 electron/                        → Electron desktop shell (Windows)
 linux/                           → Linux port reference

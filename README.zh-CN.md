@@ -93,11 +93,10 @@
 git clone https://github.com/SorarinX/SorarinBot.git
 cd SorarinBot
 
-# 1. 前端 —— 生成静态 SPA 到 web/dist，供 go:embed 打包
+# 1. 前端 —— 构建 SPA 到 web/dist，供 go:embed 打包
 cd web
-pnpm install
-pnpm exec nuxt generate
-cp -r .output/public/* dist/
+npm install
+npm run build
 cd ..
 
 # 2. 后端 —— Windows
@@ -107,7 +106,7 @@ go build -ldflags="-s -w" -o SorarinBot.exe .
 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o SorarinBot .
 ```
 
-需要 **Go 1.25+** 与 **Node.js 20+**（含 **pnpm**）。
+需要 **Go 1.25+** 与 **Node.js 20+**（含 **npm**）。
 
 </details>
 
@@ -190,7 +189,7 @@ SorarinBot -set-password      # 把 PBKDF2-SHA256 哈希写入 config.yaml
 | 层次 | 技术 |
 | --- | --- |
 | 后端 | Go 1.25 · `net/http` · `logrus` · `modernc.org/sqlite`（纯 Go） |
-| 前端 | Nuxt 4 · Vue 3 · Nuxt UI 4 · Tailwind CSS 4 · TypeScript |
+| 前端 | React 19 · Vite 7 · Tailwind CSS 4 · TypeScript |
 | 桌面端 | Electron 43 · electron-builder（NSIS 安装包 / AppImage） |
 | 数据库 | SQLite —— `data.db`，保存聊天记录与系统日志 |
 | 微信 | [openwechat](https://github.com/eatmoreapple/openwechat) v1.4.10，vendored 在 `internal/` 下 |
@@ -224,7 +223,7 @@ SorarinBot -set-password      # 把 PBKDF2-SHA256 哈希写入 config.yaml
 go run .
 
 # 前端 —— 开发服务器，/api 自动代理到 :8080
-cd web && pnpm install && pnpm dev
+cd web && npm install && npm run dev
 
 # Electron 壳，连接本地已启动的后端
 cd electron && npm install && npm start
@@ -269,7 +268,7 @@ gofmt -l .
 ## 🙏 致谢
 
 - [openwechat](https://github.com/eatmoreapple/openwechat) —— 本项目所依赖的微信 Web 协议实现。`internal/openwechat/` 是它的一个 fork，仍适用 Apache License 2.0；与上游的差异详见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
-- [Nuxt UI](https://ui.nuxt.com) —— 后台界面所用的组件库。
+- [React](https://react.dev) 与 [Vite](https://vite.dev) —— 后台界面的运行时与构建工具。
 - [electron-builder](https://www.electron.build) —— 桌面端打包工具。
 - 以及每一位提交 Issue 和 Pull Request 的朋友。
 

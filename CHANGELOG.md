@@ -33,6 +33,10 @@ config keys that never did anything.
 
 ### Changed
 
+- **The dashboard is now a React 19 + Vite app.** The Nuxt/Vue SPA was replaced
+  by a dark-first shell with a welcome/QR screen, dashboard, sessions, logs,
+  settings and login. The API contract is unchanged; the previous frontend is
+  preserved in the `frontend-vue-final` tag.
 - `chat.image_ttl` is now read. It was previously parsed and then ignored in
   favour of a hardcoded five-minute constant, so the setting did nothing.
 - `wechat.auto_login` is now read. Setting it to `false` skips the saved token

@@ -94,11 +94,10 @@ Some releases also publish an NSIS installer (`SorarinBot.Setup.*.exe`, ~110 MB,
 git clone https://github.com/SorarinX/SorarinBot.git
 cd SorarinBot
 
-# 1. Frontend — generate the static SPA into web/dist, where go:embed picks it up
+# 1. Frontend — build the SPA into web/dist, where go:embed picks it up
 cd web
-pnpm install
-pnpm exec nuxt generate
-cp -r .output/public/* dist/
+npm install
+npm run build
 cd ..
 
 # 2. Backend — Windows
@@ -108,7 +107,7 @@ go build -ldflags="-s -w" -o SorarinBot.exe .
 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o SorarinBot .
 ```
 
-Requires **Go 1.25+** and **Node.js 20+** with **pnpm**.
+Requires **Go 1.25+** and **Node.js 20+** with **npm**.
 
 </details>
 
@@ -204,7 +203,7 @@ Three ideas explain most of the design:
 | Layer | Technology |
 | --- | --- |
 | Backend | Go 1.25 · `net/http` · `logrus` · `modernc.org/sqlite` (pure Go) |
-| Frontend | Nuxt 4 · Vue 3 · Nuxt UI 4 · Tailwind CSS 4 · TypeScript |
+| Frontend | React 19 · Vite 7 · Tailwind CSS 4 · TypeScript |
 | Desktop | Electron 43 · electron-builder (NSIS installer / AppImage) |
 | Database | SQLite — `data.db`, chat history and system logs |
 | WeChat | [openwechat](https://github.com/eatmoreapple/openwechat) v1.4.10, vendored under `internal/` |
@@ -239,7 +238,7 @@ is set, everything except the three `auth` routes returns `401` until you sign i
 go run .
 
 # Frontend — dev server with /api proxied to :8080
-cd web && pnpm install && pnpm dev
+cd web && npm install && npm run dev
 
 # Electron shell around a locally running backend
 cd electron && npm install && npm start
@@ -286,7 +285,7 @@ If SorarinBot is useful to you, a coffee is appreciated — it goes straight int
 ## 🙏 Acknowledgements
 
 - [openwechat](https://github.com/eatmoreapple/openwechat) — the WeChat Web protocol this project builds on. A fork of it lives in `internal/openwechat/` under the Apache License 2.0; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for exactly how it differs.
-- [Nuxt UI](https://ui.nuxt.com) — component library behind the dashboard.
+- [React](https://react.dev) and [Vite](https://vite.dev) — the dashboard runtime and build tool.
 - [electron-builder](https://www.electron.build) — desktop packaging.
 - And everyone who filed an issue or sent a pull request.
 
