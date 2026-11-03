@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { saveConfig } from "../lib/settings";
 import { useConfigData } from "../lib/useConfigData";
 import "../styles/admin-page.css";
@@ -112,6 +112,9 @@ export default function PromptPage() {
     <div className="prompt-page">
       <header className="admin-head-row">
         <div className="admin-head-copy">
+          <Link to="/settings" className="admin-back-link">
+            ← 返回设置
+          </Link>
           <div className="admin-kicker-row">
             <p className="admin-kicker">PROMPT</p>
             {unavailable ? <span className="admin-chip">演示内容</span> : null}

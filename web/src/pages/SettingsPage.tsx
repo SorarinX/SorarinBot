@@ -188,7 +188,7 @@ export default function SettingsPage() {
       await saveConfig(updates);
       if (apiKey) setMaskedKey(maskApiKey(apiKey));
       setForm((current) => ({ ...current, apiKey: "" }));
-      setSaveStatus({ tone: "success", text: "Provider 已保存" });
+      setSaveStatus({ tone: "success", text: "模型服务已保存" });
     } catch (error) {
       setSaveStatus({
         tone: "error",
@@ -260,7 +260,7 @@ export default function SettingsPage() {
             aria-current={section === "provider" ? "page" : undefined}
             onClick={() => setSection("provider")}
           >
-            Provider
+            模型服务
           </button>
           <button
             type="button"
@@ -274,14 +274,14 @@ export default function SettingsPage() {
 
         <section
           className="settings-panel admin-card"
-          aria-label={section === "provider" ? "Provider 配置" : "系统配置"}
+          aria-label={section === "provider" ? "模型服务配置" : "系统配置"}
         >
           {section === "provider" ? (
             <div className="settings-form">
               <header className="settings-form-head">
                 <div>
-                  <h2>Provider</h2>
-                  <p>配置 LLM 服务商连接</p>
+                  <h2>模型服务</h2>
+                  <p>配置大模型服务商连接</p>
                 </div>
                 <span className="settings-form-state">{formStateLabel}</span>
               </header>
@@ -305,7 +305,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="settings-field">
-                  <span className="admin-field-label">Base URL</span>
+                  <span className="admin-field-label">接口地址</span>
                   <input
                     className="admin-input"
                     type="url"
@@ -319,7 +319,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="settings-field">
-                  <span className="admin-field-label">Model</span>
+                  <span className="admin-field-label">模型</span>
                   <div className="settings-inline">
                     <input
                       className="admin-input"
@@ -367,7 +367,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="settings-field">
-                  <span className="admin-field-label">API Key</span>
+                  <span className="admin-field-label">API 密钥</span>
                   <div className="settings-key-row">
                     <input
                       className="admin-input"
@@ -384,8 +384,8 @@ export default function SettingsPage() {
                       type="button"
                       className="admin-icon-button"
                       onClick={() => setShowKey((current) => !current)}
-                      aria-label={showKey ? "隐藏 API Key" : "显示 API Key"}
-                      title={showKey ? "隐藏 API Key" : "显示 API Key"}
+                      aria-label={showKey ? "隐藏密钥" : "显示密钥"}
+                      title={showKey ? "隐藏密钥" : "显示密钥"}
                       disabled={!ready}
                     >
                       {showKey ? (
@@ -397,7 +397,7 @@ export default function SettingsPage() {
                   </div>
                   <p className="admin-field-help">
                     <span className="settings-masked">
-                      {maskedKey ? "已保存：" + maskedKey : "尚未保存 API Key"}
+                      {maskedKey ? "已保存：" + maskedKey : "尚未保存密钥"}
                     </span>
                     <span> · 留空表示不修改</span>
                   </p>
@@ -453,7 +453,7 @@ export default function SettingsPage() {
                     </span>
                   ) : (
                     <span>
-                      {testResult.error || "请检查 Base URL、Model 与 API Key"}
+                      {testResult.error || "请检查接口地址、模型与密钥"}
                       {testResult.latencyMs !== null
                         ? " · 延迟 " + testResult.latencyMs + "ms"
                         : ""}

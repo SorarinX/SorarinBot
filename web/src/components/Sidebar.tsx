@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { BotIcon, LogoutIcon, MoonIcon, SunIcon } from "./icons";
+import { LogoutIcon, MoonIcon, SunIcon } from "./icons";
 import { NAV_ITEMS } from "../lib/navigation";
 import { cn } from "../lib/cn";
 import { useTheme } from "../lib/theme";
@@ -19,9 +19,11 @@ export function Sidebar() {
   return (
     <aside className="app-sidebar sidebar-glass fixed inset-y-0 left-0 z-30 flex w-[232px] flex-col border-r border-border">
       <div className="flex h-14 shrink-0 items-center gap-2.5 border-b border-border px-4">
-        <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-brand text-white">
-          <BotIcon className="size-[18px]" />
-        </span>
+        <img
+          src="/logo.png"
+          alt=""
+          className="size-8 shrink-0 rounded-lg bg-white object-contain ring-1 ring-black/5"
+        />
         <span className="truncate text-[14px] font-semibold tracking-tight text-text">
           SorarinBot
         </span>

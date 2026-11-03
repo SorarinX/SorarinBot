@@ -78,6 +78,23 @@
   line-height: 1.6;
 }
 
+.admin-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  line-height: 1;
+  text-decoration: none;
+  transition: color var(--dur-hover) var(--ease-out);
+}
+
+.admin-back-link:hover {
+  color: var(--brand);
+}
+
 .admin-card {
   border: 1px solid var(--border);
   border-radius: var(--radius-card);

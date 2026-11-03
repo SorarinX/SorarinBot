@@ -51,8 +51,9 @@ html.dark {
   --color-error: var(--error);
   --color-info: var(--info);
   --font-sans: var(--font-ui);
-  --font-display: var(--font-display);
-  --font-mono: var(--font-mono);
+  /* 用字面量而不是 var(--font-display)：同名自引用会让整条字体栈失效。 */
+  --font-display: "Sora Variable", Sora, "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 @layer base {
