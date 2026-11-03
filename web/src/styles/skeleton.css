@@ -1,0 +1,198 @@
+/* First-load skeletons (P5). Only shown while the initial read has no data;
+ * polling/refresh never remounts them.
+ */
+
+.skeleton-block {
+  background-color: var(--surface-2);
+  border-radius: 8px;
+  animation: skeleton-breathe 1.2s ease-in-out infinite;
+}
+
+@keyframes skeleton-breathe {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ── Dashboard: 3 KPI blocks + a 4-row list ───────────────────────────── */
+
+.skeleton-dash {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.skeleton-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.skeleton-kpi {
+  height: 108px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+.skeleton-panel {
+  padding: 8px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background-color: var(--surface-solid);
+  box-shadow: var(--shadow-card);
+}
+
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 54px;
+  border-bottom: 1px solid var(--border);
+}
+
+.skeleton-row:last-child {
+  border-bottom: 0;
+}
+
+.skeleton-avatar {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border-radius: 999px;
+}
+
+.skeleton-line {
+  height: 10px;
+  border-radius: 999px;
+}
+
+.skeleton-line--name {
+  width: 30%;
+  min-width: 100px;
+}
+
+.skeleton-line--meta {
+  width: 18%;
+  min-width: 60px;
+  height: 8px;
+  margin-left: auto;
+}
+
+/* ── Chat: four session rows ──────────────────────────────────────────── */
+
+.chat-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.chat-skeleton-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-height: 54px;
+  padding: 8px 10px;
+}
+
+.chat-skeleton-avatar {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border-radius: 999px;
+}
+
+.chat-skeleton-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 9px;
+  padding-top: 4px;
+  min-width: 0;
+}
+
+.chat-skeleton-line {
+  width: 55%;
+  height: 10px;
+  border-radius: 999px;
+}
+
+.chat-skeleton-line--short {
+  width: 30%;
+  height: 8px;
+}
+
+.chat-skeleton-time {
+  width: 30px;
+  height: 8px;
+  margin-top: 5px;
+  flex: none;
+  border-radius: 999px;
+}
+
+/* ── Logs: four 36px rows ─────────────────────────────────────────────── */
+
+.logs-skeleton {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 18px;
+}
+
+.logs-skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 36px;
+  flex: none;
+  border-bottom: 1px solid var(--border);
+}
+
+.logs-skeleton-time {
+  width: 52px;
+  height: 9px;
+  flex: none;
+  border-radius: 999px;
+}
+
+.logs-skeleton-level {
+  width: 40px;
+  height: 14px;
+  flex: none;
+  border-radius: 999px;
+}
+
+.logs-skeleton-message {
+  width: 58%;
+  height: 10px;
+  border-radius: 999px;
+}
+
+.logs-skeleton-message--short {
+  width: 36%;
+}
+
+@media (max-width: 899px) {
+  .skeleton-kpis {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .skeleton-kpi {
+    height: 84px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-block {
+    animation: none;
+    opacity: 0.7;
+  }
+}

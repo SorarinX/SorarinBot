@@ -1,0 +1,846 @@
+/* Welcome / P1a-3 — fixed dark first-run page.
+ * Signature: breathing mint halo and a scanning line inside the QR frame.
+ * All motion is CSS-only.
+ */
+
+html.welcome-active {
+  background-color: #0b0b0b;
+  color-scheme: dark;
+}
+
+html.welcome-active body {
+  background-color: #0b0b0b;
+}
+
+.welcome-page {
+  --welcome-mint: #13e0bc;
+  --welcome-gold: #d1ab79;
+  --welcome-amber: #f59e0b;
+  --welcome-error: #f87171;
+  --welcome-note: #8a8a8a;
+
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow: hidden;
+  color-scheme: dark;
+  color: #ffffff;
+  background-color: #0b0b0b;
+  background-image: radial-gradient(
+    ellipse 94% 86% at 50% 44%,
+    #121212 0%,
+    #0f0f0f 56%,
+    #0b0b0b 100%
+  );
+  font-family: var(--font-ui);
+}
+
+/* ── Background composition ─────────────────────────────────────────── */
+
+.welcome-ambient {
+  position: absolute;
+  z-index: 0;
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.welcome-ambient-mint {
+  top: -28vw;
+  left: -18vw;
+  width: 60vw;
+  height: 60vw;
+  background-color: rgba(19, 224, 188, 0.1);
+  filter: blur(120px);
+}
+
+.welcome-ambient-gold {
+  right: -24vw;
+  bottom: -30vw;
+  width: 64vw;
+  height: 64vw;
+  background-color: rgba(209, 171, 121, 0.06);
+  filter: blur(140px);
+}
+
+.welcome-glow {
+  position: absolute;
+  z-index: 0;
+  top: 48%;
+  left: 50%;
+  width: min(62vw, 860px);
+  aspect-ratio: 1;
+  border-radius: 999px;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at center,
+    rgba(19, 224, 188, 0.42) 0%,
+    rgba(19, 224, 188, 0.16) 38%,
+    rgba(19, 224, 188, 0) 70%
+  );
+  filter: blur(80px);
+  opacity: 0.5;
+  transform: translate(-50%, -50%) scale(1);
+  animation: welcome-breathe 14s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Inline SVG grain, generated entirely in CSS. No external image request. */
+.welcome-noise {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.02;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 180px 180px;
+}
+
+.welcome-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1480px;
+  min-height: 100vh;
+  min-height: 100svh;
+  margin: 0 auto;
+  padding: clamp(28px, 3.2vw, 46px) clamp(24px, 5vw, 72px) 32px;
+}
+
+/* ── Masthead ───────────────────────────────────────────────────────── */
+
+.welcome-topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px 24px;
+}
+
+.welcome-wordmark {
+  display: inline-block;
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-size: clamp(36px, 3vw, 42px);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+  color: var(--welcome-mint);
+  background-image: linear-gradient(135deg, #13e0bc 0%, #d1ab79 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: welcome-brand-in 600ms var(--ease-out) both;
+}
+
+.welcome-top-actions {
+  display: flex;
+  align-items: center;
+  padding-top: 3px;
+}
+
+.welcome-github {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 13px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.035);
+  color: #a1a1a1;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  transition:
+    color var(--dur-hover) var(--ease-out),
+    border-color var(--dur-hover) var(--ease-out),
+    background-color var(--dur-hover) var(--ease-out);
+}
+
+.welcome-github:hover {
+  color: #f0f0f0;
+  border-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+.welcome-github-icon {
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
+
+/* ── Main split ─────────────────────────────────────────────────────── */
+
+.welcome-main {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 336px;
+  align-items: center;
+  column-gap: clamp(56px, 7vw, 112px);
+  width: 100%;
+  padding: clamp(44px, 6.5vh, 74px) 0 clamp(26px, 4vh, 42px);
+}
+
+.welcome-copy {
+  width: 100%;
+  max-width: 720px;
+  min-width: 0;
+}
+
+.welcome-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  margin: 0;
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: clamp(44px, 5.2vw, 76px);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+}
+
+.welcome-title-line {
+  white-space: nowrap;
+  animation: welcome-title-in 700ms var(--ease-out) both;
+}
+
+.welcome-title-line:first-child {
+  animation-delay: 120ms;
+}
+
+.welcome-title-line:last-child {
+  animation-delay: 180ms;
+}
+
+.welcome-title-period {
+  color: var(--welcome-mint);
+}
+
+.welcome-capabilities {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
+  color: #c9c9c9;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  opacity: 0.7;
+  animation: welcome-copy-in 500ms var(--ease-out) 240ms both;
+}
+
+.welcome-capabilities li {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.welcome-capabilities li + li::before {
+  content: "";
+  width: 2px;
+  height: 2px;
+  margin: 0 12px;
+  border-radius: 999px;
+  background-color: var(--welcome-mint);
+}
+
+.welcome-tagline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0 0;
+  color: #c9c9c9;
+  font-family: var(--font-ui);
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  animation: welcome-copy-in 500ms var(--ease-out) 240ms both;
+}
+
+.welcome-tagline::before {
+  content: "";
+  flex: 0 0 24px;
+  width: 24px;
+  height: 1px;
+  border-radius: 999px;
+  background-color: var(--welcome-mint);
+}
+
+.welcome-description {
+  max-width: 34em;
+  margin: 20px 0 0;
+  color: #9a9a9a;
+  font-family: var(--font-ui);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.8;
+  animation: welcome-copy-in 500ms var(--ease-out) 240ms both;
+}
+
+.welcome-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 24px;
+  color: #6b6b6b;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+}
+
+.welcome-footer-spec {
+  margin: 0;
+}
+
+.welcome-footer-version {
+  flex: none;
+  color: #6b6b6b;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ── Glass QR card ──────────────────────────────────────────────────── */
+
+.welcome-login {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.welcome-qr-shell {
+  position: relative;
+  flex: none;
+  width: 336px;
+  max-width: 100%;
+  border-radius: 24px;
+  animation: welcome-card-in 700ms var(--ease-out) 360ms both;
+}
+
+.welcome-card-visual {
+  position: relative;
+  border-radius: 24px;
+  transition: transform 240ms var(--ease-out);
+  will-change: transform;
+}
+
+.welcome-qr-shell:hover .welcome-card-visual {
+  transform: translateY(-3px);
+}
+
+.welcome-card-halo {
+  position: absolute;
+  z-index: 0;
+  top: 12%;
+  right: -4%;
+  bottom: 7%;
+  left: -4%;
+  border-radius: 999px;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 50% 46%,
+    rgba(19, 224, 188, 0.92) 0%,
+    rgba(19, 224, 188, 0.28) 44%,
+    rgba(19, 224, 188, 0) 72%
+  );
+  filter: blur(60px);
+  opacity: 0.25;
+  transition: opacity 240ms var(--ease-out);
+}
+
+.welcome-qr-shell:hover .welcome-card-halo {
+  opacity: 0.4;
+}
+
+.welcome-card {
+  position: relative;
+  z-index: 2;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  background-color: rgba(255, 255, 255, 0.04);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 30px 80px rgba(0, 0, 0, 0.42);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  backdrop-filter: blur(24px) saturate(1.4);
+  transition:
+    border-color 240ms var(--ease-out),
+    background-color 240ms var(--ease-out),
+    box-shadow 240ms var(--ease-out);
+}
+
+.welcome-qr-shell:hover .welcome-card {
+  border-color: rgba(19, 224, 188, 0.35);
+}
+
+@supports not (
+  (backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px))
+) {
+  .welcome-card {
+    background-color: #161616;
+  }
+}
+
+.welcome-card-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 2px 16px;
+  color: #d4d4d4;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+}
+
+.welcome-qr-icon {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: var(--welcome-mint);
+}
+
+/* ── QR waiting / image ─────────────────────────────────────────────── */
+
+.welcome-qr-frame {
+  position: relative;
+  width: 248px;
+  max-width: 100%;
+  aspect-ratio: 1;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 18px;
+  background-color: #161616;
+  box-shadow: 0 0 48px rgba(19, 224, 188, 0.12);
+}
+
+.welcome-qr-waiting {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background-color: #161616;
+}
+
+/* Faint 8px QR-like square grid; no external asset. */
+.welcome-qr-waiting::before {
+  content: "";
+  position: absolute;
+  inset: 16px;
+  border-radius: 10px;
+  pointer-events: none;
+  opacity: 0.06;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      #ffffff 0 1px,
+      transparent 1px 8px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      #ffffff 0 1px,
+      transparent 1px 8px
+    );
+}
+
+.welcome-scan-line {
+  position: absolute;
+  z-index: 1;
+  top: 24px;
+  right: 32px;
+  left: 32px;
+  height: 2px;
+  border-radius: 999px;
+  background-color: var(--welcome-mint);
+  box-shadow: 0 0 12px rgba(19, 224, 188, 0.6);
+  animation: welcome-scan-line 2.4s ease-in-out infinite;
+  will-change: transform;
+}
+
+.welcome-qr-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background-color: #ffffff;
+  animation: welcome-qr-image-in 300ms var(--ease-out) both;
+}
+
+/* ── Status and CTA ─────────────────────────────────────────────────── */
+
+.welcome-status {
+  margin-top: 20px;
+}
+
+.welcome-status-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.welcome-status-dot {
+  position: relative;
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-radius: 999px;
+  background-color: var(--welcome-note);
+}
+
+.welcome-status[data-tone="brand"] .welcome-status-dot {
+  background-color: var(--welcome-mint);
+  box-shadow: 0 0 12px rgba(19, 224, 188, 0.38);
+}
+
+.welcome-status[data-tone="amber"] .welcome-status-dot {
+  background-color: var(--welcome-amber);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.22);
+}
+
+.welcome-status[data-tone="error"] .welcome-status-dot {
+  background-color: var(--welcome-error);
+  box-shadow: 0 0 10px rgba(248, 113, 113, 0.22);
+}
+
+.welcome-status[data-state="waiting_scan"] .welcome-status-dot::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border: 1px solid currentColor;
+  border-radius: inherit;
+  color: var(--welcome-mint);
+  opacity: 0;
+  animation: welcome-dot-breathe 2s ease-in-out 1s infinite;
+}
+
+.welcome-status-label {
+  color: #ededed;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.welcome-status-note {
+  margin: 6px 0 0 14px;
+  overflow: hidden;
+  color: var(--welcome-note);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.welcome-enter-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 46px;
+  margin-top: 18px;
+  border: 1px solid var(--welcome-mint);
+  border-radius: 12px;
+  background-color: var(--welcome-mint);
+  color: #061a15;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-hover) var(--ease-out),
+    border-color var(--dur-hover) var(--ease-out),
+    transform var(--dur-hover) var(--ease-out),
+    box-shadow var(--dur-hover) var(--ease-out);
+}
+
+.welcome-enter-button:enabled:hover {
+  border-color: #2fe6c9;
+  background-color: #2fe6c9;
+  box-shadow: 0 8px 26px rgba(19, 224, 188, 0.18);
+  transform: translateY(-1px);
+}
+
+.welcome-enter-button:enabled:active {
+  transform: translateY(0);
+}
+
+.welcome-enter-button:disabled {
+  border-color: rgba(255, 255, 255, 0.08);
+  background-color: rgba(255, 255, 255, 0.065);
+  color: rgba(255, 255, 255, 0.36);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.welcome-enter-arrow {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
+/* ── Motion ─────────────────────────────────────────────────────────── */
+
+@keyframes welcome-brand-in {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+@keyframes welcome-title-in {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+@keyframes welcome-copy-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes welcome-card-in {
+  from {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(0);
+  }
+}
+
+@keyframes welcome-breathe {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) translate(0, 0) scale(1);
+  }
+  50% {
+    opacity: 0.75;
+    transform: translate(-50%, -50%) translate(2%, 0) scale(1.04);
+  }
+}
+
+@keyframes welcome-scan-line {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(200px);
+  }
+}
+
+@keyframes welcome-dot-breathe {
+  0%,
+  100% {
+    opacity: 0.12;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.58;
+    transform: scale(1.6);
+  }
+}
+
+@keyframes welcome-qr-image-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────── */
+
+@media (max-width: 899px) {
+  .welcome-inner {
+    padding: 28px 28px 32px;
+  }
+
+  .welcome-main {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    row-gap: clamp(32px, 5vh, 48px);
+    column-gap: 0;
+    padding: 38px 0 22px;
+  }
+
+  .welcome-login {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .welcome-glow {
+    top: 42%;
+    width: min(92vw, 700px);
+  }
+
+  .welcome-ambient-mint {
+    top: -220px;
+    left: -220px;
+    width: 520px;
+    height: 520px;
+  }
+
+  .welcome-ambient-gold {
+    right: -280px;
+    bottom: -280px;
+    width: 560px;
+    height: 560px;
+  }
+}
+
+@media (max-width: 640px) {
+  .welcome-inner {
+    padding: 22px 20px 32px;
+  }
+
+  .welcome-github {
+    height: 30px;
+    padding: 0 11px;
+    font-size: 11px;
+  }
+
+  .welcome-wordmark {
+    font-size: 36px;
+  }
+
+  .welcome-main {
+    row-gap: 24px;
+    padding: 24px 0 14px;
+  }
+
+  .welcome-description {
+    font-size: 15px;
+  }
+
+  .welcome-card {
+    padding: 20px;
+  }
+
+  .welcome-card-heading {
+    margin-bottom: 14px;
+  }
+
+  .welcome-status {
+    margin-top: 16px;
+  }
+
+  .welcome-enter-button {
+    margin-top: 14px;
+  }
+}
+
+@media (max-width: 380px) {
+  .welcome-inner {
+    padding-inline: 16px;
+  }
+
+  .welcome-card {
+    padding: 20px;
+  }
+
+  .welcome-capabilities li + li::before {
+    margin: 0 9px;
+  }
+
+  .welcome-footer {
+    gap: 6px 14px;
+  }
+}
+
+/* ── Reduced motion ─────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-wordmark,
+  .welcome-title-line,
+  .welcome-capabilities,
+  .welcome-tagline,
+  .welcome-description,
+  .welcome-qr-shell,
+  .welcome-qr-image,
+  .welcome-glow,
+  .welcome-scan-line,
+  .welcome-status[data-state="waiting_scan"] .welcome-status-dot::after {
+    animation: none !important;
+  }
+
+  .welcome-wordmark,
+  .welcome-title-line,
+  .welcome-capabilities,
+  .welcome-tagline,
+  .welcome-description,
+  .welcome-qr-shell,
+  .welcome-qr-image {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+
+  .welcome-glow {
+    opacity: 0.62;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  .welcome-scan-line {
+    transform: translateY(100px);
+  }
+
+  .welcome-card-visual,
+  .welcome-card-halo,
+  .welcome-card,
+  .welcome-enter-button,
+  .welcome-github {
+    transition: none;
+  }
+
+  .welcome-qr-shell:hover .welcome-card-visual {
+    transform: none;
+  }
+}

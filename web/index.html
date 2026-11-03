@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" type="image/png" href="/logo.png" />
+    <title>SorarinBot 控制台</title>
+    <script>
+      // 在首屏渲染前恢复主题，避免亮/暗闪烁。
+      // 首次访问（无存储）固定深色，不跟随系统；仅显式选择 light 时保持浅色。
+      (function () {
+        var dark = true;
+        try {
+          var stored = localStorage.getItem("sorarin-theme");
+          dark = stored !== "light";
+        } catch (error) {
+          dark = true;
+        }
+        if (dark) document.documentElement.classList.add("dark");
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

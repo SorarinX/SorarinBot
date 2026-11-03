@@ -1,0 +1,451 @@
+/* Settings and system prompt / P3. */
+
+.settings-page,
+.prompt-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.settings-head-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  flex: none;
+  margin-top: 25px;
+}
+
+.settings-prompt-link {
+  flex: none;
+}
+
+.prompt-demo-chip {
+  flex: none;
+  margin-top: 25px;
+}
+
+.settings-layout {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  align-items: start;
+  gap: 20px;
+  min-width: 0;
+}
+
+.settings-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px;
+}
+
+.settings-nav button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  background-color: transparent;
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    color var(--dur-hover) var(--ease-out),
+    background-color var(--dur-hover) var(--ease-out);
+}
+
+.settings-nav button:hover {
+  background-color: var(--surface-2);
+  color: var(--text);
+}
+
+.settings-nav button[data-active="true"] {
+  background-color: color-mix(in srgb, var(--brand) 12%, transparent);
+  color: var(--brand);
+}
+
+.settings-panel {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.settings-form {
+  width: 100%;
+  max-width: 640px;
+  padding: 22px;
+}
+
+.settings-form-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.settings-form-head h2 {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+}
+
+.settings-form-head p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.settings-form-state {
+  flex: none;
+  padding-top: 2px;
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.settings-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.settings-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.settings-inline .admin-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.settings-inline .admin-button {
+  flex: none;
+  height: 38px;
+}
+
+.settings-model-select {
+  margin-top: 1px;
+}
+
+.settings-key-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.settings-key-row .admin-input {
+  padding-right: 42px;
+}
+
+.settings-key-row .admin-icon-button {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+}
+
+.settings-masked {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.settings-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.settings-test-hint {
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.settings-save-state {
+  margin-left: auto;
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.settings-save-state[data-tone="success"] {
+  color: var(--brand);
+}
+
+.settings-save-state[data-tone="error"] {
+  color: var(--error);
+}
+
+.settings-test-result {
+  margin-top: 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.settings-test-result[data-tone="success"] {
+  border-color: color-mix(in srgb, var(--brand) 22%, var(--border));
+  background-color: color-mix(in srgb, var(--brand) 7%, transparent);
+  color: var(--brand);
+}
+
+.settings-test-result[data-tone="error"] {
+  border-color: color-mix(in srgb, var(--error) 24%, var(--border));
+  background-color: color-mix(in srgb, var(--error) 7%, transparent);
+  color: var(--error);
+}
+
+.settings-test-result strong {
+  display: block;
+  font-weight: 600;
+}
+
+.settings-test-result span {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  opacity: 0.86;
+}
+
+.settings-switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 4px 0 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-switch-row p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.settings-readonly {
+  display: flex;
+  align-items: flex-start;
+  gap: 36px;
+  flex-wrap: wrap;
+  padding-top: 16px;
+}
+
+.settings-readonly-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.settings-readonly-label {
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.settings-readonly-value {
+  max-width: 520px;
+  overflow: hidden;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-system-error {
+  margin-top: 10px;
+}
+
+/* ── Prompt editor ───────────────────────────────────────────────────── */
+
+.prompt-card {
+  padding: 22px;
+}
+
+.prompt-textarea {
+  width: 100%;
+  min-height: 340px;
+  padding: 15px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background-color: var(--surface-2);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  line-height: 1.8;
+  resize: none;
+  overflow: hidden;
+  transition:
+    border-color var(--dur-hover) var(--ease-out),
+    background-color var(--dur-hover) var(--ease-out);
+}
+
+.prompt-textarea:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--brand) 55%, var(--border));
+  background-color: var(--surface-solid);
+}
+
+.prompt-textarea:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.prompt-textarea:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.prompt-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 8px;
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.prompt-count {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.prompt-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.prompt-save-state {
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.prompt-save-state[data-tone="success"] {
+  color: var(--brand);
+}
+
+.prompt-save-state[data-tone="error"] {
+  color: var(--error);
+}
+
+@media (max-width: 899px) {
+  .settings-head-actions {
+    margin-top: 0;
+    justify-content: flex-end;
+    align-self: flex-start;
+  }
+
+  .settings-prompt-link {
+    align-self: flex-start;
+  }
+
+  .prompt-demo-chip {
+    margin-top: 0;
+    align-self: flex-start;
+  }
+
+  .settings-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .settings-nav {
+    flex-direction: row;
+  }
+
+  .settings-nav button {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .settings-form,
+  .prompt-card {
+    padding: 16px;
+  }
+
+  .settings-actions {
+    align-items: flex-start;
+  }
+
+  .settings-save-state {
+    width: 100%;
+    margin-left: 0;
+    order: 3;
+  }
+
+  .settings-test-hint {
+    order: 2;
+  }
+
+  .settings-test-result {
+    font-size: 11px;
+  }
+
+  .prompt-textarea {
+    min-height: 300px;
+  }
+
+  .prompt-actions {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-nav button,
+  .prompt-textarea {
+    transition: none;
+  }
+}

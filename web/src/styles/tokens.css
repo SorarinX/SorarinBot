@@ -1,0 +1,74 @@
+/* SorarinBot · 奇迹秀式（qijishow）设计令牌
+ * 亮色为默认值；暗色由 <html class="dark"> 覆盖。
+ * 色值来源：docs/05-前端迁移计划.md 第 5 节。
+ */
+:root {
+  color-scheme: light;
+
+  /* 颜色 */
+  --bg: #f7f7f5;
+  --surface: rgba(255, 255, 255, 0.85);
+  --surface-solid: #ffffff;
+  --surface-2: #f0efec;
+  --border: #e6e4e0;
+  --border-strong: #d6d3ce;
+  --text: #111111;
+  --muted: #6b6b6b;
+  --brand: #0fbfa4;
+  --brand-ink: #0a8f7b;
+  --gold: #b8862f;
+  --success: #0fbfa4;
+  --warn: #d97706;
+  --error: #dc2626;
+  --info: #2563eb;
+  /* 内容区左上角的薄荷氛围光（浅色 4%，深色 8%） */
+  --ambient-glow: rgba(15, 191, 164, 0.04);
+
+  /* 形状 */
+  --radius-card: 18px;
+  --radius-btn: 12px;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
+  --glass-blur: 20px;
+
+  /* 动效时长 */
+  --dur-press: 90ms;
+  --dur-hover: 120ms;
+  --dur-sm: 160ms;
+  --dur-md: 200ms;
+  --dur-lg: 240ms;
+  --dur-num: 320ms;
+
+  /* 缓动 */
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  --ease-in-out: cubic-bezier(.4, 0, .2, 1);
+
+  /* 字体 */
+  --font-ui: "Inter Variable", Inter, "PingFang SC", "HarmonyOS Sans SC",
+    "Microsoft YaHei", sans-serif;
+  --font-display: "Sora Variable", Sora, "PingFang SC", "HarmonyOS Sans SC",
+    "Microsoft YaHei", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --bg: #121212;
+  --surface: rgba(30, 30, 30, 0.45);
+  --surface-solid: #1a1a1a;
+  --surface-2: #1e1e1e;
+  --border: #2d2d2d;
+  --border-strong: #3a3a3a;
+  --text: #eaeaea;
+  --muted: #afafaf;
+  --brand: #13e0bc;
+  --brand-ink: #13e0bc;
+  --gold: #d1ab79;
+  --success: #13e0bc;
+  --warn: #f59e0b;
+  --error: #f87171;
+  --info: #60a5fa;
+  --ambient-glow: rgba(19, 224, 188, 0.08);
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 32px rgba(0, 0, 0, 0.35);
+}

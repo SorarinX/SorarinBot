@@ -1,0 +1,310 @@
+/* Logs / P3 — full-height log viewer. */
+
+.logs-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: calc(100vh - 105px);
+  height: calc(100dvh - 105px);
+  min-height: 520px;
+  min-width: 0;
+}
+
+.logs-panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.logs-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.logs-levels {
+  display: flex;
+  gap: 4px;
+  flex: none;
+}
+
+.logs-level-chip {
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background-color: var(--surface-2);
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    color var(--dur-hover) var(--ease-out),
+    border-color var(--dur-hover) var(--ease-out),
+    background-color var(--dur-hover) var(--ease-out);
+}
+
+.logs-level-chip:hover {
+  color: var(--text);
+}
+
+.logs-level-chip[data-active="true"] {
+  border-color: color-mix(in srgb, var(--brand) 22%, transparent);
+  background-color: color-mix(in srgb, var(--brand) 12%, transparent);
+  color: var(--brand);
+}
+
+.logs-search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex: 1;
+  min-width: 160px;
+  max-width: 280px;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background-color: var(--surface-2);
+  color: var(--muted);
+  cursor: text;
+  transition:
+    border-color var(--dur-hover) var(--ease-out),
+    background-color var(--dur-hover) var(--ease-out);
+}
+
+.logs-search:focus-within {
+  border-color: color-mix(in srgb, var(--brand) 52%, var(--border));
+  background-color: var(--surface-solid);
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.logs-search-icon {
+  flex: none;
+}
+
+.logs-search-input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.logs-search-input::placeholder {
+  color: var(--muted);
+}
+
+.logs-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  margin-left: auto;
+}
+
+.logs-confirm {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex: none;
+  padding: 9px 16px;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--error) 18%, var(--border));
+  background-color: color-mix(in srgb, var(--error) 6%, transparent);
+  color: var(--error);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.logs-confirm-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+}
+
+.logs-status {
+  flex: none;
+  padding: 7px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.logs-status[data-tone="success"] {
+  color: var(--brand);
+}
+
+.logs-status[data-tone="error"] {
+  color: var(--error);
+}
+
+.logs-list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  margin: 0;
+  padding: 4px 8px 8px;
+  overflow-y: auto;
+  list-style: none;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+  scrollbar-width: thin;
+}
+
+.logs-row {
+  display: grid;
+  grid-template-columns: 70px 56px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  height: 36px;
+  flex: none;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  transition: background-color var(--dur-hover) var(--ease-out);
+}
+
+.logs-row:hover {
+  background-color: color-mix(in srgb, var(--text) 4%, transparent);
+}
+
+.logs-time {
+  color: var(--muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.logs-level {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.logs-level[data-tone="info"] {
+  background-color: color-mix(in srgb, var(--brand) 11%, transparent);
+  color: var(--brand);
+}
+
+.logs-level[data-tone="warn"] {
+  background-color: color-mix(in srgb, var(--warn) 11%, transparent);
+  color: var(--warn);
+}
+
+.logs-level[data-tone="error"] {
+  background-color: color-mix(in srgb, var(--error) 10%, transparent);
+  color: var(--error);
+}
+
+.logs-level[data-tone="muted"] {
+  background-color: var(--surface-2);
+  color: var(--muted);
+}
+
+.logs-message {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logs-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex: none;
+  padding: 8px 18px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+
+.logs-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.logs-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.logs-list::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background-color: var(--scrollbar-thumb);
+}
+
+@media (max-width: 720px) {
+  .logs-page {
+    height: calc(100vh - 105px);
+    height: calc(100dvh - 105px);
+  }
+
+  .logs-toolbar {
+    flex-wrap: wrap;
+    padding: 12px;
+  }
+
+  .logs-search {
+    order: 3;
+    flex-basis: 100%;
+    max-width: none;
+  }
+
+  .logs-actions {
+    margin-left: auto;
+  }
+
+  .logs-confirm {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .logs-row {
+    grid-template-columns: 62px 52px minmax(0, 1fr);
+    gap: 8px;
+    padding: 0 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logs-level-chip,
+  .logs-search,
+  .logs-row {
+    transition: none;
+  }
+}

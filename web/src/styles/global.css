@@ -1,0 +1,223 @@
+@import "tailwindcss";
+@import "./tokens.css";
+
+/* 暗色由 html 上的 .dark 类驱动，而不是系统偏好。 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Thin, quiet scrollbars: dark thumb on light surfaces and vice versa. */
+:root {
+  --scrollbar-thumb: rgba(0, 0, 0, 0.18);
+}
+
+html.dark {
+  --scrollbar-thumb: rgba(255, 255, 255, 0.16);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track,
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background-color: var(--scrollbar-thumb);
+}
+
+/* 把设计令牌映射成 Tailwind 语义色。 */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-solid: var(--surface-solid);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-brand: var(--brand);
+  --color-brand-ink: var(--brand-ink);
+  --color-gold: var(--gold);
+  --color-success: var(--success);
+  --color-warn: var(--warn);
+  --color-error: var(--error);
+  --color-info: var(--info);
+  --font-sans: var(--font-ui);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
+}
+
+@layer base {
+  html {
+    background-color: var(--bg);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+
+  .tabular,
+  .font-mono {
+    font-variant-numeric: tabular-nums;
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--brand) 24%, transparent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+
+    /* Keep a very short fade on route changes; the global rule above would
+     * otherwise reduce it to an imperceptible 0.01ms. The fade keyframes have
+     * no transform, so there is no movement. */
+    .page-transition {
+      animation: page-transition-fade 80ms var(--ease-out) both !important;
+    }
+  }
+}
+
+/* 毛玻璃只用于侧边栏、顶栏与弹窗/菜单；不支持 backdrop-filter 时保持纯色。 */
+@layer components {
+  .glass-surface {
+    background-color: var(--surface-solid);
+  }
+
+  .glass-bg {
+    background-color: var(--bg);
+  }
+
+  @supports ((backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px))) {
+    .glass-surface {
+      background-color: var(--surface);
+    }
+
+    .glass-bg {
+      background-color: color-mix(in srgb, var(--bg) 82%, transparent);
+    }
+
+    .glass-surface,
+    .glass-bg {
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+      backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+    }
+  }
+
+  /* Sidebar uses a slightly denser glass in dark mode (never pure black). */
+  .sidebar-glass {
+    background-color: var(--surface-solid);
+  }
+
+  @supports ((backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px))) {
+    .sidebar-glass {
+      background-color: var(--surface);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+      backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+    }
+
+    .dark .sidebar-glass {
+      background-color: rgba(20, 20, 20, 0.55);
+    }
+  }
+
+  @supports not (
+    (backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px))
+  ) {
+    .dark .sidebar-glass {
+      background-color: #141414;
+    }
+  }
+}
+
+/* Desktop shell offset. Below 900px the fixed sidebar steps aside so the
+ * chat page (and the rest of the console) can use the full viewport. */
+.app-content {
+  margin-left: 232px;
+}
+
+@media (max-width: 899px) {
+  .app-sidebar {
+    display: none;
+  }
+
+  .app-content {
+    margin-left: 0;
+  }
+}
+
+/* Shared horizontal gutter for the topbar and the main content column.
+ * At 1440px the console keeps ~80px of breathing room on each side. */
+.app-gutter {
+  padding-inline: 24px;
+}
+
+@media (min-width: 1024px) {
+  .app-gutter {
+    padding-inline: 40px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .app-gutter {
+    padding-inline: 80px;
+  }
+}
+
+/* Content-area ambience: a very faint mint wash pinned to the top-left of the
+ * console, behind the main column only (the sidebar stays its own layer). */
+.app-ambient {
+  position: fixed;
+  top: 56px;
+  left: 232px;
+  z-index: 0;
+  width: 760px;
+  height: 540px;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 18% 18%,
+    var(--ambient-glow) 0%,
+    transparent 62%
+  );
+  filter: blur(120px);
+}
+
+/* Match the full-width mobile shell: the ambience starts at the viewport edge. */
+@media (max-width: 899px) {
+  .app-ambient {
+    left: 0;
+  }
+}

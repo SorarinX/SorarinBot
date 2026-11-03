@@ -1,0 +1,33 @@
+/* AppShell route transitions (P5). Welcome/Login are outside this wrapper. */
+
+.page-transition {
+  animation: page-transition-in 180ms var(--ease-out) both;
+}
+
+@keyframes page-transition-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes page-transition-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The global reduced-motion rule caps animations at 0.01ms; this specific
+   * rule keeps the short fade required by the design while removing movement. */
+  .page-transition {
+    animation: page-transition-fade 80ms var(--ease-out) both !important;
+  }
+}
