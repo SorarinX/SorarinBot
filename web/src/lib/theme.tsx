@@ -13,6 +13,7 @@ const STORAGE_KEY = "sorarin-theme";
 
 type ThemeContextValue = {
   theme: Theme;
+  setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
 };
 
@@ -30,7 +31,7 @@ function getInitialTheme(): Theme {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(getInitialTheme);
+  const [theme, setThemeState] = useState<Theme>(getInitialTheme);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
@@ -41,12 +42,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
   }, [theme]);
 
+  const setTheme = useCallback((next: Theme) => {
+    setThemeState(next);
+  }, []);
+
   const toggleTheme = useCallback(() => {
-    setTheme((current) => (current === "dark" ? "light" : "dark"));
+    setThemeState((current) => (current === "dark" ? "light" : "dark"));
   }, []);
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );

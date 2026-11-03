@@ -1,39 +1,194 @@
-/* Welcome / P1a-3 — fixed dark first-run page.
+/* Welcome / P1a-3 — first-run page.
+ * Light is the default; .dark restores the original dark composition.
  * Signature: breathing mint halo and a scanning line inside the QR frame.
  * All motion is CSS-only.
  */
 
 html.welcome-active {
+  background-color: #f7f7f5;
+  color-scheme: light;
+}
+
+html.dark.welcome-active {
   background-color: #0b0b0b;
   color-scheme: dark;
 }
 
 html.welcome-active body {
+  background-color: #f7f7f5;
+}
+
+html.dark.welcome-active body {
   background-color: #0b0b0b;
 }
 
 .welcome-page {
-  --welcome-mint: #13e0bc;
-  --welcome-gold: #d1ab79;
-  --welcome-amber: #f59e0b;
-  --welcome-error: #f87171;
-  --welcome-note: #8a8a8a;
+  /* All Welcome colors live here so the page can switch themes locally.
+   * Light values are the default; .dark .welcome-page below restores the
+   * original dark composition without touching layout or motion. */
+  color-scheme: light;
+
+  --welcome-bg: #f7f7f5;
+  --welcome-bg-center: #f1f0ec;
+  --welcome-bg-mid: #f4f4f1;
+  --welcome-fg: #111111;
+  --welcome-title-color: #111111;
+  --welcome-secondary: #5f5f5f;
+  --welcome-description-color: #5f5f5f;
+  --welcome-footer-color: #6b6b6b;
+  --welcome-capabilities-color: #5f5f5f;
+  --welcome-capabilities-opacity: 1;
+  --welcome-mint: #0fbfa4;
+  --welcome-mint-ink: #0a8f7b;
+  --welcome-gold: #b8862f;
+  --welcome-amber: #d97706;
+  --welcome-error: #dc2626;
+  --welcome-status-label: #111111;
+  --welcome-status-note: #5f5f5f;
+  --welcome-status-dot: #8a8a8a;
+  --welcome-skip-color: #5f5f5f;
+  --welcome-skip-hover: var(--welcome-mint-ink);
+
+  --welcome-ambient-mint: rgba(15, 191, 164, 0.12);
+  --welcome-ambient-gold: rgba(184, 134, 47, 0.08);
+  --welcome-glow-strong: rgba(15, 191, 164, 0.26);
+  --welcome-glow-mid: rgba(15, 191, 164, 0.1);
+  --welcome-glow-clear: rgba(15, 191, 164, 0);
+  --welcome-card-halo-strong: rgba(15, 191, 164, 0.55);
+  --welcome-card-halo-mid: rgba(15, 191, 164, 0.18);
+  --welcome-card-halo-clear: rgba(15, 191, 164, 0);
+  --welcome-card-halo-opacity: 0.2;
+  --welcome-card-halo-hover-opacity: 0.32;
+
+  --welcome-brand-gradient-start: var(--welcome-mint);
+  --welcome-brand-gradient-end: var(--welcome-gold);
+
+  --welcome-github-bg: rgba(255, 255, 255, 0.72);
+  --welcome-github-border: rgba(17, 17, 17, 0.1);
+  --welcome-github-color: #5f5f5f;
+  --welcome-github-hover-color: #111111;
+  --welcome-github-hover-border: rgba(17, 17, 17, 0.18);
+  --welcome-github-hover-bg: rgba(255, 255, 255, 0.92);
+
+  --welcome-card-bg: rgba(255, 255, 255, 0.82);
+  --welcome-card-border: rgba(17, 17, 17, 0.08);
+  --welcome-card-shadow: 0 24px 60px rgba(17, 17, 17, 0.08);
+  --welcome-card-hover-border: rgba(15, 191, 164, 0.35);
+  --welcome-card-fallback-bg: #ffffff;
+  --welcome-card-heading: #111111;
+
+  --welcome-qr-bg: #ffffff;
+  --welcome-qr-image-bg: #ffffff;
+  --welcome-qr-grid-color: rgba(17, 17, 17, 0.06);
+  --welcome-qr-grid-opacity: 1;
+  --welcome-qr-shadow: 0 0 48px rgba(15, 191, 164, 0.1);
+  --welcome-scan-shadow: 0 0 12px rgba(15, 191, 164, 0.4);
+
+  --welcome-status-brand-glow: 0 0 12px rgba(15, 191, 164, 0.3);
+  --welcome-status-amber-glow: 0 0 10px rgba(217, 119, 6, 0.22);
+  --welcome-status-error-glow: 0 0 10px rgba(220, 38, 38, 0.2);
+
+  --welcome-button-bg: #087c6b;
+  --welcome-button-border: #087c6b;
+  --welcome-button-color: #ffffff;
+  --welcome-button-hover-bg: #07695b;
+  --welcome-button-hover-border: #07695b;
+  --welcome-button-hover-shadow: 0 8px 26px rgba(10, 143, 123, 0.2);
+  --welcome-button-disabled-bg: #e9e7e2;
+  --welcome-button-disabled-border: #e2e0db;
+  --welcome-button-disabled-color: #6b6b6b;
 
   position: relative;
   isolation: isolate;
   min-height: 100vh;
   min-height: 100svh;
   overflow: hidden;
-  color-scheme: dark;
-  color: #ffffff;
-  background-color: #0b0b0b;
+  color: var(--welcome-fg);
+  background-color: var(--welcome-bg);
   background-image: radial-gradient(
     ellipse 94% 86% at 50% 44%,
-    #121212 0%,
-    #0f0f0f 56%,
-    #0b0b0b 100%
+    var(--welcome-bg-center) 0%,
+    var(--welcome-bg-mid) 56%,
+    var(--welcome-bg) 100%
   );
   font-family: var(--font-ui);
+}
+
+.dark .welcome-page {
+  color-scheme: dark;
+
+  --welcome-bg: #0b0b0b;
+  --welcome-bg-center: #121212;
+  --welcome-bg-mid: #0f0f0f;
+  --welcome-fg: #ffffff;
+  --welcome-title-color: #ffffff;
+  --welcome-secondary: #c9c9c9;
+  --welcome-description-color: #9a9a9a;
+  --welcome-footer-color: #6b6b6b;
+  --welcome-capabilities-color: #c9c9c9;
+  --welcome-capabilities-opacity: 0.7;
+  --welcome-mint: #13e0bc;
+  --welcome-mint-ink: #13e0bc;
+  --welcome-gold: #d1ab79;
+  --welcome-amber: #f59e0b;
+  --welcome-error: #f87171;
+  --welcome-status-label: #ededed;
+  --welcome-status-note: #8a8a8a;
+  --welcome-status-dot: #8a8a8a;
+  --welcome-skip-color: #afafaf;
+  --welcome-skip-hover: var(--welcome-mint);
+
+  --welcome-ambient-mint: rgba(19, 224, 188, 0.1);
+  --welcome-ambient-gold: rgba(209, 171, 121, 0.06);
+  --welcome-glow-strong: rgba(19, 224, 188, 0.42);
+  --welcome-glow-mid: rgba(19, 224, 188, 0.16);
+  --welcome-glow-clear: rgba(19, 224, 188, 0);
+  --welcome-card-halo-strong: rgba(19, 224, 188, 0.92);
+  --welcome-card-halo-mid: rgba(19, 224, 188, 0.28);
+  --welcome-card-halo-clear: rgba(19, 224, 188, 0);
+  --welcome-card-halo-opacity: 0.25;
+  --welcome-card-halo-hover-opacity: 0.4;
+
+  --welcome-brand-gradient-start: var(--welcome-mint);
+  --welcome-brand-gradient-end: var(--welcome-gold);
+
+  --welcome-github-bg: rgba(255, 255, 255, 0.035);
+  --welcome-github-border: rgba(255, 255, 255, 0.1);
+  --welcome-github-color: #a1a1a1;
+  --welcome-github-hover-color: #f0f0f0;
+  --welcome-github-hover-border: rgba(255, 255, 255, 0.2);
+  --welcome-github-hover-bg: rgba(255, 255, 255, 0.06);
+
+  --welcome-card-bg: rgba(255, 255, 255, 0.04);
+  --welcome-card-border: rgba(255, 255, 255, 0.1);
+  --welcome-card-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 30px 80px rgba(0, 0, 0, 0.42);
+  --welcome-card-hover-border: rgba(19, 224, 188, 0.35);
+  --welcome-card-fallback-bg: #161616;
+  --welcome-card-heading: #d4d4d4;
+
+  --welcome-qr-bg: #161616;
+  /* Dark keeps the original white grid + 0.06 group opacity so its rendered
+   * result is unchanged. Light uses the specified rgba grid directly. */
+  --welcome-qr-grid-color: #ffffff;
+  --welcome-qr-grid-opacity: 0.06;
+  --welcome-qr-shadow: 0 0 48px rgba(19, 224, 188, 0.12);
+  --welcome-scan-shadow: 0 0 12px rgba(19, 224, 188, 0.6);
+
+  --welcome-status-brand-glow: 0 0 12px rgba(19, 224, 188, 0.38);
+  --welcome-status-amber-glow: 0 0 10px rgba(245, 158, 11, 0.22);
+  --welcome-status-error-glow: 0 0 10px rgba(248, 113, 113, 0.22);
+
+  --welcome-button-bg: var(--welcome-mint-ink);
+  --welcome-button-border: var(--welcome-mint-ink);
+  --welcome-button-color: #061a15;
+  --welcome-button-hover-bg: #2fe6c9;
+  --welcome-button-hover-border: #2fe6c9;
+  --welcome-button-hover-shadow: 0 8px 26px rgba(19, 224, 188, 0.18);
+  --welcome-button-disabled-bg: rgba(255, 255, 255, 0.065);
+  --welcome-button-disabled-border: rgba(255, 255, 255, 0.08);
+  --welcome-button-disabled-color: rgba(255, 255, 255, 0.36);
 }
 
 /* ── Background composition ─────────────────────────────────────────── */
@@ -50,7 +205,7 @@ html.welcome-active body {
   left: -18vw;
   width: 60vw;
   height: 60vw;
-  background-color: rgba(19, 224, 188, 0.1);
+  background-color: var(--welcome-ambient-mint);
   filter: blur(120px);
 }
 
@@ -59,7 +214,7 @@ html.welcome-active body {
   bottom: -30vw;
   width: 64vw;
   height: 64vw;
-  background-color: rgba(209, 171, 121, 0.06);
+  background-color: var(--welcome-ambient-gold);
   filter: blur(140px);
 }
 
@@ -74,9 +229,9 @@ html.welcome-active body {
   pointer-events: none;
   background: radial-gradient(
     circle at center,
-    rgba(19, 224, 188, 0.42) 0%,
-    rgba(19, 224, 188, 0.16) 38%,
-    rgba(19, 224, 188, 0) 70%
+    var(--welcome-glow-strong) 0%,
+    var(--welcome-glow-mid) 38%,
+    var(--welcome-glow-clear) 70%
   );
   filter: blur(80px);
   opacity: 0.5;
@@ -128,7 +283,11 @@ html.welcome-active body {
   line-height: 1.02;
   letter-spacing: -0.045em;
   color: var(--welcome-mint);
-  background-image: linear-gradient(135deg, #13e0bc 0%, #d1ab79 100%);
+  background-image: linear-gradient(
+    135deg,
+    var(--welcome-brand-gradient-start) 0%,
+    var(--welcome-brand-gradient-end) 100%
+  );
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -147,10 +306,10 @@ html.welcome-active body {
   gap: 7px;
   height: 34px;
   padding: 0 13px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--welcome-github-border);
   border-radius: 999px;
-  background-color: rgba(255, 255, 255, 0.035);
-  color: #a1a1a1;
+  background-color: var(--welcome-github-bg);
+  color: var(--welcome-github-color);
   font-family: var(--font-ui);
   font-size: 12px;
   font-weight: 500;
@@ -166,9 +325,9 @@ html.welcome-active body {
 }
 
 .welcome-github:hover {
-  color: #f0f0f0;
-  border-color: rgba(255, 255, 255, 0.2);
-  background-color: rgba(255, 255, 255, 0.06);
+  color: var(--welcome-github-hover-color);
+  border-color: var(--welcome-github-hover-border);
+  background-color: var(--welcome-github-hover-bg);
 }
 
 .welcome-github-icon {
@@ -200,7 +359,7 @@ html.welcome-active body {
   flex-wrap: wrap;
   align-items: baseline;
   margin: 0;
-  color: #ffffff;
+  color: var(--welcome-title-color);
   font-family: var(--font-display);
   font-size: clamp(44px, 5.2vw, 76px);
   font-weight: 700;
@@ -232,13 +391,13 @@ html.welcome-active body {
   margin: 28px 0 0;
   padding: 0;
   list-style: none;
-  color: #c9c9c9;
+  color: var(--welcome-capabilities-color);
   font-family: var(--font-ui);
   font-size: 12px;
   font-weight: 400;
   line-height: 1.5;
   letter-spacing: 0.02em;
-  opacity: 0.7;
+  opacity: var(--welcome-capabilities-opacity);
   animation: welcome-copy-in 500ms var(--ease-out) 240ms both;
 }
 
@@ -262,7 +421,7 @@ html.welcome-active body {
   align-items: center;
   gap: 12px;
   margin: 16px 0 0;
-  color: #c9c9c9;
+  color: var(--welcome-secondary);
   font-family: var(--font-ui);
   font-size: 20px;
   font-weight: 500;
@@ -283,7 +442,7 @@ html.welcome-active body {
 .welcome-description {
   max-width: 34em;
   margin: 20px 0 0;
-  color: #9a9a9a;
+  color: var(--welcome-description-color);
   font-family: var(--font-ui);
   font-size: 16px;
   font-weight: 400;
@@ -295,7 +454,7 @@ html.welcome-active body {
   display: block;
   width: fit-content;
   margin: 14px auto 0;
-  color: var(--muted);
+  color: var(--welcome-skip-color);
   font-family: var(--font-ui);
   font-size: 12px;
   line-height: 1;
@@ -304,7 +463,7 @@ html.welcome-active body {
 }
 
 .welcome-skip:hover {
-  color: var(--brand);
+  color: var(--welcome-skip-hover);
 }
 
 .welcome-footer {
@@ -313,7 +472,7 @@ html.welcome-active body {
   align-items: center;
   justify-content: space-between;
   gap: 10px 24px;
-  color: #6b6b6b;
+  color: var(--welcome-footer-color);
   font-family: var(--font-ui);
   font-size: 12px;
   font-weight: 400;
@@ -327,7 +486,7 @@ html.welcome-active body {
 
 .welcome-footer-version {
   flex: none;
-  color: #6b6b6b;
+  color: var(--welcome-footer-color);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -371,29 +530,27 @@ html.welcome-active body {
   pointer-events: none;
   background: radial-gradient(
     circle at 50% 46%,
-    rgba(19, 224, 188, 0.92) 0%,
-    rgba(19, 224, 188, 0.28) 44%,
-    rgba(19, 224, 188, 0) 72%
+    var(--welcome-card-halo-strong) 0%,
+    var(--welcome-card-halo-mid) 44%,
+    var(--welcome-card-halo-clear) 72%
   );
   filter: blur(60px);
-  opacity: 0.25;
+  opacity: var(--welcome-card-halo-opacity);
   transition: opacity 240ms var(--ease-out);
 }
 
 .welcome-qr-shell:hover .welcome-card-halo {
-  opacity: 0.4;
+  opacity: var(--welcome-card-halo-hover-opacity);
 }
 
 .welcome-card {
   position: relative;
   z-index: 2;
   padding: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--welcome-card-border);
   border-radius: 24px;
-  background-color: rgba(255, 255, 255, 0.04);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 30px 80px rgba(0, 0, 0, 0.42);
+  background-color: var(--welcome-card-bg);
+  box-shadow: var(--welcome-card-shadow);
   -webkit-backdrop-filter: blur(24px) saturate(1.4);
   backdrop-filter: blur(24px) saturate(1.4);
   transition:
@@ -403,14 +560,14 @@ html.welcome-active body {
 }
 
 .welcome-qr-shell:hover .welcome-card {
-  border-color: rgba(19, 224, 188, 0.35);
+  border-color: var(--welcome-card-hover-border);
 }
 
 @supports not (
   (backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px))
 ) {
   .welcome-card {
-    background-color: #161616;
+    background-color: var(--welcome-card-fallback-bg);
   }
 }
 
@@ -419,7 +576,7 @@ html.welcome-active body {
   align-items: center;
   gap: 8px;
   margin: 0 2px 16px;
-  color: #d4d4d4;
+  color: var(--welcome-card-heading);
   font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 500;
@@ -444,15 +601,15 @@ html.welcome-active body {
   margin: 0 auto;
   overflow: hidden;
   border-radius: 18px;
-  background-color: #161616;
-  box-shadow: 0 0 48px rgba(19, 224, 188, 0.12);
+  background-color: var(--welcome-qr-bg);
+  box-shadow: var(--welcome-qr-shadow);
 }
 
 .welcome-qr-waiting {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  background-color: #161616;
+  background-color: var(--welcome-qr-bg);
 }
 
 /* Faint 8px QR-like square grid; no external asset. */
@@ -462,16 +619,16 @@ html.welcome-active body {
   inset: 16px;
   border-radius: 10px;
   pointer-events: none;
-  opacity: 0.06;
+  opacity: var(--welcome-qr-grid-opacity);
   background-image:
     repeating-linear-gradient(
       0deg,
-      #ffffff 0 1px,
+      var(--welcome-qr-grid-color) 0 1px,
       transparent 1px 8px
     ),
     repeating-linear-gradient(
       90deg,
-      #ffffff 0 1px,
+      var(--welcome-qr-grid-color) 0 1px,
       transparent 1px 8px
     );
 }
@@ -485,9 +642,18 @@ html.welcome-active body {
   height: 2px;
   border-radius: 999px;
   background-color: var(--welcome-mint);
-  box-shadow: 0 0 12px rgba(19, 224, 188, 0.6);
+  box-shadow: var(--welcome-scan-shadow);
   animation: welcome-scan-line 2.4s ease-in-out infinite;
   will-change: transform;
+}
+
+/* The code is no longer scannable: freeze the scan line and dim the empty grid. */
+.welcome-qr-frame.is-failed .welcome-scan-line {
+  display: none;
+}
+
+.welcome-qr-frame.is-failed .welcome-qr-waiting {
+  opacity: 0.35;
 }
 
 .welcome-qr-image {
@@ -495,7 +661,7 @@ html.welcome-active body {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  background-color: #ffffff;
+  background-color: var(--welcome-qr-image-bg);
   animation: welcome-qr-image-in 300ms var(--ease-out) both;
 }
 
@@ -517,22 +683,22 @@ html.welcome-active body {
   height: 6px;
   flex: none;
   border-radius: 999px;
-  background-color: var(--welcome-note);
+  background-color: var(--welcome-status-dot);
 }
 
 .welcome-status[data-tone="brand"] .welcome-status-dot {
   background-color: var(--welcome-mint);
-  box-shadow: 0 0 12px rgba(19, 224, 188, 0.38);
+  box-shadow: var(--welcome-status-brand-glow);
 }
 
 .welcome-status[data-tone="amber"] .welcome-status-dot {
   background-color: var(--welcome-amber);
-  box-shadow: 0 0 10px rgba(245, 158, 11, 0.22);
+  box-shadow: var(--welcome-status-amber-glow);
 }
 
 .welcome-status[data-tone="error"] .welcome-status-dot {
   background-color: var(--welcome-error);
-  box-shadow: 0 0 10px rgba(248, 113, 113, 0.22);
+  box-shadow: var(--welcome-status-error-glow);
 }
 
 .welcome-status[data-state="waiting_scan"] .welcome-status-dot::after {
@@ -547,7 +713,7 @@ html.welcome-active body {
 }
 
 .welcome-status-label {
-  color: #ededed;
+  color: var(--welcome-status-label);
   font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 500;
@@ -557,7 +723,7 @@ html.welcome-active body {
 .welcome-status-note {
   margin: 6px 0 0 14px;
   overflow: hidden;
-  color: var(--welcome-note);
+  color: var(--welcome-status-note);
   font-family: var(--font-ui);
   font-size: 12px;
   font-weight: 400;
@@ -575,10 +741,10 @@ html.welcome-active body {
   width: 100%;
   height: 46px;
   margin-top: 18px;
-  border: 1px solid var(--welcome-mint);
+  border: 1px solid var(--welcome-button-border);
   border-radius: 12px;
-  background-color: var(--welcome-mint);
-  color: #061a15;
+  background-color: var(--welcome-button-bg);
+  color: var(--welcome-button-color);
   font-family: var(--font-ui);
   font-size: 14px;
   font-weight: 600;
@@ -593,9 +759,9 @@ html.welcome-active body {
 }
 
 .welcome-enter-button:enabled:hover {
-  border-color: #2fe6c9;
-  background-color: #2fe6c9;
-  box-shadow: 0 8px 26px rgba(19, 224, 188, 0.18);
+  border-color: var(--welcome-button-hover-border);
+  background-color: var(--welcome-button-hover-bg);
+  box-shadow: var(--welcome-button-hover-shadow);
   transform: translateY(-1px);
 }
 
@@ -604,9 +770,9 @@ html.welcome-active body {
 }
 
 .welcome-enter-button:disabled {
-  border-color: rgba(255, 255, 255, 0.08);
-  background-color: rgba(255, 255, 255, 0.065);
-  color: rgba(255, 255, 255, 0.36);
+  border-color: var(--welcome-button-disabled-border);
+  background-color: var(--welcome-button-disabled-bg);
+  color: var(--welcome-button-disabled-color);
   cursor: not-allowed;
   box-shadow: none;
 }

@@ -6,7 +6,7 @@ import { useTheme } from "../lib/theme";
 import { useAuth } from "../lib/useAuth";
 
 export function Sidebar() {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const { required, logout } = useAuth();
   const navigate = useNavigate();
   const isDark = theme === "dark";
@@ -64,18 +64,41 @@ export function Sidebar() {
 
       <div className="border-t border-border p-2.5">
         <div className="flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={toggleTheme}
-            aria-label={isDark ? "切换到浅色模式" : "切换到深色模式"}
-            className="flex h-9 min-w-0 flex-1 items-center gap-2.5 rounded-lg px-2.5 text-[13px] text-muted transition-colors duration-[var(--dur-hover)] ease-[var(--ease-out)] hover:bg-surface-2 hover:text-text dark:hover:bg-white/[0.06]"
+          <div
+            role="group"
+            aria-label="外观"
+            className="flex h-9 min-w-0 flex-1 items-center gap-0.5 rounded-lg border border-border/70 bg-surface-2/80 p-0.5"
           >
-            {isDark ? <SunIcon className="size-4" /> : <MoonIcon className="size-4" />}
-            <span className="truncate">{isDark ? "浅色模式" : "深色模式"}</span>
-            <span className="ml-auto text-[11px] text-muted/80">
-              {isDark ? "Dark" : "Light"}
-            </span>
-          </button>
+            <button
+              type="button"
+              onClick={() => setTheme("light")}
+              aria-pressed={!isDark}
+              className={cn(
+                "flex h-8 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-md px-1.5 text-[12px] font-medium transition-colors duration-[var(--dur-hover)] ease-[var(--ease-out)]",
+                !isDark
+                  ? "bg-brand/[0.12] text-brand-ink"
+                  : "text-muted hover:bg-surface-solid/70 hover:text-text dark:hover:bg-white/[0.06]",
+              )}
+            >
+              <SunIcon className="size-3.5 shrink-0" />
+              <span className="truncate">浅色</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setTheme("dark")}
+              aria-pressed={isDark}
+              className={cn(
+                "flex h-8 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-md px-1.5 text-[12px] font-medium transition-colors duration-[var(--dur-hover)] ease-[var(--ease-out)]",
+                isDark
+                  ? "bg-brand/[0.12] text-brand"
+                  : "text-muted hover:bg-surface-solid/70 hover:text-text",
+              )}
+            >
+              <MoonIcon className="size-3.5 shrink-0" />
+              <span className="truncate">深色</span>
+            </button>
+          </div>
 
           {required ? (
             <button

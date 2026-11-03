@@ -5,6 +5,7 @@ import {
   type LoginSnapshot,
   type LoginState,
 } from "../lib/useLoginStatus";
+import { RefreshIcon } from "../components/icons";
 import "../styles/welcome.css";
 
 const APP_VERSION = "v2.4.0";
@@ -32,7 +33,7 @@ const STATUS_COPY: Record<LoginState, StatusCopy> = {
   },
   waiting_scan: {
     label: "等待扫码",
-    note: "打开微信扫一扫，在手机上确认登录。",
+    note: "微信扫一扫，3 分钟内有效。",
     tone: "brand",
   },
   scanned: {
@@ -71,7 +72,12 @@ function describeStatus(snapshot: LoginSnapshot): StatusCopy {
 
   const base = STATUS_COPY[snapshot.state];
   if (snapshot.state === "failed" && snapshot.lastError) {
-    return { ...base, note: snapshot.lastError };
+    // The backend reports timeouts in English. Keep the UI Chinese while
+    // preserving other (already localized) errors verbatim.
+    const note = /timed\s*out|timeout/i.test(snapshot.lastError)
+      ? "二维码已过期，请点「刷新二维码」重新获取。"
+      : snapshot.lastError;
+    return { ...base, note };
   }
 
   return base;
@@ -131,8 +137,10 @@ export default function WelcomePage() {
   const login = useLoginStatus();
   const status = describeStatus(login);
   const [qrImageBroken, setQrImageBroken] = useState(false);
+  const [retrying, setRetrying] = useState(false);
 
   const isLoggedIn = login.state === "logged_in";
+  const isFailed = login.state === "failed";
   const showQrImage = Boolean(login.qrUrl) && !qrImageBroken;
 
   useEffect(() => {
@@ -153,6 +161,29 @@ export default function WelcomePage() {
 
   function enterWorkspace() {
     if (isLoggedIn) navigate("/dashboard");
+  }
+
+  async function refreshQr() {
+    if (retrying) return;
+    setRetrying(true);
+    try {
+      // The endpoint takes no body. A 2s status poll picks up waiting_scan.
+      const response = await fetch("/api/login/retry", { method: "POST" });
+      if (!response.ok) return;
+      const payload: unknown = await response.json().catch(() => null);
+      if (
+        payload !== null &&
+        typeof payload === "object" &&
+        "ok" in payload &&
+        payload.ok === false
+      ) {
+        return;
+      }
+    } catch {
+      /* Keep the failed state; the button becomes clickable again. */
+    } finally {
+      setRetrying(false);
+    }
   }
 
   return (
@@ -210,7 +241,9 @@ export default function WelcomePage() {
                   </div>
 
                   <div
-                    className="welcome-qr-frame"
+                    className={
+                      "welcome-qr-frame" + (isFailed ? " is-failed" : "")
+                    }
                     aria-busy={!showQrImage}
                   >
                     {showQrImage ? (
@@ -247,12 +280,30 @@ export default function WelcomePage() {
                   <button
                     type="button"
                     className="welcome-enter-button"
-                    onClick={enterWorkspace}
-                    disabled={!isLoggedIn}
-                    title={isLoggedIn ? undefined : "完成微信扫码登录后可进入"}
+                    onClick={isFailed ? () => void refreshQr() : enterWorkspace}
+                    disabled={isFailed ? retrying : !isLoggedIn}
+                    aria-busy={isFailed ? retrying : undefined}
+                    title={
+                      isFailed
+                        ? retrying
+                          ? "正在重新获取二维码"
+                          : "重新获取登录二维码"
+                        : isLoggedIn
+                          ? undefined
+                          : "完成微信扫码登录后可进入"
+                    }
                   >
-                    <span>进入工作台</span>
-                    <ArrowIcon />
+                    {isFailed ? (
+                      <>
+                        <span>{retrying ? "正在刷新…" : "刷新二维码"}</span>
+                        <RefreshIcon className="welcome-enter-arrow" />
+                      </>
+                    ) : (
+                      <>
+                        <span>进入工作台</span>
+                        <ArrowIcon />
+                      </>
+                    )}
                   </button>
 
                   {!isLoggedIn ? (
