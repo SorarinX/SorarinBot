@@ -2,9 +2,8 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { EyeIcon, EyeOffIcon } from "../components/icons";
 import { useAuth } from "../lib/useAuth";
+import { APP_VERSION } from "../lib/version";
 import "../styles/login.css";
-
-const APP_VERSION = "v2.4.0";
 
 export default function LoginPage() {
   const { login } = useAuth();

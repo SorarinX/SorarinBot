@@ -7,7 +7,7 @@ import {
   requestJson,
 } from "./http";
 
-export const APP_VERSION = "v2.4.0";
+export { APP_VERSION } from "./version";
 
 export type ProviderPresetId = "deepseek" | "openai" | "minimax" | "custom";
 

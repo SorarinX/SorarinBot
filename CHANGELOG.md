@@ -86,6 +86,14 @@ config keys that never did anything.
 
 ### Fixed
 
+- `/api/history` and `/api/logs` returned `null` instead of `[]` on an empty
+  database, forcing every client to special-case null.
+- Preset providers (`deepseek`, `openai`, `minimax`) ignored a custom
+  `base_url`, so a proxy saved in the dashboard silently did nothing. An empty
+  DeepSeek model now defaults to `deepseek-chat` too.
+- The auto-open browser used the raw listen address (`0.0.0.0:8080`), and the
+  console could hide even when the web server had failed. It now uses the
+  display URL and probes `/api/auth/status` before hiding.
 - `SorarinBot -set-password` no longer stores a password it cannot verify. A
   shell that prefixes what it pipes in — Windows PowerShell 5.1 writes a UTF-8
   BOM — produced a hash of something the operator never typed, and the only

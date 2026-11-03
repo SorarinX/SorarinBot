@@ -8,7 +8,7 @@ import {
 import { RefreshIcon } from "../components/icons";
 import "../styles/welcome.css";
 
-const APP_VERSION = "v2.4.0";
+import { APP_VERSION } from "../lib/version";
 const GITHUB_URL = "https://github.com/SorarinX/SorarinBot";
 const CAPABILITIES = ["多模型接入", "本地运行", "会话记忆", "图片理解"];
 
@@ -166,9 +166,14 @@ export default function WelcomePage() {
   async function refreshQr() {
     if (retrying) return;
     setRetrying(true);
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => controller.abort(), 4000);
     try {
       // The endpoint takes no body. A 2s status poll picks up waiting_scan.
-      const response = await fetch("/api/login/retry", { method: "POST" });
+      const response = await fetch("/api/login/retry", {
+        method: "POST",
+        signal: controller.signal,
+      });
       if (!response.ok) return;
       const payload: unknown = await response.json().catch(() => null);
       if (
@@ -182,6 +187,7 @@ export default function WelcomePage() {
     } catch {
       /* Keep the failed state; the button becomes clickable again. */
     } finally {
+      window.clearTimeout(timer);
       setRetrying(false);
     }
   }

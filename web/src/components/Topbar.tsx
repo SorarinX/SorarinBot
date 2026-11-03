@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { SettingsIcon } from "./icons";
-
-const APP_VERSION = "v2.4.0";
+import { APP_VERSION } from "../lib/version";
 
 export function Topbar() {
   return (

@@ -212,7 +212,7 @@ func main() {
 	go func() {
 		time.Sleep(1 * time.Second)
 		if os.Getenv("SORARINBOT_ELECTRON") == "" {
-			openBrowser("http://" + cfg.Web.Listen)
+			openBrowser(displayWebURL(cfg.Web.Listen))
 		}
 	}()
 
@@ -222,6 +222,9 @@ func main() {
 	if !*keepConsole && os.Getenv("SORARINBOT_ELECTRON") == "" {
 		go func() {
 			time.Sleep(1500 * time.Millisecond)
+			if !webReachable(displayWebURL(cfg.Web.Listen)) {
+				return
+			}
 			hideConsoleWindow()
 		}()
 	}
@@ -298,6 +301,18 @@ func displayWebURL(listen string) string {
 	return "http://" + net.JoinHostPort(host, port)
 }
 
+// webReachable confirms the dashboard answers before the console is hidden;
+// if the listener failed there is no other visible surface left.
+func webReachable(base string) bool {
+	client := &http.Client{Timeout: 2 * time.Second}
+	resp, err := client.Get(base + "/api/auth/status")
+	if err != nil {
+		return false
+	}
+	resp.Body.Close()
+	return true
+}
+
 // displayPath keeps the card short: a database inside the working directory
 // is shown as "./data.db" instead of its absolute path.
 func displayPath(path string) string {
@@ -352,6 +367,15 @@ func apiKeyConfigured(cfg *config.Config) bool {
 	return cfg.Provider.APIKey != ""
 }
 
+// baseURLOr keeps a preset's default endpoint but lets the dashboard point
+// that preset at a proxy or a compatible gateway.
+func baseURLOr(value, fallback string) string {
+	if strings.TrimSpace(value) != "" {
+		return value
+	}
+	return fallback
+}
+
 func buildProviderFromCfg(cfg *config.Config) providers.Provider {
 	pc := &cfg.Provider
 	name := pc.Name
@@ -368,16 +392,20 @@ func buildProviderFromCfg(cfg *config.Config) providers.Provider {
 		}
 		c = openaicompat.Config{
 			Name:    "minimax",
-			BaseURL: "https://api.minimaxi.com/v1",
+			BaseURL: baseURLOr(pc.BaseURL, "https://api.minimaxi.com/v1"),
 			APIKey:  pickKey(pc.APIKey, "MINIMAX_API_KEY"),
 			Model:   model,
 		}
 	case "deepseek":
+		model := pc.Model
+		if model == "" {
+			model = "deepseek-chat"
+		}
 		c = openaicompat.Config{
 			Name:    "deepseek",
-			BaseURL: "https://api.deepseek.com",
+			BaseURL: baseURLOr(pc.BaseURL, "https://api.deepseek.com"),
 			APIKey:  pickKey(pc.APIKey, "DEEPSEEK_API_KEY"),
-			Model:   pc.Model,
+			Model:   model,
 		}
 	case "openai":
 		model := pc.Model
@@ -386,7 +414,7 @@ func buildProviderFromCfg(cfg *config.Config) providers.Provider {
 		}
 		c = openaicompat.Config{
 			Name:    "openai",
-			BaseURL: "https://api.openai.com/v1",
+			BaseURL: baseURLOr(pc.BaseURL, "https://api.openai.com/v1"),
 			APIKey:  pickKey(pc.APIKey, "OPENAI_API_KEY"),
 			Model:   model,
 		}

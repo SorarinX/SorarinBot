@@ -101,7 +101,7 @@ func insertMessage(sender, room, userMsg, botReply, model string, promptTokens, 
 // QueryMessages returns paginated messages. Offset 0 = most recent.
 func QueryMessages(limit, offset int) ([]Row, int) {
 	if db == nil {
-		return nil, 0
+		return []Row{}, 0
 	}
 	var total int
 	_ = db.QueryRow(`SELECT COUNT(*) FROM messages`).Scan(&total)
@@ -112,11 +112,11 @@ func QueryMessages(limit, offset int) ([]Row, int) {
 		 FROM messages ORDER BY id DESC LIMIT ? OFFSET ?`, limit, offset)
 	if err != nil {
 		logrus.Errorf("db QueryMessages: %v", err)
-		return nil, 0
+		return []Row{}, 0
 	}
 	defer rows.Close()
 
-	var out []Row
+	out := make([]Row, 0)
 	for rows.Next() {
 		var r Row
 		if err := rows.Scan(&r.ID, &r.Sender, &r.Room, &r.UserMessage, &r.BotReply,
@@ -169,7 +169,7 @@ func ClearLogs() {
 // QueryLogs returns recent log entries.
 func QueryLogs(limit, offset int) []string {
 	if db == nil {
-		return nil
+		return []string{}
 	}
 	if limit <= 0 {
 		limit = 100
@@ -184,10 +184,10 @@ func QueryLogs(limit, offset int) []string {
 		`SELECT level || ' | ' || message || ' | ' || created_at FROM logs ORDER BY id DESC LIMIT ? OFFSET ?`, limit, offset)
 	if err != nil {
 		logrus.Errorf("db QueryLogs: %v", err)
-		return nil
+		return []string{}
 	}
 	defer rows.Close()
-	var out []string
+	out := make([]string, 0)
 	for rows.Next() {
 		var line string
 		if err := rows.Scan(&line); err != nil {

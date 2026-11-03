@@ -158,7 +158,9 @@ func (a *Adapter) loginLoop() {
 	//    off, so an operator who wants a fresh session gets a QR code straight
 	//    away instead of five failed token attempts first. The key used to be
 	//    parsed and ignored.
-	if config.Snapshot().WeChat.AutoLogin && hasSavedToken() {
+	autoLogin := config.Snapshot().WeChat.AutoLogin
+	hotToken := autoLogin && hasSavedToken()
+	if hotToken {
 		for attempt := 1; attempt <= maxHotLoginAttempts; attempt++ {
 			a.setLogin(func(s *LoginStatus) {
 				s.State = LoginHotLoggingIn
@@ -188,16 +190,21 @@ func (a *Adapter) loginLoop() {
 				s.NextRetry = ""
 			})
 		}
-	} else if !config.Snapshot().WeChat.AutoLogin {
+	} else if !autoLogin {
 		logrus.Info("[login] auto_login is off; going straight to a QR scan")
 	} else {
 		logrus.Info("[login] no saved token; going straight to a QR scan")
 	}
 
-	// 2. One automatic scan-login fallback.
+	// 2. One automatic scan-login fallback. A fresh install never tried a
+	//    token, so do not claim that it failed.
+	lastError := "等待扫码"
+	if hotToken {
+		lastError = "token 登录失败，等待扫码"
+	}
 	a.setLogin(func(s *LoginStatus) {
 		s.State = LoginWaitingScan
-		s.LastError = "token 登录失败，等待扫码"
+		s.LastError = lastError
 	})
 	console.Status(string(LoginWaitingScan), "")
 	scanErr := a.tryScanLogin()
