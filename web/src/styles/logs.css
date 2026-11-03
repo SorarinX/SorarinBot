@@ -174,12 +174,12 @@
   grid-template-columns: 70px 56px minmax(0, 1fr);
   align-items: center;
   gap: 10px;
-  height: 36px;
+  height: 40px;
   flex: none;
   padding: 0 10px;
   border-radius: 8px;
-  font-family: var(--font-mono);
-  font-size: 12px;
+  font-family: var(--font-ui);
+  font-size: 13px;
   line-height: 1.5;
   transition: background-color var(--dur-hover) var(--ease-out);
 }
@@ -190,7 +190,8 @@
 
 .logs-time {
   color: var(--muted);
-  font-size: 11px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -235,6 +236,7 @@
   min-width: 0;
   overflow: hidden;
   color: var(--text);
+  font-family: var(--font-ui);
   text-overflow: ellipsis;
   white-space: nowrap;
 }

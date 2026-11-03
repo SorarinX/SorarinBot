@@ -47,7 +47,8 @@
     "Microsoft YaHei", sans-serif;
   --font-display: "Sora Variable", Sora, "PingFang SC", "HarmonyOS Sans SC",
     "Microsoft YaHei", sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas,
+    "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", monospace;
 }
 
 .dark {

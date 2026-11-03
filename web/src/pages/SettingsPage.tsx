@@ -51,7 +51,9 @@ export default function SettingsPage() {
   const ready = status === "live" && config !== null;
   const unavailable = status === "unavailable";
 
-  const [section, setSection] = useState<Section>("provider");
+  const [section, setSection] = useState<Section>(
+    new URLSearchParams(location.search).get("tab") === "system" ? "system" : "provider",
+  );
   const [form, setForm] = useState<ProviderForm>(EMPTY_FORM);
   const [preset, setPreset] = useState<ProviderPresetId | "">("");
   const [maskedKey, setMaskedKey] = useState("");
