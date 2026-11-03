@@ -26,6 +26,7 @@ import (
 	"SorarinBot/core/message"
 	"SorarinBot/core/session"
 	"SorarinBot/database"
+	"SorarinBot/internal/console"
 	"SorarinBot/providers"
 	"SorarinBot/providers/openaicompat"
 
@@ -38,16 +39,24 @@ var uiFS embed.FS
 var startupTime = time.Now()
 
 func main() {
-	// SORARINBOT_DEBUG=1 turns on debug logging (documented in README).
-	if os.Getenv("SORARINBOT_DEBUG") != "" {
-		logrus.SetLevel(logrus.DebugLevel)
-	}
-
 	setPassword := flag.Bool("set-password", false,
 		"prompt for a dashboard password, store its hash in config.yaml, and exit")
 	listen := flag.String("listen", "",
 		"override web.listen for this run only, e.g. 127.0.0.1:8081")
+	quiet := flag.Bool("quiet", false,
+		"only print warnings and errors (no start-up card or QR code)")
 	flag.Parse()
+
+	// SORARINBOT_DEBUG=1 turns on debug logging (documented in README).
+	// -quiet wins over it: it is the explicit request for this run.
+	switch {
+	case *quiet:
+		logrus.SetLevel(logrus.WarnLevel)
+		console.SetQuiet(true)
+	case os.Getenv("SORARINBOT_DEBUG") != "":
+		logrus.SetLevel(logrus.DebugLevel)
+	}
+	logrus.SetFormatter(console.Formatter())
 
 	// Always run from exe directory so relative paths work on double-click
 	exe, _ := os.Executable()
@@ -96,43 +105,16 @@ func main() {
 		cfg.Web.Listen = *listen
 	}
 
-	banner := []string{
-		"███████╗ ██████╗ ██████╗  █████╗ ██████╗ ██╗███╗   ██╗",
-		"██╔════╝██╔═══██╗██╔══██╗██╔══██╗██╔══██╗██║████╗  ██║",
-		"███████╗██║   ██║██████╔╝███████║██████╔╝██║██╔██╗ ██║",
-		"╚════██║██║   ██║██╔══██╗██╔══██║██╔══██╗██║██║╚██╗██║",
-		"███████║╚██████╔╝██║  ██║██║  ██║██║  ██║██║██║ ╚████║",
-		"╚══════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝",
-		"",
-		"                ██████╗  ██████╗ ████████╗",
-		"                ██╔══██╗██╔═══██╗╚══██╔══╝",
-		"                ██████╔╝██║   ██║   ██║",
-		"                ██╔══██╗██║   ██║   ██║",
-		"                ██████╔╝╚██████╔╝   ██║",
-		"                ╚═════╝  ╚═════╝    ╚═╝",
-		"",
-		"              ✦ SorarinBot AI Assistant ✦",
-		"         Modern · Fast · OpenAI Compatible",
-	}
-
-	// Find max line width for centering
-	maxWidth := 0
-	for _, line := range banner {
-		if len(line) > maxWidth {
-			maxWidth = len(line)
-		}
-	}
-	// Terminal width (default 120, can adjust)
-	termWidth := 120
-	padding := (termWidth - maxWidth) / 2
-	if padding < 0 {
-		padding = 0
-	}
-	fmt.Println()
-	for _, line := range banner {
-		fmt.Printf("%*s%s\n", padding, "", line)
-	}
-	fmt.Println()
+	// Start-up card: product name plus the four facts a user needs before
+	// the dashboard opens. console.Card prints nothing when stdout is
+	// redirected, under -quiet, or when the Electron shell owns the UI.
+	console.Card(console.CardConfig{
+		Version:  version,
+		WebURL:   displayWebURL(cfg.Web.Listen),
+		Provider: providerLabel(cfg),
+		Model:    modelLabel(cfg),
+		DBPath:   displayPath(cfg.DB.Path),
+	})
 
 	// Build provider from config
 	p := buildProviderFromCfg(cfg)
@@ -275,6 +257,80 @@ func pickKey(cfgKey, envKey string) string {
 		return cfgKey
 	}
 	return os.Getenv(envKey)
+}
+
+// version mirrors electron/package.json and is shown on the start-up card.
+const version = "v2.4.0"
+
+// displayWebURL turns a listen address into something a user can paste into
+// a browser: an empty or wildcard host means "this machine".
+func displayWebURL(listen string) string {
+	host, port, err := net.SplitHostPort(listen)
+	if err != nil {
+		if listen == "" {
+			return "http://localhost:8080"
+		}
+		return "http://" + listen
+	}
+	switch host {
+	case "", "0.0.0.0", "::":
+		host = "localhost"
+	}
+	return "http://" + net.JoinHostPort(host, port)
+}
+
+// displayPath keeps the card short: a database inside the working directory
+// is shown as "./data.db" instead of its absolute path.
+func displayPath(path string) string {
+	if path == "" {
+		return "./data.db"
+	}
+	cwd, err := os.Getwd()
+	if err != nil {
+		return path
+	}
+	rel, err := filepath.Rel(cwd, path)
+	if err != nil || rel == "." || rel == ".." ||
+		strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+		return path
+	}
+	return "./" + filepath.ToSlash(rel)
+}
+
+// providerLabel is the provider name as the user sees it; the default
+// provider can be left unnamed in config.yaml.
+func providerLabel(cfg *config.Config) string {
+	if cfg.Provider.Name != "" {
+		return cfg.Provider.Name
+	}
+	return "openaicompat"
+}
+
+// modelLabel is the right-hand side of the "AI 服务" row: the model actually
+// in use, or nothing at all when no key is configured (the card then says
+// 未配置).
+func modelLabel(cfg *config.Config) string {
+	if !apiKeyConfigured(cfg) {
+		return ""
+	}
+	if cfg.Provider.Model != "" {
+		return cfg.Provider.Model
+	}
+	return "已配置"
+}
+
+// apiKeyConfigured mirrors buildProviderFromCfg's key lookup: config first,
+// then the provider-specific environment variable.
+func apiKeyConfigured(cfg *config.Config) bool {
+	switch cfg.Provider.Name {
+	case "minimax":
+		return pickKey(cfg.Provider.APIKey, "MINIMAX_API_KEY") != ""
+	case "deepseek":
+		return pickKey(cfg.Provider.APIKey, "DEEPSEEK_API_KEY") != ""
+	case "openai":
+		return pickKey(cfg.Provider.APIKey, "OPENAI_API_KEY") != ""
+	}
+	return cfg.Provider.APIKey != ""
 }
 
 func buildProviderFromCfg(cfg *config.Config) providers.Provider {

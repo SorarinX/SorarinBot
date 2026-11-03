@@ -16,10 +16,10 @@ import (
 	"SorarinBot/core/config"
 	"SorarinBot/core/message"
 	"SorarinBot/core/session"
+	"SorarinBot/internal/console"
 	ow "SorarinBot/internal/openwechat"
 
 	"github.com/sirupsen/logrus"
-	"github.com/skip2/go-qrcode"
 )
 
 // Gate-2 (P5-1 / P5-2) concurrency limits.
@@ -151,6 +151,7 @@ func (a *Adapter) loginLoop() {
 				s.Attempts = attempt
 				s.QRURL = ""
 			})
+			console.Status(string(LoginHotLoggingIn), fmt.Sprintf("%d/%d", attempt, maxHotLoginAttempts))
 
 			if d := hotLoginBackoff(attempt); d > 0 {
 				a.setLogin(func(s *LoginStatus) {
@@ -182,21 +183,26 @@ func (a *Adapter) loginLoop() {
 		s.State = LoginWaitingScan
 		s.LastError = "token 登录失败，等待扫码"
 	})
-	if err := a.tryScanLogin(); err == nil {
+	console.Status(string(LoginWaitingScan), "")
+	scanErr := a.tryScanLogin()
+	if scanErr == nil {
 		a.markLoggedIn()
 		return
-	} else {
-		logrus.Warnf("[login] automatic scan login failed: %v", err)
-		a.setLogin(func(s *LoginStatus) {
-			s.LastError = err.Error()
-		})
 	}
+	logrus.Warnf("[login] automatic scan login failed: %v", scanErr)
+	a.setLogin(func(s *LoginStatus) {
+		s.LastError = scanErr.Error()
+	})
 
 	// 3. Give up; wait for an explicit retry.
 	a.setLogin(func(s *LoginStatus) {
 		s.State = LoginFailed
 		s.NextRetry = ""
 	})
+	// A cancelled context means shutdown, not a failed login.
+	if a.ctx.Err() == nil {
+		console.Status(string(LoginFailed), scanErr.Error())
+	}
 	logrus.Warnf("[login] giving up automatic login; use POST /api/login/retry to retry")
 
 	// 4. Serve explicit retry requests forever. The process stays alive
@@ -223,6 +229,9 @@ func (a *Adapter) loginLoop() {
 					s.Attempts = 0
 					s.QRURL = ""
 				})
+				// The QR callback prints this state too; identical
+				// text keeps the terminal to a single line.
+				console.Status(string(LoginWaitingScan), "")
 				err = a.tryScanLogin()
 			} else {
 				a.setLogin(func(s *LoginStatus) {
@@ -230,6 +239,7 @@ func (a *Adapter) loginLoop() {
 					s.Attempts = 0
 					s.QRURL = ""
 				})
+				console.Status(string(LoginHotLoggingIn), "手动重试")
 				err = a.tryHotLogin()
 			}
 
@@ -244,6 +254,9 @@ func (a *Adapter) loginLoop() {
 				s.LastError = err.Error()
 				s.State = LoginFailed
 			})
+			if a.ctx.Err() == nil {
+				console.Status(string(LoginFailed), err.Error())
+			}
 		}
 	}
 }
@@ -318,10 +331,28 @@ func (a *Adapter) markLoggedIn() {
 		s.LastError = ""
 		s.NextRetry = ""
 	})
+	nick := a.currentNick()
+	console.ClearQR()
+	console.Status(string(LoginLoggedIn), nick)
+	console.Success(nick)
 	if a.onLoginSuccess != nil {
 		a.onLoginSuccess()
 	}
 	logrus.Infof("[login] WeChat login successful")
+}
+
+// currentNick returns the logged-in account's nickname, or "" when the bot
+// has not published it yet. It is only used for the terminal line.
+func (a *Adapter) currentNick() string {
+	bot := a.Bot()
+	if bot == nil {
+		return ""
+	}
+	self, err := bot.GetCurrentUser()
+	if err != nil || self == nil {
+		return ""
+	}
+	return self.NickName
 }
 
 // attachCallbacks wires the state machine's callbacks onto a bot.
@@ -330,16 +361,21 @@ func (a *Adapter) attachCallbacks(bot *ow.Bot) {
 		// Reaching here means a scan is genuinely required, which only
 		// happens on the automatic first-run fallback or an explicit
 		// operator retry.
+		qrURL := ow.GetQrcodeUrl(uuid)
 		a.setLogin(func(s *LoginStatus) {
 			s.State = LoginWaitingScan
-			s.QRURL = ow.GetQrcodeUrl(uuid)
+			s.QRURL = qrURL
 		})
-		qrDisplay(uuid)
+		console.Status(string(LoginWaitingScan), "")
+		qrDisplay(qrURL)
 	}
 	bot.ScanCallBack = func(ow.CheckLoginResponse) {
 		a.setLogin(func(s *LoginStatus) { s.State = LoginScanned })
+		console.Status(string(LoginScanned), "")
 	}
 	bot.LoginCallBack = func(ow.CheckLoginResponse) {
+		// The terminal line for this transition is printed by
+		// markLoggedIn, which also knows the account nickname.
 		a.setLogin(func(s *LoginStatus) { s.State = LoginLoggedIn })
 	}
 }
@@ -360,13 +396,8 @@ var newBot = func() *ow.Bot { return ow.DefaultBot(ow.Desktop) }
 // tests can neutralise it: the library's default UUIDCallback opens a
 // browser window, which an automated test must never do. Production keeps
 // the terminal QR code.
-var qrDisplay = func(uuid string) {
-	q, err := qrcode.New(ow.GetQrcodeUrl(uuid), qrcode.Medium)
-	if err != nil {
-		logrus.Warnf("[scan] qr render failed: %v", err)
-		return
-	}
-	fmt.Println(q.ToSmallString(false))
+var qrDisplay = func(url string) {
+	console.ShowQR(url, scanQRTimeout)
 	logrus.Infof("[scan] QR code displayed, scan with WeChat")
 }
 
