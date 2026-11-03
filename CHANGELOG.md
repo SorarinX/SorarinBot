@@ -11,7 +11,7 @@ config keys that never did anything.
 ### Added
 
 - **Dashboard authentication.** Setting `admin.password_hash` now gates every
-  `/api` route and the `/ws` heartbeat behind a session cookie, with a login
+  `/api` route behind a session cookie, with a login
   screen in the dashboard and a 退出登录 entry in the user menu. Implemented with
   `crypto/pbkdf2` and `crypto/hmac` only, so the dependency list is unchanged.
   Authentication is off while the hash is empty, which keeps a localhost-only
@@ -28,6 +28,8 @@ config keys that never did anything.
 - A warning in both READMEs that the dashboard is plain HTTP and must not be
   exposed to the internet, and that running a personal account over the WeChat
   Web protocol risks the account being restricted.
+- `SORARINBOT_DEBUG=1` now raises logrus to debug level. The variable was
+  documented in both READMEs but nothing read it.
 
 ### Changed
 
@@ -59,6 +61,10 @@ config keys that never did anything.
   system to enable.
 - `adapters/openwechat/platform_windows.go` and `platform_linux.go`, which
   defined an `openBrowser` that nothing called.
+- The `/ws` heartbeat and `heartbeat.go`. No dashboard build ever opened that
+  socket, so `heartbeat.Done()` could never fire and the “exit when the browser
+  closes” path was unreachable; it also conflicted with the tray icon added in
+  v2.2. `github.com/gorilla/websocket` is no longer a dependency.
 
 ### Fixed
 
@@ -73,13 +79,20 @@ config keys that never did anything.
   resolved, and rejected unless they land inside the distribution folder.
 - `go.mod` no longer marks `github.com/energye/systray` as an indirect
   dependency; it is imported directly by `systray.go`.
+- The Electron shell could never open a window once a dashboard password was
+  set: its readiness probe required `200` from `/api/status`, which answers
+  `401` until the renderer has a session, so the shell timed out after 30s. It
+  now probes `/api/auth/status`, which is always public and still proves the
+  responder is SorarinBot.
+- `electron/package.json` carries the app version again (it was stuck at 2.2.0
+  while the app had moved on).
 
 ### Corrected documentation
 
-- The “Known Limitations” and dead-code claims in earlier notes were wrong on
-  two counts and are corrected here: `heartbeat.go` is live (`main.go` consumes
-  `heartbeat.Done()` to exit when no browser is connected), and `IsJoinGroup`
-  and `session.OnTaskPanic` are both reachable and used.
+- An earlier note claimed `heartbeat.go` was live. It was not: no dashboard
+  build ever opened `/ws`, so `heartbeat.Done()` could never fire. The file and
+  the socket are removed in this release, which supersedes that claim.
+- `IsJoinGroup` and `session.OnTaskPanic` are both reachable and used.
 
 ## [2.3.0] - 2026-09-17
 

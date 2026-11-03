@@ -34,7 +34,7 @@
 - 🧠 **Memory isolated per conversation** — sessions are keyed by `private:<user>` and `group:<room>:<user>`, so the same person in two different groups keeps two independent contexts.
 - ⚡ **Non-blocking dispatch** — an LLM call never stalls the WeChat sync loop. Each conversation gets one strict serial worker, and different conversations run in parallel under a global cap of 8.
 - 🔐 **Observable login** — a six-state login machine (`idle` → `hot_logging_in` → `waiting_scan` → `scanned` → `logged_in` / `failed`) surfaced in the dashboard with a **Retry** button. A failed login no longer takes the process down.
-- 🔑 **Dashboard password** — optional, off by default, and enforced on every API route and the heartbeat socket when enabled. Failed logins are throttled per address.
+- 🔑 **Dashboard password** — optional, off by default, and enforced on every API route when enabled. Failed logins are throttled per address.
 - 🖼️ **Vision** — send an image with a caption and it is handed to a vision-capable model.
 - 👋 **Group welcome** — greets new members when they join a group.
 - 📊 **Web dashboard** — live sessions, paginated chat history, system logs, a provider connection test, and a light/dark theme.
@@ -167,7 +167,7 @@ history and system logs, and change your provider API key. That is fine on
 SorarinBot -set-password      # stores a PBKDF2-SHA256 hash in config.yaml
 ```
 
-Restart afterwards. Once set, every `/api` route and the heartbeat socket require
+Restart afterwards. Once set, every `/api` route requires
 a session cookie; failed logins are throttled per client address; the session
 lasts seven days and is invalidated by a restart. Run the same command with an
 empty answer to turn the password back off.
@@ -203,7 +203,7 @@ Three ideas explain most of the design:
 
 | Layer | Technology |
 | --- | --- |
-| Backend | Go 1.25 · `net/http` · `gorilla/websocket` · `logrus` · `modernc.org/sqlite` (pure Go) |
+| Backend | Go 1.25 · `net/http` · `logrus` · `modernc.org/sqlite` (pure Go) |
 | Frontend | Nuxt 4 · Vue 3 · Nuxt UI 4 · Tailwind CSS 4 · TypeScript |
 | Desktop | Electron 43 · electron-builder (NSIS installer / AppImage) |
 | Database | SQLite — `data.db`, chat history and system logs |
@@ -231,7 +231,6 @@ is set, everything except the three `auth` routes returns `401` until you sign i
 | `GET` | `/api/models` | Models offered by the configured provider. |
 | `GET` / `PUT` | `/api/config` | Read or update configuration (applied immediately). |
 | `GET` / `PUT` | `/api/autostart` | Read or set the auto-start toggle. |
-| `WebSocket` | `/ws` | Dashboard heartbeat. |
 
 ## 🛠️ Development
 

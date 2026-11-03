@@ -189,7 +189,7 @@ SorarinBot -set-password      # 把 PBKDF2-SHA256 哈希写入 config.yaml
 
 | 层次 | 技术 |
 | --- | --- |
-| 后端 | Go 1.25 · `net/http` · `gorilla/websocket` · `logrus` · `modernc.org/sqlite`（纯 Go） |
+| 后端 | Go 1.25 · `net/http` · `logrus` · `modernc.org/sqlite`（纯 Go） |
 | 前端 | Nuxt 4 · Vue 3 · Nuxt UI 4 · Tailwind CSS 4 · TypeScript |
 | 桌面端 | Electron 43 · electron-builder（NSIS 安装包 / AppImage） |
 | 数据库 | SQLite —— `data.db`，保存聊天记录与系统日志 |
@@ -216,7 +216,6 @@ SorarinBot -set-password      # 把 PBKDF2-SHA256 哈希写入 config.yaml
 | `GET` | `/api/models` | 当前 Provider 可用的模型列表。 |
 | `GET` / `PUT` | `/api/config` | 读取或更新配置（立即生效）。 |
 | `GET` / `PUT` | `/api/autostart` | 读取或设置开机自启动开关。 |
-| `WebSocket` | `/ws` | 后台心跳。 |
 
 ## 🛠️ 开发指南
 
