@@ -68,7 +68,7 @@
 1. **Download.** Grab the latest `SorarinBot-v*-win64-portable.zip` from [**Releases**](https://github.com/SorarinX/SorarinBot/releases) and extract it anywhere.
 2. **Run it.** Double-click `SorarinBot.exe`. A tray icon appears and the dashboard opens in your browser at **http://localhost:8080**.
 3. **Connect a model.** Open **Settings**, paste an API key, pick a model, and save — the change is live immediately, no restart.
-4. **Log in to WeChat.** Back on the dashboard home, scan the QR code with WeChat. The same QR code is also printed in the console. The status badge turns green once you are in.
+4. **Log in to WeChat.** Back on the dashboard home, scan the QR code with WeChat. The console shows the dashboard address; on a headless machine, start with `-console-qr` to print the code in the terminal instead. The status badge turns green once you are in.
 
 Now send yourself a message on WeChat and the bot will answer.
 
@@ -164,6 +164,7 @@ history and system logs, and change your provider API key. That is fine on
 
 ```bash
 SorarinBot -set-password      # stores a PBKDF2-SHA256 hash in config.yaml
+SorarinBot -console-qr        # print the login QR in the terminal (headless setups)
 ```
 
 Restart afterwards. Once set, every `/api` route requires

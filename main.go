@@ -45,7 +45,11 @@ func main() {
 		"override web.listen for this run only, e.g. 127.0.0.1:8081")
 	quiet := flag.Bool("quiet", false,
 		"only print warnings and errors (no start-up card or QR code)")
+	consoleQR := flag.Bool("console-qr", false,
+		"print the login QR code in the terminal instead of relying on the web UI")
 	flag.Parse()
+
+	console.SetQR(*consoleQR)
 
 	// SORARINBOT_DEBUG=1 turns on debug logging (documented in README).
 	// -quiet wins over it: it is the explicit request for this run.

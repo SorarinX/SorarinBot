@@ -14,11 +14,21 @@ import (
 // prints a separator when there is something to clear.
 var qrShown atomic.Bool
 
+// qrEnabled controls the terminal QR block. It defaults to on for tests and
+// direct users of the package; main turns it off unless -console-qr is given,
+// because the web dashboard is the primary place to scan.
+var qrEnabled atomic.Bool
+
+func init() { qrEnabled.Store(true) }
+
+// SetQR enables or disables the terminal QR block.
+func SetQR(enabled bool) { qrEnabled.Store(enabled) }
+
 // ShowQR prints the WeChat login QR code. The code itself is never coloured:
 // a phone camera needs the plain pattern, so only the frame and the captions
 // carry the palette. Nothing is printed in Electron mode or under -quiet.
 func ShowQR(url string, ttl time.Duration) {
-	if url == "" || quiet.Load() || inElectron() {
+	if url == "" || !qrEnabled.Load() || quiet.Load() || inElectron() {
 		return
 	}
 	coloured := Colors()

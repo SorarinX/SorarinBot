@@ -33,6 +33,9 @@ config keys that never did anything.
 
 ### Changed
 
+- **The terminal no longer prints the login QR by default.** The dashboard is
+  the place to scan; the console only shows its address and hides itself after
+  login. `-console-qr` restores the terminal block for headless machines.
 - **The dashboard is now a React 19 + Vite app.** The Nuxt/Vue SPA was replaced
   by a dark-first shell with a welcome/QR screen, dashboard, sessions, logs,
   settings and login. The API contract is unchanged; the previous frontend is
