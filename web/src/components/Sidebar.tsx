@@ -22,7 +22,7 @@ export function Sidebar() {
         <img
           src="/logo.png"
           alt=""
-          className="size-8 shrink-0 rounded-lg bg-white object-contain ring-1 ring-black/5"
+          className="size-8 shrink-0 object-contain"
         />
         <span className="truncate text-[14px] font-semibold tracking-tight text-text">
           SorarinBot
