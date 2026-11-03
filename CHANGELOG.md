@@ -33,6 +33,10 @@ config keys that never did anything.
 
 ### Changed
 
+- **The console window hides itself once the dashboard is up.** People were
+  closing the black window and stopping the bot; the tray icon and the web UI
+  remain. `-console` keeps it visible, and a console shared with a shell is
+  never hidden.
 - **A fresh install reaches the QR scan immediately.** The login loop used to
   retry an absent token five times (about 30 seconds of `invalid storage`
   errors) before offering the code; it now checks for a saved token first.

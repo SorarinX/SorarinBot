@@ -47,9 +47,14 @@ func main() {
 		"only print warnings and errors (no start-up card or QR code)")
 	consoleQR := flag.Bool("console-qr", false,
 		"print the login QR code in the terminal instead of relying on the web UI")
+	keepConsole := flag.Bool("console", false,
+		"keep the console window visible (it is hidden by default once the dashboard is up)")
 	flag.Parse()
 
 	console.SetQR(*consoleQR)
+	if *consoleQR {
+		*keepConsole = true
+	}
 
 	// SORARINBOT_DEBUG=1 turns on debug logging (documented in README).
 	// -quiet wins over it: it is the explicit request for this run.
@@ -210,6 +215,16 @@ func main() {
 			openBrowser("http://" + cfg.Web.Listen)
 		}
 	}()
+
+	// The console is a startup artifact for most people: hide it once the
+	// dashboard is reachable so a stray click on the X cannot stop the bot.
+	// A console shared with a shell is left alone, and -console opts out.
+	if !*keepConsole && os.Getenv("SORARINBOT_ELECTRON") == "" {
+		go func() {
+			time.Sleep(1500 * time.Millisecond)
+			hideConsoleWindow()
+		}()
+	}
 
 	// Exit on OS signal (SIGINT/SIGTERM) or a tray "quit".
 	// The old browser-heartbeat exit is gone: no dashboard client ever opened
