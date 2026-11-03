@@ -113,13 +113,17 @@ func main() {
 	if *listen != "" {
 		cfg.Web.Listen = *listen
 	}
+	// Pick a free port before anything prints it: the server already retries
+	// busy ports, but the card and the browser must point at the port that is
+	// actually used.
+	webListen := freeListen(cfg.Web.Listen)
 
 	// Start-up card: product name plus the four facts a user needs before
 	// the dashboard opens. console.Card prints nothing when stdout is
 	// redirected, under -quiet, or when the Electron shell owns the UI.
 	console.Card(console.CardConfig{
 		Version:  version,
-		WebURL:   displayWebURL(cfg.Web.Listen),
+		WebURL:   displayWebURL(webListen),
 		Provider: providerLabel(cfg),
 		Model:    modelLabel(cfg),
 		DBPath:   displayPath(cfg.DB.Path),
@@ -176,7 +180,7 @@ func main() {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		startWeb(ctx, cfg.Web.Listen, h, sessMgr, adapter)
+		startWeb(ctx, webListen, h, sessMgr, adapter)
 	}()
 
 	// Graceful shutdown
@@ -188,7 +192,7 @@ func main() {
 		go func() {
 			iconPath := filepath.Join(filepath.Dir(os.Args[0]), "icon.ico")
 			InitTray(TrayConfig{
-				WebURL:   "http://" + cfg.Web.Listen,
+				WebURL:   displayWebURL(webListen),
 				IconPath: iconPath,
 				OnExit: func() {
 					logrus.Info("[tray] quit requested")
@@ -212,7 +216,7 @@ func main() {
 	go func() {
 		time.Sleep(1 * time.Second)
 		if os.Getenv("SORARINBOT_ELECTRON") == "" {
-			openBrowser(displayWebURL(cfg.Web.Listen))
+			openBrowser(displayWebURL(webListen))
 		}
 	}()
 
@@ -222,7 +226,7 @@ func main() {
 	if !*keepConsole && os.Getenv("SORARINBOT_ELECTRON") == "" {
 		go func() {
 			time.Sleep(1500 * time.Millisecond)
-			if !webReachable(displayWebURL(cfg.Web.Listen)) {
+			if !webReachable(displayWebURL(webListen)) {
 				return
 			}
 			hideConsoleWindow()
@@ -299,6 +303,29 @@ func displayWebURL(listen string) string {
 		host = "localhost"
 	}
 	return "http://" + net.JoinHostPort(host, port)
+}
+
+// freeListen returns the first free port at or after the configured one.
+// The number of attempts is bounded so a firewall cannot hang startup.
+func freeListen(listen string) string {
+	host, portStr, err := net.SplitHostPort(listen)
+	if err != nil {
+		host, portStr = "localhost", "8080"
+	}
+	port, err := strconv.Atoi(portStr)
+	if err != nil || port == 0 {
+		port = 8080
+	}
+	for i := 0; i < 20; i++ {
+		addr := net.JoinHostPort(host, strconv.Itoa(port+i))
+		ln, err := net.Listen("tcp", addr)
+		if err != nil {
+			continue
+		}
+		ln.Close()
+		return addr
+	}
+	return listen
 }
 
 // webReachable confirms the dashboard answers before the console is hidden;
