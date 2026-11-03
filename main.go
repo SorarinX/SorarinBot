@@ -38,6 +38,11 @@ var uiFS embed.FS
 var startupTime = time.Now()
 
 func main() {
+	// SORARINBOT_DEBUG=1 turns on debug logging (documented in README).
+	if os.Getenv("SORARINBOT_DEBUG") != "" {
+		logrus.SetLevel(logrus.DebugLevel)
+	}
+
 	setPassword := flag.Bool("set-password", false,
 		"prompt for a dashboard password, store its hash in config.yaml, and exit")
 	listen := flag.String("listen", "",
@@ -220,13 +225,12 @@ func main() {
 		}
 	}()
 
-	// Exit when either OS signal or browser heartbeat timeout
-	select {
-	case <-ch:
-		logrus.Info("shutting down (signal)...")
-	case <-heartbeat.Done():
-		logrus.Info("shutting down (browser closed)...")
-	}
+	// Exit on OS signal (SIGINT/SIGTERM) or a tray "quit".
+	// The old browser-heartbeat exit is gone: no dashboard client ever opened
+	// /ws, so heartbeat.Done() could never fire, and a browser-driven exit
+	// would also kill the tray icon added in v2.2.
+	<-ch
+	logrus.Info("shutting down (signal)...")
 	logrus.Info("shutting down...")
 	cancel()
 	if b := adapter.Bot(); b != nil {
@@ -329,7 +333,7 @@ func buildMux(h *message.Handler, sm *session.Manager, adapter *ow_adapter.Adapt
 
 	// Dashboard authentication. These three routes stay public so the SPA can
 	// work out whether to render a login screen; auth.middleware gates every
-	// other /api route and the heartbeat socket.
+	// other /api route.
 	mux.HandleFunc("/api/auth/status", auth.handleStatus)
 	mux.HandleFunc("/api/auth/login", auth.handleLogin)
 	mux.HandleFunc("/api/auth/logout", auth.handleLogout)
@@ -726,9 +730,6 @@ func buildMux(h *message.Handler, sm *session.Manager, adapter *ow_adapter.Adapt
 			http.Error(w, "method not allowed", 405)
 		}
 	})
-
-	// WebSocket heartbeat for browser close detection
-	mux.HandleFunc("/ws", heartbeat.handleWS)
 
 	return mux
 }

@@ -32,22 +32,27 @@ async function findFreePort() {
   throw new Error(`no free port in ${PORT_RANGE_START}-${PORT_RANGE_END}`)
 }
 
-// waitForServer polls /api/status and requires our own status payload, so a
-// different application squatting on the port can never be mistaken for the
-// backend.
+// waitForServer polls /api/auth/status, which is always public and returns our
+// own { required, authenticated } payload. Two reasons it is not /api/status:
+//
+//  1. once a dashboard password is set, /api/status answers 401 until the
+//     renderer has a session, which used to look like "backend never started"
+//     and made the desktop app quit after a 30s timeout;
+//  2. a different application squatting on the port would not answer this
+//     shape, so it still cannot be mistaken for our backend.
 function waitForServer(baseUrl, timeout = 30000) {
   return new Promise((resolve, reject) => {
     const start = Date.now()
     const check = () => {
       http
-        .get(`${baseUrl}/api/status`, (res) => {
+        .get(`${baseUrl}/api/auth/status`, (res) => {
           let body = ''
           res.setEncoding('utf8')
           res.on('data', (chunk) => { body += chunk })
           res.on('end', () => {
             if (res.statusCode === 200) {
               try {
-                if (JSON.parse(body).status === 'running') { resolve(); return }
+                if (typeof JSON.parse(body).required === 'boolean') { resolve(); return }
               } catch {
                 // Not our server; keep waiting.
               }

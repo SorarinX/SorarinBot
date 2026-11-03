@@ -48,7 +48,15 @@ watch(userMessages, () => {
   nextTick(() => { if (scrollRef.value) scrollRef.value.scrollTop = scrollRef.value.scrollHeight })
 }, { immediate: true })
 
-onMounted(() => { setInterval(() => { refreshStatus(); refreshHistory() }, 10000) })
+let pollTimer: ReturnType<typeof setInterval> | undefined
+
+onMounted(() => {
+  pollTimer = setInterval(() => { refreshStatus(); refreshHistory() }, 10000)
+})
+
+onUnmounted(() => {
+  if (pollTimer) clearInterval(pollTimer)
+})
 
 async function handleRefresh() {
   await refreshStatus()

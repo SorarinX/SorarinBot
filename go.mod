@@ -4,7 +4,6 @@ go 1.25.0
 
 require (
 	github.com/energye/systray v1.0.3
-	github.com/gorilla/websocket v1.5.3
 	github.com/sirupsen/logrus v1.9.4
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	golang.org/x/sys v0.47.0

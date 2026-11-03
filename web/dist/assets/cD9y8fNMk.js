@@ -1,0 +1,1 @@
+import{u as i}from"./cCOiG60YH.js";import{l as o}from"./edYPnw3fq.js";function p(r=100){const s=o(()=>`/api/logs?limit=${r}`),{data:t,error:e,loading:u,refresh:a}=i(s);return{logs:o(()=>t.value??[]),error:e,loading:u,refresh:a}}export{p as u};

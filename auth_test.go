@@ -180,7 +180,6 @@ func TestMiddlewareBlocksUnauthenticatedAPI(t *testing.T) {
 		{"/api/status", http.StatusUnauthorized},
 		{"/api/config", http.StatusUnauthorized},
 		{"/api/history", http.StatusUnauthorized},
-		{"/ws", http.StatusUnauthorized},
 		// Reachable without a session so the login screen can be rendered.
 		{"/api/auth/status", http.StatusOK},
 		{"/api/auth/login", http.StatusOK},
@@ -205,7 +204,7 @@ func TestMiddlewarePassesEverythingThroughWhenDisabled(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 	}))
 
-	for _, path := range []string{"/api/status", "/api/config", "/ws"} {
+	for _, path := range []string{"/api/status", "/api/config"} {
 		rec := httptest.NewRecorder()
 		handler.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, path, nil))
 		if rec.Code != http.StatusOK {

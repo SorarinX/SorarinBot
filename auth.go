@@ -186,15 +186,14 @@ var publicAPIPaths = map[string]bool{
 	"/api/auth/logout": true,
 }
 
-// middleware guards the API and the heartbeat socket. Static assets are left
-// alone on purpose: the SPA shell holds no data, and serving it lets the login
-// page load.
+// middleware guards the API. Static assets are left alone on purpose: the SPA
+// shell holds no data, and serving it lets the login page load.
 func (a *authenticator) middleware(next http.Handler) http.Handler {
 	if !a.enabled() {
 		return next
 	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		protected := strings.HasPrefix(r.URL.Path, "/api/") || r.URL.Path == "/ws"
+		protected := strings.HasPrefix(r.URL.Path, "/api/")
 		if !protected || publicAPIPaths[r.URL.Path] || a.validSession(r) {
 			next.ServeHTTP(w, r)
 			return

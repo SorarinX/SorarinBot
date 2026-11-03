@@ -54,7 +54,6 @@ export interface ProviderConfig {
 // === Chat ===
 
 export interface ChatConfig {
-  context_enabled: boolean
   max_context: number
   image_ttl: number
 }
@@ -62,7 +61,6 @@ export interface ChatConfig {
 // === WeChat ===
 
 export interface WeChatConfig {
-  strict_login: boolean
   token_file: string
   auto_login: boolean
   trigger_prefix: string
