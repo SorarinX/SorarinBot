@@ -33,6 +33,10 @@ config keys that never did anything.
 
 ### Changed
 
+- **A fresh install reaches the QR scan immediately.** The login loop used to
+  retry an absent token five times (about 30 seconds of `invalid storage`
+  errors) before offering the code; it now checks for a saved token first.
+- The default `prompt` is Chinese, matching the product's audience.
 - **The terminal no longer prints the login QR by default.** The dashboard is
   the place to scan; the console only shows its address and hides itself after
   login. `-console-qr` restores the terminal block for headless machines.

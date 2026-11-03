@@ -232,6 +232,11 @@ func newStateMachineFixture(t *testing.T, factory func() *ow.Bot) *Adapter {
 	}
 	newBot = factory
 
+	// These fixtures exercise the token path; pretend a saved token exists so
+	// the loop does not take the fresh-install shortcut.
+	prevHasToken := hasSavedToken
+	hasSavedToken = func() bool { return true }
+
 	// Compress the frozen 0/5/10/20/40s schedule (which totals 75s and
 	// would make these tests unusable) without changing the policy the
 	// default function encodes. That policy has its own test.
@@ -241,6 +246,7 @@ func newStateMachineFixture(t *testing.T, factory func() *ow.Bot) *Adapter {
 	t.Cleanup(func() {
 		newBot = prevFactory
 		hotLoginBackoff = prevBackoff
+		hasSavedToken = prevHasToken
 	})
 
 	ctx, cancel := context.WithCancel(context.Background())

@@ -125,7 +125,7 @@ provider:
   model: deepseek-chat
   api_key: ""
 
-prompt: "You are a helpful AI assistant."
+prompt: "你是一个乐于助人的 AI 助手。用简洁、自然的中文回答，先给结论，再补充细节。"
 
 chat:
   max_context: 3              # previous turns replayed as context; 0 disables history

@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -144,7 +145,7 @@ func (a *Adapter) loginLoop() {
 	//    off, so an operator who wants a fresh session gets a QR code straight
 	//    away instead of five failed token attempts first. The key used to be
 	//    parsed and ignored.
-	if config.Snapshot().WeChat.AutoLogin {
+	if config.Snapshot().WeChat.AutoLogin && hasSavedToken() {
 		for attempt := 1; attempt <= maxHotLoginAttempts; attempt++ {
 			a.setLogin(func(s *LoginStatus) {
 				s.State = LoginHotLoggingIn
@@ -174,8 +175,10 @@ func (a *Adapter) loginLoop() {
 				s.NextRetry = ""
 			})
 		}
-	} else {
+	} else if !config.Snapshot().WeChat.AutoLogin {
 		logrus.Info("[login] auto_login is off; going straight to a QR scan")
+	} else {
+		logrus.Info("[login] no saved token; going straight to a QR scan")
 	}
 
 	// 2. One automatic scan-login fallback.
@@ -512,6 +515,16 @@ func (a *Adapter) newBotWithHandler() *ow.Bot {
 	bot := newBot()
 	bot.MessageHandler = a.dispatch()
 	return bot
+}
+
+// hasSavedToken reports whether a non-empty hot-login token exists. A fresh
+// install has none, so it should reach the QR scan immediately instead of
+// spending five backoff attempts on an "invalid storage" error.
+//
+// It is a variable so tests can drive both branches without touching disk.
+var hasSavedToken = func() bool {
+	info, err := os.Stat(tokenPath())
+	return err == nil && info.Size() > 0
 }
 
 // tokenPath returns the configured hot-login storage path.

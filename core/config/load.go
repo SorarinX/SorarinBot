@@ -33,7 +33,7 @@ func defaultConfig() Config {
 			Model:   "",
 			APIKey:  "",
 		},
-		Prompt: "You are a helpful AI assistant.",
+		Prompt: "你是一个乐于助人的 AI 助手。用简洁、自然的中文回答，先给结论，再补充细节。",
 	}
 }
 
