@@ -205,7 +205,7 @@ web:
 一个进程，无外部服务。微信和控制台在同一个 Go 二进制里相遇，唯一的对外请求是大模型调用。
 
 <p align="center">
-  <img src=".github/images/architecture.svg" width="920" alt="SorarinBot 架构图">
+  <img src=".github/images/architecture-3.0.zh.svg" width="920" alt="SorarinBot 架构图">
 </p>
 
 三个设计点解释了大部分结构：
