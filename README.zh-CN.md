@@ -47,24 +47,24 @@
 ## 📸 界面预览
 
 <p align="center">
-  <img src=".github/images/welcome.png" width="880" alt="SorarinBot 欢迎页">
+  <img src=".github/images/welcome-3.0.png" width="880" alt="SorarinBot 欢迎页">
   <br>
   <sub>欢迎页 —— 扫码登录，或先跳过扫码进入控制台配置模型。</sub>
 </p>
 
 <p align="center">
-  <img src=".github/images/dashboard.png" width="880" alt="SorarinBot 仪表盘">
+  <img src=".github/images/dashboard-3.0.png" width="880" alt="SorarinBot 仪表盘">
   <br>
   <sub>仪表盘 —— Provider 状态、实时微信登录状态，以及按会话隔离的列表。</sub>
 </p>
 
 |                                        聊天记录                                        |                                        系统日志                                        |
 | :-----------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------: |
-| ![聊天记录](.github/images/chat.png) | ![系统日志](.github/images/logs.png) |
+| ![聊天记录](.github/images/chat-3.0.png) | ![系统日志](.github/images/logs-3.0.png) |
 
 |                                       配置管理                                       |                                       系统提示词                                       |
 | :---------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------: |
-| ![配置管理](.github/images/settings.png) | ![系统提示词](.github/images/prompt.png) |
+| ![配置管理](.github/images/settings-3.0.png) | ![系统提示词](.github/images/prompt-3.0.png) |
 
 ## 🚀 快速开始
 

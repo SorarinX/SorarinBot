@@ -47,24 +47,24 @@
 ## 📸 Screenshots
 
 <p align="center">
-  <img src=".github/images/welcome.png" width="880" alt="SorarinBot welcome screen">
+  <img src=".github/images/welcome-3.0.png" width="880" alt="SorarinBot welcome screen">
   <br>
   <sub>The welcome screen — scan the QR, or skip into the console and configure a model first.</sub>
 </p>
 
 <p align="center">
-  <img src=".github/images/dashboard.png" width="880" alt="SorarinBot dashboard">
+  <img src=".github/images/dashboard-3.0.png" width="880" alt="SorarinBot dashboard">
   <br>
   <sub>The dashboard — provider status, live WeChat login state and per-conversation sessions.</sub>
 </p>
 
 |                                         Chat history                                          |                                        System logs                                        |
 | :------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------: |
-| ![Chat history](.github/images/chat.png) | ![System logs](.github/images/logs.png) |
+| ![Chat history](.github/images/chat-3.0.png) | ![System logs](.github/images/logs-3.0.png) |
 
 |                                       Settings                                        |                                     System prompt                                      |
 | :----------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------: |
-| ![Settings](.github/images/settings.png) | ![System prompt](.github/images/prompt.png) |
+| ![Settings](.github/images/settings-3.0.png) | ![System prompt](.github/images/prompt-3.0.png) |
 
 ## 🚀 Quick Start
 
