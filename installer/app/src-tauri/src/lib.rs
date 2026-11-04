@@ -11,7 +11,7 @@ mod window_effects;
 
 use state::InstallerState;
 use std::path::PathBuf;
-use tauri::Manager;
+use tauri::{Manager, WebviewWindow};
 
 #[tauri::command]
 async fn fetch_manifest(urls: Vec<String>) -> Result<manifest::Manifest, error::InstallerError> {
@@ -22,6 +22,30 @@ async fn fetch_manifest(urls: Vec<String>) -> Result<manifest::Manifest, error::
         }
     }
     manifest::fetch(urls).await
+}
+
+#[tauri::command]
+fn start_window_drag(window: WebviewWindow) -> Result<(), String> {
+    #[cfg(target_os = "windows")]
+    {
+        use windows::Win32::Foundation::{LPARAM, WPARAM};
+        use windows::Win32::UI::Input::KeyboardAndMouse::ReleaseCapture;
+        use windows::Win32::UI::WindowsAndMessaging::{
+            SendMessageW, HTCAPTION, WM_NCLBUTTONDOWN,
+        };
+
+        let hwnd = window.hwnd().map_err(|error| error.to_string())?;
+        unsafe {
+            let _ = ReleaseCapture();
+            SendMessageW(
+                hwnd,
+                WM_NCLBUTTONDOWN,
+                Some(WPARAM(HTCAPTION as usize)),
+                Some(LPARAM(0)),
+            );
+        }
+    }
+    Ok(())
 }
 
 #[tauri::command]
@@ -68,6 +92,7 @@ pub fn run() {
             download::cancel_download,
             logging::open_log,
             installer_version,
+            start_window_drag,
             default_install_dir,
             payload_temp_path,
         ])

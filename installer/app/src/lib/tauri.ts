@@ -12,6 +12,11 @@ export async function onEvent<T>(event: string, handler: (payload: T) => void): 
   return listen<T>(event, (message) => handler(message.payload));
 }
 
+export async function startDraggingWindow(): Promise<void> {
+  if (!isTauri()) return;
+  await invoke("start_window_drag");
+}
+
 export async function minimizeWindow(): Promise<void> {
   if (!isTauri()) return;
   const { getCurrentWindow } = await import("@tauri-apps/api/window");

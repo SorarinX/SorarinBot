@@ -20,6 +20,7 @@ import {
   minimizeWindow,
   onInstallProgress,
   openPath,
+  startDraggingWindow,
   pickDataSource,
   pickDirectory,
   pollInstall,
@@ -295,6 +296,12 @@ function App() {
   }
 
   async function beginInstall() {
+    const normalized = installDir.trim();
+    if (!/^[A-Za-z]:[\\/]/.test(normalized)) {
+      setError("安装位置必须是绝对路径，例如 C:\\Users\\你\\AppData\\Local\\Programs\\SorarinBot。");
+      return;
+    }
+    setInstallDir(normalized);
     setPage("progress");
     setPhase("download");
     setProgress(0);
@@ -363,7 +370,11 @@ function App() {
     if (page === "progress" && (phase === "download" || phase === "verify" || phase === "install")) {
       if (!window.confirm("安装仍在进行，关闭窗口会中断安装。确定关闭吗？")) return;
     }
-    await closeWindow();
+    try {
+      await closeWindow();
+    } catch (err) {
+      setError(errorText(err));
+    }
   }
 
   async function handleBrowse() {
@@ -386,13 +397,26 @@ function App() {
     }
   }
 
+  async function handleOpenFolder() {
+    try {
+      await openPath(installDir);
+    } catch (err) {
+      setError(errorText(err));
+    }
+  }
+
   async function handleFinish() {
     try {
       if (launchAfter) await launchApp(installDir);
-    } catch {
-      // closing is still the right end state
+    } catch (err) {
+      setError(errorText(err));
+      return;
     }
-    await closeWindow();
+    try {
+      await closeWindow();
+    } catch (err) {
+      setError(errorText(err));
+    }
   }
 
   return (
@@ -425,7 +449,15 @@ function App() {
       </aside>
 
       <main className="main">
-        <header className="titlebar" data-tauri-drag-region>
+        <header
+          className="titlebar"
+          data-tauri-drag-region
+          onMouseDown={(event) => {
+            const target = event.target as HTMLElement;
+            if (target.closest("button, input, summary, a")) return;
+            void startDraggingWindow();
+          }}
+        >
           <nav className="wizard" aria-label="安装进度">
             <div className="wizard-rail">
               <span style={{ width: (currentIndex / (STEPS.length - 1)) * 100 + "%" }} />
@@ -513,7 +545,7 @@ function App() {
                   </div>
                   <label className="field-label" htmlFor="install-dir">安装文件夹<span>绝对路径 · 不需要管理员权限</span></label>
                   <div className="path-row">
-                    <input id="install-dir" value={installDir} onChange={(event) => setInstallDir(event.target.value)} spellCheck={false} />
+                    <input id="install-dir" value={installDir} onChange={(event) => setInstallDir(event.target.value)} onFocus={(event) => event.currentTarget.select()} spellCheck={false} autoComplete="off" />
                     <button type="button" className="btn btn-ghost" onClick={handleBrowse}>浏览</button>
                   </div>
                   <div className="path-meta"><span><i className="dot-mint" />路径可用</span><span>需要 {formatBytes(manifest.payload.size)}</span></div>
@@ -661,9 +693,10 @@ function App() {
                 </section>
 
                 <div className="finish-actions">
-                  <button type="button" className="btn btn-ghost" onClick={() => openPath(installDir)}><Icon name="folder" />打开安装目录</button>
+                  <button type="button" className="btn btn-ghost" onClick={handleOpenFolder}><Icon name="folder" />打开安装目录</button>
                   <button type="button" className="btn btn-primary" onClick={handleFinish}>完成 <Icon name="arrow" /></button>
                 </div>
+                {error && <div className="inline-error finish-error">{error}</div>}
               </div>
               <div className="page-foot">
                 <span><Icon name="shield" />可在应用设置中重新安装或卸载，用户数据默认保留</span>
