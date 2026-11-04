@@ -95,7 +95,7 @@
 > **Requirements** — Windows 10+ or Linux x64, roughly 25 MB of disk. Nothing else: the binary is statically linked, stores data with a pure-Go SQLite driver (no CGO), and carries the web UI inside it.
 
 1. **Download.** Grab the latest `SorarinBot-v*-win64-portable.zip` from [**Releases**](https://github.com/SorarinX/SorarinBot/releases) and extract it anywhere.
-2. **Run it.** Double-click `SorarinBot.exe`. A tray icon appears, the dashboard opens at **http://localhost:8080**, and the console window hides itself after a moment. If 8080 is busy, the next free port is used and the browser is pointed at it.
+2. **Run it.** Double-click `SorarinBot.exe`. A tray icon appears, the dashboard opens at `http://localhost:8080`, and the console window hides itself after a moment. If 8080 is busy, the next free port is used and the browser is pointed at it.
 3. **Connect a model.** Open **Settings**, paste an API key, pick a model, and save — the change applies to the next message, no restart. No key yet? Use **先不扫码，去配置** on the welcome screen to explore the console first.
 4. **Log in to WeChat.** Scan the QR code on the welcome screen. On a headless machine, start with `-console-qr` to print the code in the terminal; `-console` keeps the console window visible. The status badge turns green once you are in.
 
