@@ -1,0 +1,240 @@
+name: Release
+
+# Builds the SorarinBot NSIS payload for a vMAJOR.MINOR.PATCH tag and emits the
+# installer manifest described by installer/CONTRACT.md (section 3).
+#
+# This workflow does not create a GitHub release yet. It uploads:
+#   - the NSIS payload plus electron-updater metadata (latest.yml, blockmap)
+#   - installer-manifest.json
+# so a later publish job can attach them to the tag.
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  payload:
+    name: Build payload and manifest
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Resolve release version
+        id: version
+        shell: pwsh
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          # installer/CONTRACT.md section 2: version comparison is numeric semver
+          # and v1 has no prerelease support, so refuse anything but vX.Y.Z.
+          if ($env:TAG -notmatch '^v(?<version>\d+\.\d+\.\d+)$') {
+            Write-Error "release tags must look like vMAJOR.MINOR.PATCH (got '$env:TAG'); installer contract v1 does not support prereleases"
+            exit 1
+          }
+          $version = $Matches['version']
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "version=$version"
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "tag=$env:TAG"
+          Write-Host "release version: $version"
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+          cache: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      # web/package-lock.json and electron/package-lock.json are currently
+      # ignored by the repository .gitignore, so a clean checkout may not have
+      # them. Prefer npm ci (reproducible) and fall back to npm install with a
+      # loud warning until the lockfiles are committed.
+      - name: Install web dependencies
+        working-directory: web
+        shell: pwsh
+        run: |
+          if (Test-Path -LiteralPath package-lock.json) {
+            npm ci --no-audit --no-fund
+          } else {
+            Write-Warning 'web/package-lock.json is missing (gitignored today); falling back to npm install. Commit the lockfile for reproducible CI.'
+            npm install --no-audit --no-fund
+          }
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Build web frontend
+        working-directory: web
+        shell: pwsh
+        run: npm run build
+
+      # main.go embeds web/dist, so the frontend build must come first.
+      - name: Build Go backend
+        shell: pwsh
+        env:
+          CGO_ENABLED: '0'
+        run: go build -trimpath '-ldflags=-s -w' -o electron/SorarinBot.exe .
+
+      - name: Install Electron dependencies
+        working-directory: electron
+        shell: pwsh
+        run: |
+          if (Test-Path -LiteralPath package-lock.json) {
+            npm ci --no-audit --no-fund
+          } else {
+            Write-Warning 'electron/package-lock.json is missing (gitignored today); falling back to npm install. Commit the lockfile for reproducible CI.'
+            npm install --no-audit --no-fund
+          }
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      # electron/package.json pins electronDist to ./dist, a gitignored
+      # pre-downloaded Electron runtime. On a clean checkout, materialise it
+      # from the electron npm package that npm ci just installed.
+      - name: Prepare local Electron runtime
+        working-directory: electron
+        shell: pwsh
+        run: |
+          if (Test-Path -LiteralPath 'dist\electron.exe') {
+            Write-Host 'electron/dist already present, reusing it'
+            exit 0
+          }
+          if (Test-Path -LiteralPath 'dist') {
+            Remove-Item -LiteralPath 'dist' -Recurse -Force
+          }
+          $source = 'node_modules\electron\dist'
+          if (-not (Test-Path -LiteralPath (Join-Path $source 'electron.exe'))) {
+            throw "could not find $source\electron.exe; the electron npm package did not provide a runtime"
+          }
+          Copy-Item -LiteralPath $source -Destination 'dist' -Recurse
+          Write-Host 'copied the Electron runtime to electron/dist'
+
+      # CONTRACT.md section 2: payload version = app version = tag version.
+      # Stamp it into electron/package.json for this checkout only; nothing is
+      # committed back.
+      - name: Stamp app version from tag
+        working-directory: electron
+        shell: pwsh
+        run: npm version "${{ steps.version.outputs.version }}" --no-git-tag-version --allow-same-version
+
+      - name: Configure code signing
+        shell: pwsh
+        env:
+          CERT_PFX_BASE64: ${{ secrets.WINDOWS_CERT_PFX_BASE64 }}
+          CERT_PFX_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:CERT_PFX_BASE64)) {
+            Add-Content -Path $env:GITHUB_ENV -Value 'CSC_IDENTITY_AUTO_DISCOVERY=false'
+            Write-Warning 'WINDOWS_CERT_PFX_BASE64 is not configured: the payload will be UNSIGNED. Signed releases are the public gate (installer/CONTRACT.md section 9).'
+            Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value '- Windows code signing: **not configured** (unsigned payload)'
+            exit 0
+          }
+
+          $certPath = Join-Path $env:RUNNER_TEMP 'windows-cert.pfx'
+          try {
+            [IO.File]::WriteAllBytes($certPath, [Convert]::FromBase64String($env:CERT_PFX_BASE64))
+          } catch {
+            Write-Error "WINDOWS_CERT_PFX_BASE64 is not valid base64: $($_.Exception.Message)"
+            exit 1
+          }
+          Add-Content -Path $env:GITHUB_ENV -Value "CSC_LINK=$certPath"
+          Add-Content -Path $env:GITHUB_ENV -Value "CSC_KEY_PASSWORD=$env:CERT_PFX_PASSWORD"
+          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value '- Windows code signing: **certificate configured** (CSC_LINK / CSC_KEY_PASSWORD)'
+          Write-Host "wrote signing certificate to $certPath"
+
+      # The artifact name becomes the payload URL in the manifest, so keep it
+      # URL-safe and deterministic: SorarinBot-3.1.0-Setup-payload.exe.
+      - name: Build NSIS payload
+        working-directory: electron
+        shell: pwsh
+        run: |
+          & .\node_modules\.bin\electron-builder.cmd --win nsis --publish never '-c.artifactName=SorarinBot-${version}-Setup-payload.${ext}'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Get-ChildItem -LiteralPath 'release' -File | Select-Object Name, Length | Format-Table -AutoSize | Out-String | Write-Host
+
+      - name: Locate payload
+        id: payload
+        shell: pwsh
+        run: |
+          $version = '${{ steps.version.outputs.version }}'
+          $expected = "electron/release/SorarinBot-$version-Setup-payload.exe"
+          if (Test-Path -LiteralPath $expected) {
+            $relative = $expected
+          } else {
+            $found = Get-ChildItem -LiteralPath 'electron/release' -File -Filter '*.exe' |
+              Where-Object { $_.Name -notmatch 'uninstall' } |
+              Sort-Object LastWriteTime -Descending |
+              Select-Object -First 1
+            if ($null -eq $found) {
+              Write-Error 'no NSIS payload found in electron/release'
+              exit 1
+            }
+            $relative = 'electron/release/' + $found.Name
+            Write-Warning "expected '$expected', using '$relative'"
+          }
+          $name = [IO.Path]::GetFileName($relative)
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "path=$relative"
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "name=$name"
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "urlName=$([uri]::EscapeDataString($name))"
+          Write-Host "payload: $relative"
+
+      - name: Generate installer manifest
+        shell: pwsh
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          PAYLOAD_PATH: ${{ steps.payload.outputs.path }}
+          PAYLOAD_NAME: ${{ steps.payload.outputs.urlName }}
+          REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          $base = "https://github.com/$env:REPO/releases/download/$env:TAG"
+          $arguments = @(
+            '--payload', $env:PAYLOAD_PATH,
+            '--payload-url', "$base/$env:PAYLOAD_NAME",
+            '--version', $env:VERSION,
+            '--notes-url', "https://github.com/$env:REPO/releases/tag/$env:TAG",
+            '--update-base', "https://github.com/$env:REPO/releases/latest/download",
+            '--min-bootstrapper', '1.0.0',
+            '--out', 'out/installer-manifest.json'
+          )
+          & node tools/installer/make-manifest.mjs @arguments
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Upload payload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sorarinbot-${{ steps.version.outputs.version }}-payload
+          path: |
+            ${{ steps.payload.outputs.path }}
+            electron/release/latest.yml
+            electron/release/*.blockmap
+          if-no-files-found: warn
+          compression-level: 0
+
+      - name: Upload installer manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: installer-manifest-${{ steps.version.outputs.version }}
+          path: out/installer-manifest.json
+          if-no-files-found: error
+
+      - name: Summarize release artifacts
+        shell: pwsh
+        run: |
+          $manifest = Get-Content -LiteralPath 'out/installer-manifest.json' -Raw -Encoding utf8 | ConvertFrom-Json
+          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value @(
+            '### SorarinBot ' + $manifest.version + ' installer artifacts',
+            '',
+            '- payload: ' + $manifest.payload.url,
+            '- sha256: ' + $manifest.payload.sha256,
+            '- size: ' + $manifest.payload.size + ' bytes',
+            '- minBootstrapper: ' + $manifest.minBootstrapper
+          )

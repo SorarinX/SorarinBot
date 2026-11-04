@@ -118,3 +118,9 @@ dist.bak-*/
 runtime-test-*/
 .pkgstage/
 backup/
+
+# === Installer build ===
+installer/app/dist/
+installer/app/src-tauri/target/
+installer/app/src-tauri/gen/
+installer/release/

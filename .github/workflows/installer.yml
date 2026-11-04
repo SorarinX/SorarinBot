@@ -1,0 +1,101 @@
+name: Installer
+
+# Builds the Tauri bootstrapper from installer/app + installer/app/src-tauri.
+# The bootstrapper version is independent from the app version
+# (installer/CONTRACT.md section 2); installer-manifest.json is produced by the
+# Release workflow.
+
+on:
+  push:
+    paths:
+      - 'installer/**'
+      - '.github/workflows/installer.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: installer-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bootstrapper:
+    name: Build Tauri bootstrapper
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      # CONTRACT.md section 10: the installer copy of the design tokens is
+      # generated from web/src/styles/tokens.css and CI fails on drift.
+      - name: Check design tokens are in sync
+        shell: pwsh
+        run: node installer/app/scripts/sync-tokens.mjs --check
+
+      - name: Install installer dependencies
+        working-directory: installer/app
+        shell: pwsh
+        run: |
+          if (Test-Path -LiteralPath package-lock.json) {
+            npm ci --no-audit --no-fund
+          } else {
+            Write-Warning 'installer/app/package-lock.json is missing; falling back to npm install. Commit the lockfile for reproducible CI.'
+            npm install --no-audit --no-fund
+          }
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      # Signing placeholders shared with release.yml. Tauri's Windows bundler
+      # signs through tauri.conf.json (bundle.windows.signCommand or
+      # certificateThumbprint), so wiring these variables into that config is a
+      # follow-up in installer/app/src-tauri; the env vars are exported here now so
+      # the interface is stable.
+      - name: Configure code signing
+        shell: pwsh
+        env:
+          CERT_PFX_BASE64: ${{ secrets.WINDOWS_CERT_PFX_BASE64 }}
+          CERT_PFX_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:CERT_PFX_BASE64)) {
+            Add-Content -Path $env:GITHUB_ENV -Value 'CSC_IDENTITY_AUTO_DISCOVERY=false'
+            Write-Warning 'WINDOWS_CERT_PFX_BASE64 is not configured: the bootstrapper will be UNSIGNED.'
+            Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value '- Windows code signing: **not configured** (unsigned bootstrapper)'
+            exit 0
+          }
+
+          $certPath = Join-Path $env:RUNNER_TEMP 'windows-cert.pfx'
+          try {
+            [IO.File]::WriteAllBytes($certPath, [Convert]::FromBase64String($env:CERT_PFX_BASE64))
+          } catch {
+            Write-Error "WINDOWS_CERT_PFX_BASE64 is not valid base64: $($_.Exception.Message)"
+            exit 1
+          }
+          Add-Content -Path $env:GITHUB_ENV -Value "CSC_LINK=$certPath"
+          Add-Content -Path $env:GITHUB_ENV -Value "CSC_KEY_PASSWORD=$env:CERT_PFX_PASSWORD"
+          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value '- Windows code signing: **certificate configured** (CSC_LINK / CSC_KEY_PASSWORD)'
+          Write-Host "wrote signing certificate to $certPath"
+
+      - name: Build Tauri bootstrapper
+        working-directory: installer/app
+        shell: pwsh
+        run: npm run tauri build -- --no-bundle
+
+      # installer/release/** is the contract output path; the Tauri bundle
+      # directory is included as a safety net until the bundler output location
+      # is finalised in installer/app/src-tauri.
+      - name: Upload bootstrapper artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sorarinbot-bootstrapper-${{ github.run_number }}
+          path: |
+            installer/app/src-tauri/target/release/sorarinbot-installer.exe
+          if-no-files-found: error
+          retention-days: 14

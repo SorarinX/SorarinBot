@@ -1,0 +1,48 @@
+[package]
+name = "sorarinbot-installer"
+version = "1.0.0"
+description = "SorarinBot installer bootstrapper"
+authors = ["SorarinX"]
+edition = "2021"
+
+[lib]
+name = "sorarinbot_installer_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+tauri-plugin-opener = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+semver = "1"
+sha2 = "0.10"
+hex = "0.4"
+url = "2"
+futures-util = "0.3"
+tokio = { version = "1", features = ["fs", "io-util", "time", "sync"] }
+reqwest = { version = "0.13", default-features = false, features = [
+  "stream",
+  "native-tls",
+  "system-proxy",
+  "http2",
+] }
+window-vibrancy = "0.6"
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62", features = [
+  "Win32_Foundation",
+  "Win32_Graphics_Dwm",
+  "Win32_Security_Cryptography",
+  "Win32_Security_WinTrust",
+] }
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true

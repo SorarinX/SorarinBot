@@ -1,0 +1,12 @@
+{
+  "identifier": "default",
+  "description": "Main installer window",
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "core:default",
+    "dialog:default",
+    "opener:default"
+  ]
+}

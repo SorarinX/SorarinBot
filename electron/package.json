@@ -17,8 +17,8 @@
     "files": [
       "main.js",
       "preload.js",
-      "config.yaml",
       "logo.png",
+      "!config.yaml",
       "!node_modules",
       "!*.zip",
       "!data.db",
@@ -30,10 +30,6 @@
       {
         "from": "SorarinBot.exe",
         "to": "SorarinBot.exe"
-      },
-      {
-        "from": "config.yaml",
-        "to": "config.yaml"
       }
     ],
     "electronVersion": "43.0.0",
@@ -45,15 +41,19 @@
       "icon": "icon.ico"
     },
     "nsis": {
-      "oneClick": false,
+      "oneClick": true,
       "perMachine": false,
-      "allowToChangeInstallationDirectory": true,
-      "installerIcon": "icon.ico",
-      "uninstallerIcon": "icon.ico",
-      "installerHeaderIcon": "icon.ico",
+      "allowElevation": false,
+      "runAfterFinish": false,
+      "deleteAppDataOnUninstall": false,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "SorarinBot"
+      "shortcutName": "SorarinBot",
+      "artifactName": "SorarinBot-${version}-Setup-payload.${ext}",
+      "include": "../installer/payload/sorarinbot.nsh",
+      "installerIcon": "icon.ico",
+      "uninstallerIcon": "icon.ico",
+      "installerHeaderIcon": "icon.ico"
     }
   },
   "devDependencies": {
