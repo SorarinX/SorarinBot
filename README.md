@@ -37,7 +37,8 @@
 - 🔑 **Dashboard password** — optional, off by default, and enforced on every API route when enabled. Failed logins are throttled per address.
 - 🖼️ **Vision** — send an image with a caption and it is handed to a vision-capable model.
 - 👋 **Group welcome** — greets new members when they join a group.
-- 📊 **Web dashboard** — live sessions, paginated chat history, system logs, a provider connection test, and a light/dark theme.
+- 📊 **Web dashboard** — a React 19 + Vite console with a welcome/QR screen, live sessions, paginated chat history, system logs, a provider connection test, and light/dark themes.
+- 🖥️ **Friendly terminal** — a startup card, a QR block for headless machines, and coloured logs; the console hides itself once the dashboard is up.
 - ⚙️ **Hot reload** — change the API key, model or system prompt from the UI; it applies to the next message, no restart.
 - 📌 **Tray & auto-start** — the Windows portable build adds a tray menu and a registry auto-start toggle.
 - 🐧 **Runs on Linux** — the same source builds for `linux/amd64`; there is a [tutorial](linux/TUTORIAL.md) for running it headless on a server.
@@ -45,20 +46,24 @@
 
 ## 📸 Screenshots
 
-> 🔗 **[Live preview](https://sorarinx.github.io/SorarinBot/)** — click through the whole dashboard with simulated data, no install required.
+<p align="center">
+  <img src=".github/images/welcome.png" width="880" alt="SorarinBot welcome screen">
+  <br>
+  <sub>The welcome screen — scan the QR, or skip into the console and configure a model first.</sub>
+</p>
 
 <p align="center">
-  <a href="https://sorarinx.github.io/SorarinBot/"><img src=".github/images/dashboard.png" width="880" alt="SorarinBot dashboard"></a>
+  <img src=".github/images/dashboard.png" width="880" alt="SorarinBot dashboard">
   <br>
   <sub>The dashboard — provider status, live WeChat login state and per-conversation sessions.</sub>
 </p>
 
-|                                            Chat history                                            |                                          System logs                                           |
-| :-----------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------: |
+|                                         Chat history                                          |                                        System logs                                        |
+| :------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------: |
 | ![Chat history](.github/images/chat.png) | ![System logs](.github/images/logs.png) |
 
 |                                       Settings                                        |                                     System prompt                                      |
-| :-----------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------: |
+| :----------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------: |
 | ![Settings](.github/images/settings.png) | ![System prompt](.github/images/prompt.png) |
 
 ## 🚀 Quick Start
@@ -66,9 +71,9 @@
 > **Requirements** — Windows 10+ or Linux x64, roughly 25 MB of disk. Nothing else: the binary is statically linked, stores data with a pure-Go SQLite driver (no CGO), and carries the web UI inside it.
 
 1. **Download.** Grab the latest `SorarinBot-v*-win64-portable.zip` from [**Releases**](https://github.com/SorarinX/SorarinBot/releases) and extract it anywhere.
-2. **Run it.** Double-click `SorarinBot.exe`. A tray icon appears and the dashboard opens in your browser at **http://localhost:8080**.
+2. **Run it.** Double-click `SorarinBot.exe`. A tray icon appears, the dashboard opens in your browser at **http://localhost:8080**, and the console window hides itself after a moment. If 8080 is busy, the next free port is used and the browser is pointed at it.
 3. **Connect a model.** Open **Settings**, paste an API key, pick a model, and save — the change is live immediately, no restart.
-4. **Log in to WeChat.** Back on the dashboard home, scan the QR code with WeChat. The console appears briefly and then hides itself; on a headless machine, start with `-console-qr` to print the code in the terminal instead. The status badge turns green once you are in.
+4. **Log in to WeChat.** Back on the dashboard home, scan the QR code with WeChat. The console appears briefly and then hides itself; on a headless machine, start with `-console-qr` to print the code in the terminal instead; `-console` keeps the console window visible. The status badge turns green once you are in.
 
 Now send yourself a message on WeChat and the bot will answer.
 
