@@ -1,102 +1,144 @@
-// ============================================================
-// SorarinBot GitHub Pages Preview — Mock API Interceptor
-// This file intercepts fetch() calls to /api/* and returns
-// simulated data so the real Nuxt SPA runs without a backend.
-// ============================================================
-(function() {
-  'use strict';
+(function () {
+  "use strict";
 
-  const NOW = new Date().toISOString();
-  const HOUR_AGO = new Date(Date.now() - 3600000).toISOString();
-
-  // --- Mock Data ---
-  const MOCK_STATUS = {
-    status: 'running',
-    sessions: ['小明', 'Alice', '张伟', 'Bob', '李华'],
-    provider: 'deepseek',
-    model: 'deepseek-chat',
-    startup_at: HOUR_AGO,
-    api_key_configured: true
-  };
-
-  const MOCK_SESSIONS = ['小明', 'Alice', '张伟', 'Bob', '李华'];
-
-  const MOCK_HISTORY = {
-    rows: [
-      { id: 105, sender: '张伟', room: '', user_message: '帮我写一首关于春天的五言绝句', bot_reply: '春风拂柳岸，\n细雨润花田。\n燕子归来早，\n人间四月天。\n\n这首诗描绘了春天的典型意象：春风、细雨、燕子，最后一句化用林徽因名句，点出四月春光之美。', model: 'deepseek-chat', prompt_tokens: 856, completion_tokens: 124, total_tokens: 980, created_at: '2026-07-07 22:19:55' },
-      { id: 104, sender: 'Bob', room: '', user_message: 'Go 1.25 有什么新特性？', bot_reply: 'Go 1.25 的主要新特性包括：\n\n1. **泛型改进** — 更灵活的类型约束\n2. **标准库增强** — 新增 iter 包支持迭代器\n3. **工具链优化** — go build 性能提升约 15%\n4. **WASM 支持** — 改进 WebAssembly 编译目标\n\n详细信息可以查看 Go 官方博客。', model: 'deepseek-chat', prompt_tokens: 1200, completion_tokens: 280, total_tokens: 1480, created_at: '2026-07-07 22:20:03' },
-      { id: 103, sender: 'Alice', room: '', user_message: '[图片] 这是什么品种的猫？', bot_reply: '这是一只英国短毛猫（British Shorthair），特征是：\n\n🐱 圆润的脸庞和大眼睛\n🔵 蓝灰色的毛发（最经典的颜色）\n🐾 短而密的被毛\n\n英短性格温顺、安静，是非常受欢迎的家养猫品种。', model: 'deepseek-chat', prompt_tokens: 2048, completion_tokens: 195, total_tokens: 2243, created_at: '2026-07-07 22:16:48' },
-      { id: 102, sender: '小明', room: '', user_message: '你好，你能做什么？', bot_reply: '你好！我是 SorarinBot，一个 AI 助手。我可以帮你：\n\n💬 回答各种问题\n🖼️ 识别图片内容\n📝 翻译和写作\n💡 提供建议和想法\n\n有什么需要帮忙的吗？', model: 'deepseek-chat', prompt_tokens: 512, completion_tokens: 168, total_tokens: 680, created_at: '2026-07-07 22:15:06' },
-      { id: 101, sender: 'Alice', room: '', user_message: '你好小绒！', bot_reply: '你好 Alice！😊 今天有什么可以帮你的吗？', model: 'deepseek-chat', prompt_tokens: 320, completion_tokens: 42, total_tokens: 362, created_at: '2026-07-07 22:14:30' },
-    ],
-    total: 105
-  };
-
-  const MOCK_LOGS = [
-    'info | [text] reply to 张伟: 春风拂柳岸，细雨润花田... | 2026-07-07 22:19:55',
-    'info | [text] reply to Bob: Go 1.25 的主要新特性包括... | 2026-07-07 22:20:03',
-    'info | [tickle] detected in group=AI测试群, replying | 2026-07-07 22:18:11',
-    'warn | [text] slow response: 3.2s (provider latency) | 2026-07-07 22:17:30',
-    'info | [text] reply to Alice: 这张图片显示的是一只英国短毛猫... | 2026-07-07 22:16:48',
-    'debug | [check] group @mention, reply | 2026-07-07 22:16:45',
-    'info | [image] cached for Alice, no @, no reply | 2026-07-07 22:16:22',
-    'info | [text] reply to 小明: 你好！有什么我可以帮你的吗... | 2026-07-07 22:15:06',
-    'debug | [check] private chat from 小明, reply | 2026-07-07 22:15:03',
-    'info | web UI at http://localhost:8080 | 2026-07-07 22:14:16',
-    'info | provider: deepseek, model=deepseek-chat, vision=true | 2026-07-07 22:14:15',
-    'debug | [ws] browser connected, total: 1 | 2026-07-07 22:13:42',
-    'info | [login] WeChat login successful | 2026-07-07 22:13:41',
-    'info | [scan] QR code displayed, scan with WeChat | 2026-07-07 22:12:05',
-    'info | config loaded from config.yaml | 2026-07-07 22:12:00',
-  ];
-
-  const MOCK_CONFIG = {
-    provider: { name: 'deepseek', base_url: 'https://api.deepseek.com', model: 'deepseek-chat', api_key: 'sk-••••••••' },
-    prompt: '你是一个有用的 AI 助手，名叫小绒。你的性格活泼可爱，喜欢用表情符号。回答问题时要简洁明了，必要时使用 Markdown 格式化内容。',
-    chat: { context_enabled: true, max_context: 3, image_ttl: 300 },
-    wechat: { strict_login: false, token_file: './token.json', auto_login: true, trigger_prefix: '' },
-    web: { listen: 'localhost:8080' },
-    database: { path: './data.db' }
-  };
-
-  const MOCK_MODELS = { ok: true, models: ['deepseek-chat', 'deepseek-reasoner', 'gpt-4o', 'gpt-4o-mini', 'claude-sonnet-4-20250514', 'MiniMax-M3'] };
-
-  // --- Router ---
-  function mockResponse(url, method) {
-    if (url === '/api/status') return MOCK_STATUS;
-    if (url === '/api/sessions') return MOCK_SESSIONS;
-    if (url.startsWith('/api/history')) return MOCK_HISTORY;
-    if (url.startsWith('/api/logs')) return MOCK_LOGS;
-    if (url === '/api/config' && method === 'GET') return MOCK_CONFIG;
-    if (url === '/api/models') return MOCK_MODELS;
-    if (url === '/api/test') return { ok: true, latency_ms: 245, model: 'deepseek-chat' };
-    return null;
+  var now = Date.now();
+  function iso(minutesAgo) {
+    return new Date(now - minutesAgo * 60000).toISOString();
   }
 
-  // --- Interceptor ---
-  const origFetch = window.fetch;
-  window.fetch = function(input, init) {
-    const url = typeof input === 'string' ? input : input.url;
-    const method = (init?.method || 'GET').toUpperCase();
+  var sessions = [
+    { key: "wxid_linxiaoman", display: "林小满", kind: "private", room: "", pairs: 24 },
+    { key: "4521@chatroom", display: "产品设计群", kind: "group", room: "4521@chatroom", pairs: 18 },
+    { key: "wxid_azhe", display: "阿哲", kind: "private", room: "", pairs: 9 },
+    { key: "3188@chatroom", display: "周末爬山群", kind: "group", room: "3188@chatroom", pairs: 6 },
+    { key: "wxid_chenyining", display: "陈以宁", kind: "private", room: "", pairs: 15 },
+    { key: "7720@chatroom", display: "前端技术交流", kind: "group", room: "7720@chatroom", pairs: 12 },
+    { key: "wxid_zhoumo", display: "周墨", kind: "private", room: "", pairs: 7 },
+    { key: "9051@chatroom", display: "AI 产品观察", kind: "group", room: "9051@chatroom", pairs: 21 },
+    { key: "wxid_susu", display: "苏苏", kind: "private", room: "", pairs: 4 },
+    { key: "6612@chatroom", display: "读书会", kind: "group", room: "6612@chatroom", pairs: 8 },
+    { key: "wxid_laowang", display: "老王", kind: "private", room: "", pairs: 3 },
+    { key: "4409@chatroom", display: "摄影同好", kind: "group", room: "4409@chatroom", pairs: 5 }
+  ];
 
-    // Match both /api/* and /SorarinBot/api/* (baseURL may inject prefix)
-    const apiPrefixes = ['/api/', '/SorarinBot/api/'];
-    const isApi = apiPrefixes.some(p => url.startsWith(p));
-    const isHeartbeat = url === '/_heartbeat.js' || url === '/SorarinBot/_heartbeat.js';
+  var rows = [];
+  var nextId = 1;
+  function push(minutesAgo, sender, room, user, bot, model, tokens) {
+    rows.push({
+      id: nextId++,
+      sender: sender,
+      room: room,
+      user_message: user,
+      bot_reply: bot,
+      model: model,
+      total_tokens: tokens,
+      created_at: iso(minutesAgo)
+    });
+  }
 
-    if (isApi || isHeartbeat) {
-      // Normalize: strip /SorarinBot prefix for routing
-      const normalized = url.replace(/^\/SorarinBot/, '');
-      const mock = mockResponse(normalized, method);
-      if (mock !== null) {
-        return Promise.resolve(new Response(JSON.stringify(mock), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' }
-        }));
-      }
-    }
-    return origFetch.apply(this, arguments);
+  push(2880, "陈以宁", "4521@chatroom", "二维码登录失败时要不要加个重试？", "建议加。失败后展示「重新登录」，并把错误写进日志。", "deepseek-chat", 412);
+  push(2870, "林小满", "", "帮我记一下：周五前把登录文案再过一遍。", "记下了，周五上午提醒你。", "deepseek-chat", 286);
+  push(1440, "陈以宁", "4521@chatroom", "群公告里的版本号记得改成 v3.0.0。", "改好了，发布说明里的日期也一起更新了。", "deepseek-chat", 286);
+  push(1435, "林小满", "", "明天下午的评审还是三点吗？", "对，三点开始，我把会议链接发你。", "deepseek-chat", 367);
+  push(60, "陈以宁", "4521@chatroom", "这版首页的间距是不是可以再松一点？", "可以，我把主标题到副标题的间距调到 16，再看一版。", "deepseek-chat", 518);
+  push(55, "陈以宁", "4521@chatroom", "顺手把移动端的按钮统一成 44 高。", "已统一，点击区域也补到了 44×44。", "gpt-4o-mini", 203);
+  push(10, "林小满", "", "好的，谢谢。", "不客气，随时叫我。", "deepseek-chat", 128);
+  push(5, "阿哲", "", "如果模型超时了会怎么样？", "会重试两次，还不行就回一句「稍后再试」，并写日志。", "deepseek-chat", 198);
+
+  var logs = [
+    "info | 服务启动完成，正在监听 127.0.0.1:8080 | " + iso(16).slice(0, 19).replace("T", " "),
+    "info | 微信登录成功，会话上下文已就绪 | " + iso(15).slice(0, 19).replace("T", " "),
+    "info | 已加载 12 个会话上下文 | " + iso(14).slice(0, 19).replace("T", " "),
+    "info | 收到群消息：产品设计群 | " + iso(10).slice(0, 19).replace("T", " "),
+    "warn | 模型响应较慢（2.8s），已自动重试 | " + iso(8).slice(0, 19).replace("T", " "),
+    "info | 图片理解完成，用时 1.2s | " + iso(6).slice(0, 19).replace("T", " "),
+    "error | 图片下载超时，已跳过本次图片理解 | " + iso(5).slice(0, 19).replace("T", " "),
+    "warn | 微信登录态即将过期，将在 10 分钟后尝试续期 | " + iso(4).slice(0, 19).replace("T", " "),
+    "info | 配置热更新：provider · model | " + iso(3).slice(0, 19).replace("T", " "),
+    "error | 模型调用失败：context deadline exceeded | " + iso(2).slice(0, 19).replace("T", " "),
+    "info | 收到私聊消息：林小满 | " + iso(1).slice(0, 19).replace("T", " "),
+    "info | 已写入 1 条聊天记录到 data.db | " + iso(0).slice(0, 19).replace("T", " ")
+  ];
+
+  var prompt = "你是 SorarinBot，一位耐心、可靠的中文 AI 助手，服务于 SorarinBot 控制台。请优先理解用户的真实意图，用清晰、自然、礼貌的中文回答；不确定的信息要明确说明，不编造事实，不假装执行无法完成的操作。回答技术问题时先给结论，再给必要的步骤、命令和示例；涉及隐私、安全、账号或高风险操作时，先提醒风险。保持简洁，避免空洞的套话。";
+
+  var config = {
+    provider: {
+      name: "deepseek",
+      base_url: "https://api.deepseek.com",
+      model: "deepseek-chat",
+      api_key: "sk-****abcd"
+    },
+    prompt: prompt,
+    database: { path: "./data.db" }
   };
 
-  console.log('[SorarinBot Preview] Mock API layer active — all data is simulated');
+  function json(obj, status) {
+    return new Response(JSON.stringify(obj), {
+      status: status || 200,
+      headers: { "Content-Type": "application/json; charset=utf-8" }
+    });
+  }
+
+  var realFetch = window.fetch.bind(window);
+  window.fetch = function (input, init) {
+    var raw = typeof input === "string" ? input : (input && input.url) || "";
+    var url;
+    try {
+      url = new URL(raw, window.location.href);
+    } catch (error) {
+      return realFetch(input, init);
+    }
+    if (url.pathname.indexOf("/api/") !== 0) {
+      return realFetch(input, init);
+    }
+
+    var path = url.pathname;
+    var method = ((init && init.method) || (input && input.method) || "GET").toUpperCase();
+
+    if (path === "/api/auth/status") return Promise.resolve(json({ required: false, authenticated: true }));
+    if (path === "/api/auth/login") return Promise.resolve(json({ ok: true }));
+    if (path === "/api/auth/logout") return Promise.resolve(json({ ok: true }));
+
+    if (path === "/api/login") return Promise.resolve(json({ state: "logged_in", attempts: 0, qr_url: "", last_error: "" }));
+    if (path === "/api/login/retry") return Promise.resolve(json({ ok: true, state: "waiting_scan" }, 202));
+
+    if (path === "/api/status") {
+      return Promise.resolve(json({
+        provider: "deepseek",
+        model: "deepseek-chat",
+        startup_at: iso(16),
+        api_key_configured: true,
+        wechat_state: "logged_in",
+        sessions: sessions
+      }));
+    }
+
+    if (path === "/api/history") {
+      var limit = Number(url.searchParams.get("limit") || 50);
+      var offset = Number(url.searchParams.get("offset") || 0);
+      var total = limit === 1 ? 1287 : rows.length;
+      return Promise.resolve(json({ rows: rows.slice(offset, offset + limit), total: total }));
+    }
+
+    if (path === "/api/logs") {
+      if (method === "DELETE") return Promise.resolve(json({ status: "ok" }));
+      return Promise.resolve(json(logs));
+    }
+
+    if (path === "/api/config") {
+      if (method === "PUT") return Promise.resolve(json({ status: "ok" }));
+      return Promise.resolve(json(config));
+    }
+
+    if (path === "/api/sessions") return Promise.resolve(json([]));
+    if (path === "/api/models") return Promise.resolve(json({ ok: true, models: ["deepseek-chat", "deepseek-reasoner", "gpt-4o", "gpt-4o-mini"] }));
+    if (path === "/api/test") return Promise.resolve(json({ ok: true, latency_ms: 842, model: "deepseek-chat", error: "" }));
+    if (path === "/api/autostart") {
+      if (method === "PUT") return Promise.resolve(json({ ok: true, enabled: true }));
+      return Promise.resolve(json({ enabled: true }));
+    }
+
+    return Promise.resolve(json({ error: "not found" }, 404));
+  };
 })();
