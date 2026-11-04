@@ -32,7 +32,7 @@
 
 > 🔗 **[Live preview](https://sorarinx.github.io/SorarinBot/)** — click through the dashboard with simulated data, no install required.
 >
-> 🆕 **v3.0** replaces the Nuxt dashboard with React 19 + Vite, adds a light/dark welcome screen, and hides the console once the dashboard is up. [Release notes →](https://github.com/SorarinX/SorarinBot/releases/tag/v3.0.0)
+> 🆕 **v3.0.1** ships the Windows installer: a Tauri bootstrapper with a real rounded window, a four-step progress flow, and a manifest-driven payload. [Release notes →](https://github.com/SorarinX/SorarinBot/releases/tag/v3.0.1)
 
 ## 📑 Contents
 
@@ -94,7 +94,7 @@
 
 > **Requirements** — Windows 10+ or Linux x64, roughly 25 MB of disk. Nothing else: the binary is statically linked, stores data with a pure-Go SQLite driver (no CGO), and carries the web UI inside it.
 
-1. **Download.** Grab the latest `SorarinBot-v*-win64-portable.zip` from [**Releases**](https://github.com/SorarinX/SorarinBot/releases) and extract it anywhere.
+1. **Install or unzip.** Run `SorarinBot-Setup.exe` from [**Releases**](https://github.com/SorarinX/SorarinBot/releases) (recommended), or grab `SorarinBot-v*-win64-portable.zip` and extract it anywhere.
 2. **Run it.** Double-click `SorarinBot.exe`. A tray icon appears, the dashboard opens at `http://localhost:8080`, and the console window hides itself after a moment. If 8080 is busy, the next free port is used and the browser is pointed at it.
 3. **Connect a model.** Open **Settings**, paste an API key, pick a model, and save — the change applies to the next message, no restart. No key yet? Use **先不扫码，去配置** on the welcome screen to explore the console first.
 4. **Log in to WeChat.** Scan the QR code on the welcome screen. On a headless machine, start with `-console-qr` to print the code in the terminal; `-console` keeps the console window visible. The status badge turns green once you are in.
@@ -108,11 +108,13 @@ Now send yourself a message on WeChat and the bot will answer.
 
 ### Linux
 
-No Linux package is published for v3.0.0. Build it from source with the commands below, or follow [LINUX.md](LINUX.md) for a systemd setup.
+No Linux package is published for v3.0.1. Build it from source with the commands below, or follow [LINUX.md](LINUX.md) for a systemd setup.
 
 ### Windows — desktop installer
 
-v3.0.0 does not include an Electron installer. Use the portable build above; it carries the same backend and web console.
+v3.0.1 publishes `SorarinBot-Setup.exe`, a Tauri bootstrapper that downloads the versioned Electron payload, verifies its SHA-256, installs per user, and launches the app.
+
+> ⚠️ The installer is **unsigned** for now, so Windows SmartScreen may show "Unknown publisher". Code signing is the next release task. The portable build above stays available.
 
 ### Build from source
 
@@ -220,7 +222,7 @@ Three ideas explain most of the design:
 | --- | --- |
 | Backend | Go 1.25 · `net/http` · `logrus` · `modernc.org/sqlite` (pure Go) |
 | Frontend | React 19 · Vite 7 · Tailwind CSS 4 · TypeScript |
-| Desktop | Electron 43 · electron-builder (not published for v3.0.0) |
+| Desktop | Electron 43 · electron-builder · Tauri 2 installer (unsigned as of v3.0.1) |
 | Database | SQLite — `data.db`, chat history and system logs |
 | WeChat | [openwechat](https://github.com/eatmoreapple/openwechat) v1.4.10, vendored under `internal/` |
 | LLM | Any OpenAI-compatible HTTP API, via `providers/openaicompat` |

@@ -3,6 +3,41 @@
 Notable changes to SorarinBot. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.1] - 2026-11-04
+
+The first release with a real Windows installer, plus a cleaner repository and
+light-theme documentation.
+
+### Added
+
+- **`SorarinBot-Setup.exe`** — a Tauri 2 + WebView2 bootstrapper with a fixed
+  1000×660 window, light/dark system theme, Mica/Acrylic fallback, native rounded
+  corners, and four screens: welcome, options, progress, finish.
+- **Manifest-driven installs.** The bootstrapper reads
+  `installer-manifest.json`, downloads a versioned NSIS payload, verifies its
+  SHA-256, and runs it silently. The bootstrapper stays at 1.x across app releases.
+- **Per-user NSIS payload** — installs to `%LOCALAPPDATA%\Programs\SorarinBot`
+  without admin rights, preserves `config.yaml` / `data.db` / `token.json`, and
+  writes `install.ok`.
+- **Import old zip data** from the options screen, with backup and rollback.
+- **`LINUX.md`** — build, run, and systemd instructions for the current source.
+- Installer CI scaffolding: `release.yml` builds the payload and manifest,
+  `installer.yml` builds the bootstrapper.
+
+### Changed
+
+- README screenshots and architecture diagrams now use the light theme, matching
+  the welcome screen.
+- The repository root no longer carries the abandoned `installer/` NSIS script
+  or the frozen `linux/` 2.1 port; both are archived outside the repo.
+- Root and Electron logos were reduced from 1.3 MB to 47 KB.
+
+### Known limitations
+
+- The installer is **unsigned**. SmartScreen will warn until code signing lands.
+- The manifest and payload are hosted on the GitHub release; no CDN mirror yet.
+- electron-updater is not wired into the Electron app yet.
+
 ## [3.0.0] - 2026-11-04
 
 Hardening pass: licence compliance, dashboard authentication, and the removal of

@@ -124,3 +124,6 @@ installer/app/dist/
 installer/app/src-tauri/target/
 installer/app/src-tauri/gen/
 installer/release/
+
+# === Local release staging ===
+/artifacts/
