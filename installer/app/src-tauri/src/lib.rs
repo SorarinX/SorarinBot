@@ -78,6 +78,9 @@ pub fn run() {
             ));
             if let Some(window) = app.get_webview_window("main") {
                 window_effects::apply(&window);
+                // Let the CSS border-radius be genuinely transparent instead of
+                // showing the WebView2 default white surface in the corners.
+                let _ = window.set_background_color(Some(tauri::window::Color(0, 0, 0, 0)));
             }
             Ok(())
         })

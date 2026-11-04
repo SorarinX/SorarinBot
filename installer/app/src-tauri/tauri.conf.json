@@ -21,7 +21,7 @@
         "decorations": false,
         "transparent": true,
         "center": true,
-        "shadow": true,
+        "shadow": false,
         "visible": true,
         "focus": true
       }

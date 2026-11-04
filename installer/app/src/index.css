@@ -31,7 +31,7 @@ button:focus-visible, input:focus-visible, summary:focus-visible, .dropzone:focu
   height: 100%;
   display: flex;
   overflow: hidden;
-  border-radius: 18px;
+  border-radius: 0;
   border: 1px solid rgba(0, 0, 0, 0.12);
   background: var(--bg);
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
@@ -120,26 +120,79 @@ button:focus-visible, input:focus-visible, summary:focus-visible, .dropzone:focu
   background: color-mix(in srgb, var(--bg) 76%, transparent);
   backdrop-filter: blur(18px);
 }
-.steps { display: flex; align-items: center; gap: 4px; }
-.step {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 26px;
-  padding: 0 9px;
-  border: 0;
-  border-radius: 7px;
-  background: transparent;
-  color: var(--muted);
-  font-size: 10.5px;
-  cursor: pointer;
-  transition: background var(--dur-hover) var(--ease-out), color var(--dur-hover) var(--ease-out);
+.flow-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--border);
+  overflow: hidden;
 }
-.step:hover { color: var(--text); background: var(--surface-2); }
-.step.is-active { color: var(--brand-ink); background: color-mix(in srgb, var(--brand) 12%, transparent); }
-.step.is-done { color: var(--text); }
-.step-num { font-family: var(--font-ui); font-variant-numeric: tabular-nums; font-size: 8.5px; opacity: 0.55; }
-.step.is-active .step-num { opacity: 1; }
+.flow-progress span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--brand), #18d6b8);
+  transition: width var(--dur-lg) var(--ease-out);
+}
+.wizard {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: 316px;
+}
+.wizard-rail {
+  position: absolute;
+  top: 10px;
+  left: 12.5%;
+  right: 12.5%;
+  height: 1px;
+  overflow: hidden;
+  background: var(--border);
+}
+.wizard-rail span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--brand), #18d6b8);
+  transition: width var(--dur-lg) var(--ease-out);
+}
+.wizard-step {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  color: var(--muted);
+}
+.wizard-node {
+  width: 21px;
+  height: 21px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 8px;
+  font-variant-numeric: tabular-nums;
+  transition: background var(--dur-md) var(--ease-out), border-color var(--dur-md) var(--ease-out), color var(--dur-md) var(--ease-out);
+}
+.wizard-node .icon { width: 10px; height: 10px; stroke-width: 2.2; }
+.wizard-step.is-done .wizard-node {
+  color: var(--brand-ink);
+  border-color: color-mix(in srgb, var(--brand) 35%, var(--border));
+  background: color-mix(in srgb, var(--brand) 10%, var(--bg));
+}
+.wizard-step.is-active .wizard-node {
+  color: #04211c;
+  border-color: var(--brand);
+  background: var(--brand);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand) 13%, transparent), 0 4px 12px color-mix(in srgb, var(--brand) 24%, transparent);
+}
+.wizard-label { font-size: 9px; line-height: 1; white-space: nowrap; }
+.wizard-step.is-active .wizard-label { color: var(--text); font-weight: 600; }
+.wizard-step.is-done .wizard-label { color: var(--text); }
 
 .window-actions { display: flex; align-items: center; gap: 2px; }
 .icon-btn {

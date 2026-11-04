@@ -44,7 +44,7 @@ const MANIFEST_URLS = [
 const STEPS: Array<{ id: Page; label: string }> = [
   { id: "welcome", label: "欢迎" },
   { id: "options", label: "选项" },
-  { id: "progress", label: "安装" },
+  { id: "progress", label: "进度" },
   { id: "finish", label: "完成" },
 ];
 
@@ -196,6 +196,7 @@ function App() {
 
   const features: Feature[] = manifest.features && manifest.features.length > 0 ? manifest.features : MOCK_MANIFEST.features!;
   const percent = Math.max(0, Math.min(100, Math.round(progress)));
+  const currentIndex = Math.max(0, STEPS.findIndex((step) => step.id === page));
   const verifying = phase === "verify";
   const installing = phase === "install";
   const ringLabel = installing ? "安装进度" : verifying ? "校验进度" : "下载进度";
@@ -425,20 +426,21 @@ function App() {
 
       <main className="main">
         <header className="titlebar" data-tauri-drag-region>
-          <nav className="steps" aria-label="安装步骤">
+          <nav className="wizard" aria-label="安装进度">
+            <div className="wizard-rail">
+              <span style={{ width: (currentIndex / (STEPS.length - 1)) * 100 + "%" }} />
+            </div>
             {STEPS.map((step, index) => (
-              <button
+              <div
                 key={step.id}
-                type="button"
-                className={cn("step", page === step.id && "is-active", STEPS.findIndex((s) => s.id === page) > index && "is-done")}
-                onClick={() => {
-                  if (page === "welcome") return;
-                  if (step.id === "welcome" || step.id === "options") setPage(step.id);
-                }}
+                className={cn("wizard-step", index < currentIndex && "is-done", index === currentIndex && "is-active")}
+                aria-current={index === currentIndex ? "step" : undefined}
               >
-                <span className="step-num">{String(index + 1).padStart(2, "0")}</span>
-                {step.label}
-              </button>
+                <span className="wizard-node">
+                  {index < currentIndex ? <Icon name="check" /> : String(index + 1).padStart(2, "0")}
+                </span>
+                <span className="wizard-label">{step.label}</span>
+              </div>
             ))}
           </nav>
           <div className="window-actions">
@@ -451,6 +453,9 @@ function App() {
             <button type="button" className="icon-btn icon-btn-close" aria-label="关闭" onClick={() => handleClose()}>
               <Icon name="close" />
             </button>
+          </div>
+          <div className="flow-progress" aria-hidden="true">
+            <span style={{ width: ((currentIndex + 1) / STEPS.length) * 100 + "%" }} />
           </div>
         </header>
 
