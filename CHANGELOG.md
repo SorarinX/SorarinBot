@@ -3,7 +3,7 @@
 Notable changes to SorarinBot. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [3.0.0] - 2026-11-04
 
 Hardening pass: licence compliance, dashboard authentication, and the removal of
 config keys that never did anything.
@@ -171,7 +171,9 @@ machine.
 - Initial release: WeChat AI assistant with multi-model support and a web
   dashboard.
 
-[Unreleased]: https://github.com/SorarinX/SorarinBot/compare/v2.3.0...HEAD
+[Unreleased]: https://github.com/SorarinX/SorarinBot/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/SorarinX/SorarinBot/releases/tag/v3.0.0
+[2.4.0]: https://github.com/SorarinX/SorarinBot/releases/tag/v2.4.0
 [2.3.0]: https://github.com/SorarinX/SorarinBot/releases/tag/v2.3.0
 [2.2.0]: https://github.com/SorarinX/SorarinBot/releases/tag/v2.2.0
 [2.1.0]: https://github.com/SorarinX/SorarinBot/releases/tag/v2.1.0

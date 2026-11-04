@@ -87,7 +87,7 @@ export const DEMO_CHAT_ROWS: ChatRow[] = [
     id: 2,
     sender: "陈以宁",
     room: "4521@chatroom",
-    userMessage: "群公告里的版本号记得改成 v2.4.0。",
+    userMessage: "群公告里的版本号记得改成 v3.0.0。",
     botReply: "改好了，发布说明里的日期也一起更新了。",
     model: "deepseek-chat",
     totalTokens: 286,

@@ -4,18 +4,18 @@
 !include "FileFunc.nsh"
 
 Name "SorarinBot"
-OutFile "SorarinBot-v1.0.0-win64-Setup.exe"
+OutFile "SorarinBot-v3.0.0-win64-Setup.exe"
 InstallDir "$PROGRAMFILES\SorarinBot"
 InstallDirRegKey HKLM "Software\SorarinBot" "InstallDir"
 RequestExecutionLevel admin
 Unicode True
 
-VIProductVersion "1.0.0.0"
+VIProductVersion "3.0.0.0"
 VIAddVersionKey "ProductName" "SorarinBot"
 VIAddVersionKey "CompanyName" "Sorarin"
 VIAddVersionKey "FileDescription" "WeChat AI Assistant"
-VIAddVersionKey "FileVersion" "1.0.0"
-VIAddVersionKey "ProductVersion" "1.0.0"
+VIAddVersionKey "FileVersion" "3.0.0"
+VIAddVersionKey "ProductVersion" "3.0.0"
 
 !define MUI_ICON "icon.ico"
 !define MUI_UNICON "icon.ico"
@@ -56,7 +56,7 @@ Section "SorarinBot (Required)" SecCore
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\SorarinBot" "InstallLocation" "$INSTDIR"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\SorarinBot" "DisplayIcon" "$INSTDIR\SorarinBot.exe"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\SorarinBot" "Publisher" "Sorarin"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\SorarinBot" "DisplayVersion" "1.0.0"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\SorarinBot" "DisplayVersion" "3.0.0"
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\SorarinBot" "NoModify" 1
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\SorarinBot" "NoRepair" 1
 

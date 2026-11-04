@@ -286,7 +286,7 @@ func pickKey(cfgKey, envKey string) string {
 }
 
 // version mirrors electron/package.json and is shown on the start-up card.
-const version = "v2.4.0"
+const version = "v3.0.0"
 
 // displayWebURL turns a listen address into something a user can paste into
 // a browser: an empty or wildcard host means "this machine".

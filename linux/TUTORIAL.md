@@ -4,7 +4,7 @@
 
 **SorarinBot — Linux 安装教程**
 
-[![Version](https://img.shields.io/badge/version-2.1.0-3B82F6?style=flat-square)](https://github.com/SorarinX/SorarinBot/releases)
+[![Version](https://img.shields.io/badge/version-3.0.0-3B82F6?style=flat-square)](https://github.com/SorarinX/SorarinBot/releases)
 [![Platform](https://img.shields.io/badge/platform-Linux-FCC624?style=flat-square&logo=linux&logoColor=black)]()
 
 </div>
