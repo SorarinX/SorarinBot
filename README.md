@@ -67,7 +67,7 @@
 - 🔑 **Dashboard password** — optional, off by default, enforced on every API route when enabled; failed logins are throttled per address.
 - 🖥️ **Friendly terminal** — startup card, QR block for headless machines, coloured logs; the console hides itself once the dashboard is up.
 - 📌 **Tray & auto-start** — the Windows portable build adds a tray menu and a registry auto-start toggle.
-- 🐧 **Linux** — the same root package cross-compiles for `linux/amd64`; the `linux/` directory is a legacy v2.1 reference port.
+- 🐧 **Linux** — the same root package cross-compiles for `linux/amd64`; see [LINUX.md](LINUX.md) for build and systemd instructions.
 - 🎯 **Pat-pat** — WeChat "pat-pat" interactions get a random reply.
 
 </details>
@@ -108,7 +108,7 @@ Now send yourself a message on WeChat and the bot will answer.
 
 ### Linux
 
-No Linux package is published for v3.0.0. Build it from source with the commands below; the `linux/` directory is a legacy v2.1 reference port and is not the current release.
+No Linux package is published for v3.0.0. Build it from source with the commands below, or follow [LINUX.md](LINUX.md) for a systemd setup.
 
 ### Windows — desktop installer
 
@@ -301,11 +301,6 @@ cd web && npm install && npm run dev
 # Electron shell around a locally running backend
 cd electron && npm install && npm start
 ```
-
-> Build the root package — `go build .` — rather than `go build ./...`. The
-> `linux/` directory is a legacy duplicate of the root files; its `main.go` is
-> behind `//go:build ignore` and the rest has no `main`, so a recursive build
-> stops with `function main is undeclared`.
 
 **Debugging**
 

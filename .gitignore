@@ -54,10 +54,11 @@ package-lock.json
 .next/
 *.snap
 
-# === Nuxt generated (rebuilt by `nuxt prepare` / `nuxt generate`) ===
-# web/dist is NOT ignored on purpose: go:embed reads it, so it ships.
-web/.nuxt/
-web/.output/
+# === Frontend build ===
+# web/dist is tracked on purpose: go:embed reads it, so it ships.
+
+# === Internal Docs ===
+docs/
 
 # === Environment & Secrets ===
 .env
@@ -100,9 +101,6 @@ release/
 
 # === Windows Resources Build ===
 winres/
-
-# === Internal Docs ===
-docs/
 
 # === Claude Code / AI Tools ===
 .claude/

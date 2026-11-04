@@ -124,7 +124,7 @@ internal/openwechat/             → WeChat protocol (fork)
 web/                             → React 19 + Vite frontend (SPA)
 web/dist/                        → Built frontend (go:embed)
 electron/                        → Electron desktop shell (Windows)
-linux/                           → Linux port reference
+LINUX.md                         → Linux build/run guide
 .github/workflows/ci.yml         → CI pipeline (test + lint + build)
 ```
 

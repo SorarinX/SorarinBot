@@ -67,7 +67,7 @@
 - 🔑 **后台密码** —— 可选、默认关闭；启用后所有 API 路由都要求登录，失败尝试按来源地址限流。
 - 🖥️ **友好的终端** —— 启动卡片、无头环境二维码、彩色日志；后台就绪后控制台自动隐藏。
 - 📌 **系统托盘与开机自启** —— Windows 便携版提供托盘菜单和注册表自启动开关。
-- 🐧 **Linux** —— 同一份根包可交叉编译 `linux/amd64`；`linux/` 目录是 2.1 时代的历史移植。
+- 🐧 **Linux** —— 同一份根包可交叉编译 `linux/amd64`；构建与 systemd 配置见 [LINUX.md](LINUX.md)。
 - 🎯 **拍一拍** —— 微信「拍一拍」会得到一句随机回复。
 
 </details>
@@ -108,7 +108,7 @@
 
 ### Linux
 
-v3.0.0 不提供 Linux 发行包。请用下面的源码构建命令；`linux/` 目录是 2.1 时代的历史移植，不是当前版本。
+v3.0.0 不提供 Linux 发行包。请用下面的源码构建命令，systemd 配置见 [LINUX.md](LINUX.md)。
 
 ### Windows —— 桌面安装包
 
@@ -301,8 +301,6 @@ cd web && npm install && npm run dev
 # Electron 壳，连接本地已启动的后端
 cd electron && npm install && npm start
 ```
-
-> 请构建根包 —— `go build .` —— 而不是 `go build ./...`。`linux/` 是根目录文件的历史副本：它的 `main.go` 带 `//go:build ignore`，其余文件没有 `main`，递归构建会报 `function main is undeclared`。
 
 **调试**
 
