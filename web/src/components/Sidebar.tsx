@@ -5,6 +5,8 @@ import { cn } from "../lib/cn";
 import { useTheme } from "../lib/theme";
 import { useAuth } from "../lib/useAuth";
 
+const LOGO_SRC = import.meta.env.BASE_URL + "logo.png";
+
 export function Sidebar() {
   const { theme, setTheme } = useTheme();
   const { required, logout } = useAuth();
@@ -20,7 +22,7 @@ export function Sidebar() {
     <aside className="app-sidebar sidebar-glass fixed inset-y-0 left-0 z-30 flex w-[232px] flex-col border-r border-border">
       <div className="flex h-14 shrink-0 items-center gap-2.5 border-b border-border px-4">
         <img
-          src="/logo.png"
+          src={LOGO_SRC}
           alt=""
           className="size-8 shrink-0 object-contain"
         />
