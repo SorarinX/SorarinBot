@@ -25,7 +25,7 @@
 ---
 
 <p align="center">
-  <a href="https://sorarinx.github.io/SorarinBot/"><img src=".github/images/welcome-3.0.jpg" width="880" alt="SorarinBot welcome screen"></a>
+  <a href="https://sorarinx.github.io/SorarinBot/"><img src=".github/images/welcome-light.jpg" width="880" alt="SorarinBot welcome screen"></a>
   <br>
   <sub>The welcome screen — scan the QR, or skip into the console and configure a model first.</sub>
 </p>
@@ -75,19 +75,19 @@
 ## 📸 Screenshots
 
 <p align="center">
-  <img src=".github/images/dashboard-3.0.png" width="880" alt="SorarinBot dashboard">
+  <img src=".github/images/dashboard-light.png" width="880" alt="SorarinBot dashboard">
   <br>
   <sub>The dashboard — provider status, live WeChat login state and per-conversation sessions.</sub>
 </p>
 
 |                                         Chat history                                          |                                        System logs                                        |
 | :------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------: |
-| ![Chat history](.github/images/chat-3.0.png) | ![System logs](.github/images/logs-3.0.png) |
+| ![Chat history](.github/images/chat-light.png) | ![System logs](.github/images/logs-light.png) |
 | Sessions, date dividers and per-reply token usage. | Level filters, search and a live log stream. |
 
 |                                       Settings                                        |                                     System prompt                                      |
 | :----------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------: |
-| ![Settings](.github/images/settings-3.0.png) | ![System prompt](.github/images/prompt-3.0.png) |
+| ![Settings](.github/images/settings-light.png) | ![System prompt](.github/images/prompt-light.png) |
 | Provider presets, connection test and auto-start. | The system prompt that defines the bot's personality. |
 
 ## 🚀 Quick Start
@@ -205,7 +205,7 @@ See [SECURITY.md](SECURITY.md) for the supported-version policy and how to repor
 One process, no external services. WeChat and the dashboard meet inside the same Go binary; the only outbound call is the LLM request.
 
 <p align="center">
-  <img src=".github/images/architecture-3.0.svg" width="920" alt="SorarinBot architecture">
+  <img src=".github/images/architecture-light.svg" width="920" alt="SorarinBot architecture">
 </p>
 
 Three ideas explain most of the design:

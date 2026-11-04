@@ -25,7 +25,7 @@
 ---
 
 <p align="center">
-  <a href="https://sorarinx.github.io/SorarinBot/"><img src=".github/images/welcome-3.0.jpg" width="880" alt="SorarinBot 欢迎页"></a>
+  <a href="https://sorarinx.github.io/SorarinBot/"><img src=".github/images/welcome-light.jpg" width="880" alt="SorarinBot 欢迎页"></a>
   <br>
   <sub>欢迎页 —— 扫码登录，或先跳过扫码进入控制台配置模型。</sub>
 </p>
@@ -75,19 +75,19 @@
 ## 📸 界面预览
 
 <p align="center">
-  <img src=".github/images/dashboard-3.0.png" width="880" alt="SorarinBot 仪表盘">
+  <img src=".github/images/dashboard-light.png" width="880" alt="SorarinBot 仪表盘">
   <br>
   <sub>仪表盘 —— Provider 状态、实时微信登录状态，以及按会话隔离的列表。</sub>
 </p>
 
 |                                        聊天记录                                        |                                        系统日志                                        |
 | :-----------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------: |
-| ![聊天记录](.github/images/chat-3.0.png) | ![系统日志](.github/images/logs-3.0.png) |
+| ![聊天记录](.github/images/chat-light.png) | ![系统日志](.github/images/logs-light.png) |
 | 会话列表、日期分隔，以及每条回复的 token 用量。 | 级别筛选、搜索和实时日志流。 |
 
 |                                       设置                                       |                                       系统提示词                                       |
 | :-------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------: |
-| ![设置](.github/images/settings-3.0.png) | ![系统提示词](.github/images/prompt-3.0.png) |
+| ![设置](.github/images/settings-light.png) | ![系统提示词](.github/images/prompt-light.png) |
 | 服务商预设、连接测试和开机自启。 | 定义机器人性格的系统提示词。 |
 
 ## 🚀 快速开始
@@ -205,7 +205,7 @@ web:
 一个进程，无外部服务。微信和控制台在同一个 Go 二进制里相遇，唯一的对外请求是大模型调用。
 
 <p align="center">
-  <img src=".github/images/architecture-3.0.zh.svg" width="920" alt="SorarinBot 架构图">
+  <img src=".github/images/architecture-light.zh.svg" width="920" alt="SorarinBot 架构图">
 </p>
 
 三个设计点解释了大部分结构：

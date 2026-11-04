@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" width="1000" height="520" role="img" aria-label="SorarinBot 架构：微信和浏览器连接同一个静态 Go 二进制，由它调用 OpenAI 兼容模型并把记录写入 SQLite。">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#B9C7C1"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1000" height="520" rx="24" fill="#F7F7F5"/>
+  <rect x="0.75" y="0.75" width="998.5" height="518.5" rx="23.25" fill="none" stroke="#E6E4E0"/>
+
+  <text x="40" y="47" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-size="22" font-weight="700" fill="#0A8F7B">SorarinBot</text>
+  <text x="40" y="69" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-size="11.5" fill="#8C9992">单个静态 Go 二进制 &#183; 无运行时依赖</text>
+
+  <rect x="110" y="96" width="240" height="78" rx="14" fill="#FFFFFF" stroke="#E3E1DC"/>
+  <text x="230" y="126" text-anchor="middle" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-size="14.5" font-weight="600" fill="#111111">微信</text>
+  <text x="230" y="147" text-anchor="middle" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-size="10.5" fill="#6B6B6B">私聊 &#183; 群 @ &#183; 拍一拍</text>
+
+  <rect x="650" y="96" width="240" height="78" rx="14" fill="#FFFFFF" stroke="#E3E1DC"/>
+  <text x="770" y="126" text-anchor="middle" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-size="14.5" font-weight="600" fill="#111111">浏览器 / Electron</text>
+  <text x="770" y="147" text-anchor="middle" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-size="10.5" fill="#6B6B6B">React 控制台 &#183; localhost:8080</text>
+
+  <rect x="50" y="206" width="900" height="150" rx="18" fill="#F1F0EC" stroke="#E3E1DC"/>
+  <text x="70" y="230" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-size="10" letter-spacing="1.2" fill="#0A8F7B">单个静态 Go 二进制</text>
+  <text x="70" y="246" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-size="9.5" fill="#8A8A8A">无外部服务 &#183; 纯 Go SQLite</text>
+
+  <rect x="80" y="260" width="195" height="76" rx="12" fill="#FFFFFF" stroke="#E3E1DC"/>
+  <text x="177" y="290" text-anchor="middle" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-size="13" font-weight="600" fill="#111111">微信适配器</text>
+  <text x="177" y="310" text-anchor="middle" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-size="9.5" fill="#6B6B6B">openwechat fork &#183; 六态登录</text>
+
+  <rect x="305" y="260" width="195" height="76" rx="12" fill="#FFFFFF" stroke="#E3E1DC"/>
+  <text x="402" y="290" text-anchor="middle" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-size="13" font-weight="600" fill="#111111">消息处理</text>
+  <text x="402" y="310" text-anchor="middle" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-size="9.5" fill="#6B6B6B">上下文 &#183; 图片 &#183; 去重</text>
+
+  <rect x="530" y="260" width="195" height="76" rx="12" fill="#FFFFFF" stroke="#E3E1DC"/>
+  <text x="627" y="290" text-anchor="middle" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-size="13" font-weight="600" fill="#111111">会话管理</text>
+  <text x="627" y="310" text-anchor="middle" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-size="9.5" fill="#6B6B6B">串行 worker &#183; 队列 16</text>
+
+  <rect x="755" y="260" width="195" height="76" rx="12" fill="#FFFFFF" stroke="#E3E1DC"/>
+  <text x="852" y="290" text-anchor="middle" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-size="13" font-weight="600" fill="#111111">HTTP 服务 + React</text>
+  <text x="852" y="310" text-anchor="middle" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-size="9.5" fill="#6B6B6B">net/http &#183; go:embed SPA</text>
+
+  <rect x="305" y="400" width="195" height="76" rx="12" fill="#FFFFFF" stroke="#E3E1DC"/>
+  <text x="402" y="430" text-anchor="middle" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-size="13" font-weight="600" fill="#111111">大模型服务</text>
+  <text x="402" y="450" text-anchor="middle" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-size="9.5" fill="#6B6B6B">任意 OpenAI 兼容接口</text>
+
+  <rect x="530" y="400" width="195" height="76" rx="12" fill="#FFFFFF" stroke="#E3E1DC"/>
+  <text x="627" y="430" text-anchor="middle" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-size="13" font-weight="600" fill="#111111">SQLite</text>
+  <text x="627" y="450" text-anchor="middle" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-size="9.5" fill="#6B6B6B">聊天记录 &#183; 日志 &#183; 会话</text>
+
+  <path d="M230 174 C230 214 177 214 177 258" fill="none" stroke="#B9C7C1" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M770 174 C770 214 852 214 852 258" fill="none" stroke="#B9C7C1" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M275 298 L303 298" fill="none" stroke="#B9C7C1" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M500 298 L528 298" fill="none" stroke="#B9C7C1" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M402 338 L402 398" fill="none" stroke="#B9C7C1" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M627 338 L627 398" fill="none" stroke="#B9C7C1" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <text x="40" y="492" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-size="9.5" fill="#8A8A8A">一个进程 &#183; 微信与控制台在同一个二进制里</text>
+</svg>
