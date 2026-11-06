@@ -32,7 +32,7 @@
 
 > 🔗 **[Live preview](https://sorarinx.github.io/SorarinBot/)** — click through the dashboard with simulated data, no install required.
 >
-> 🆕 **v3.0.1** ships the Windows installer: a Tauri bootstrapper with a real rounded window, a four-step progress flow, and a manifest-driven payload. [Release notes →](https://github.com/SorarinX/SorarinBot/releases/tag/v3.0.1)
+> 🆕 **v3.0.1** ships the Windows installer: a Tauri bootstrapper with a native Windows frame, a four-step progress flow, and a manifest-driven payload. [Release notes →](https://github.com/SorarinX/SorarinBot/releases/tag/v3.0.1)
 
 ## Download
 
@@ -86,7 +86,7 @@ Windows builds are submitted to the [SignPath Foundation](https://signpath.org/)
 <p align="center">
   <img src=".github/images/dashboard-light.png" width="880" alt="SorarinBot dashboard">
   <br>
-  <sub>The dashboard — provider status, live WeChat login state and per-conversation sessions.</sub>
+  <sub>The dashboard — provider status, WeChat login state and per-conversation sessions.</sub>
 </p>
 
 |                                         Chat history                                          |                                        System logs                                        |
@@ -97,14 +97,14 @@ Windows builds are submitted to the [SignPath Foundation](https://signpath.org/)
 |                                       Settings                                        |                                     System prompt                                      |
 | :----------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------: |
 | ![Settings](.github/images/settings-light.png) | ![System prompt](.github/images/prompt-light.png) |
-| Provider presets, connection test and auto-start. | The system prompt that defines the bot's personality. |
+| Provider presets, connection test and saved API key. | The system prompt that defines the bot's personality. |
 
 ## 🚀 Quick Start
 
-> **Requirements** — Windows 10+ or Linux x64, roughly 25 MB of disk. Nothing else: the binary is statically linked, stores data with a pure-Go SQLite driver (no CGO), and carries the web UI inside it.
+> **Requirements** — Windows 10+ or Linux x64. The portable ZIP is about 10 MB; the desktop install downloads an ~85 MB payload and uses roughly 300 MB on disk. Nothing else: the binary is statically linked, stores data with a pure-Go SQLite driver (no CGO), and carries the web UI inside it.
 
 1. **Install or unzip.** Run `SorarinBot-Setup.exe` from [**Releases**](https://github.com/SorarinX/SorarinBot/releases) (recommended), or grab `SorarinBot-v*-win64-portable.zip` and extract it anywhere.
-2. **Run it.** Double-click `SorarinBot.exe`. A tray icon appears, the dashboard opens at `http://localhost:8080`, and the console window hides itself after a moment. If 8080 is busy, the next free port is used and the browser is pointed at it.
+2. **Start it.** The desktop installer opens the Electron window directly. The portable build starts `SorarinBot.exe`, adds a tray icon, opens `http://localhost:8080`, and hides its console after a moment. If 8080 is busy, the next free port is used and the browser is pointed at it.
 3. **Connect a model.** Open **Settings**, paste an API key, pick a model, and save — the change applies to the next message, no restart. No key yet? Use **先不扫码，去配置** on the welcome screen to explore the console first.
 4. **Log in to WeChat.** Scan the QR code on the welcome screen. On a headless machine, start with `-console-qr` to print the code in the terminal; `-console` keeps the console window visible. The status badge turns green once you are in.
 
@@ -123,7 +123,7 @@ No Linux package is published for v3.0.1. Build it from source with the commands
 
 v3.0.1 publishes `SorarinBot-Setup.exe`, a Tauri bootstrapper that downloads the versioned Electron payload, verifies its SHA-256, installs per user, and launches the app.
 
-> ⚠️ The installer is **unsigned** for now, so Windows SmartScreen may show "Unknown publisher". Code signing is the next release task. The portable build above stays available.
+> ⚠️ The installer and payload are **unsigned until SignPath Foundation approves the project**, so Windows SmartScreen may show "Unknown publisher". Portable remains available in the meantime.
 
 ### Build from source
 
@@ -231,7 +231,7 @@ Three ideas explain most of the design:
 | --- | --- |
 | Backend | Go 1.25 · `net/http` · `logrus` · `modernc.org/sqlite` (pure Go) |
 | Frontend | React 19 · Vite 7 · Tailwind CSS 4 · TypeScript |
-| Desktop | Electron 43 · electron-builder · Tauri 2 installer (unsigned as of v3.0.1) |
+| Desktop | Electron 33.4.11 · electron-builder · Tauri 2 installer (SignPath onboarding, unsigned until issued) |
 | Database | SQLite — `data.db`, chat history and system logs |
 | WeChat | [openwechat](https://github.com/eatmoreapple/openwechat) v1.4.10, vendored under `internal/` |
 | LLM | Any OpenAI-compatible HTTP API, via `providers/openaicompat` |
@@ -267,7 +267,7 @@ Every endpoint is served by the same binary as the dashboard. When `admin.passwo
 <details>
 <summary><b>Windows says "Windows protected your PC"</b></summary>
 
-The binary is not code-signed. Click **More info → Run anyway**. You can also verify the download against the release checksum.
+Portable and the current installer are not signed until SignPath Foundation issues the certificate. Click **More info → Run anyway**, and verify the download against the release checksum.
 </details>
 
 <details>

@@ -32,7 +32,7 @@
 
 > 🔗 **[在线预览](https://sorarinx.github.io/SorarinBot/)** —— 用模拟数据完整体验控制台，无需安装。
 >
-> 🆕 **v3.0.1** 发布 Windows 安装版：Tauri bootstrapper、真正圆角的窗口、四步进度流程，以及 manifest 驱动的安装 payload。[发布说明 →](https://github.com/SorarinX/SorarinBot/releases/tag/v3.0.1)
+> 🆕 **v3.0.1** 发布 Windows 安装版：Tauri bootstrapper、Windows 原生窗口边框、四步进度流程，以及 manifest 驱动的安装 payload。[发布说明 →](https://github.com/SorarinX/SorarinBot/releases/tag/v3.0.1)
 
 ## 下载
 
@@ -86,7 +86,7 @@ Windows 构建已提交至 [SignPath Foundation](https://signpath.org/) 的免�
 <p align="center">
   <img src=".github/images/dashboard-light.png" width="880" alt="SorarinBot 仪表盘">
   <br>
-  <sub>仪表盘 —— Provider 状态、实时微信登录状态，以及按会话隔离的列表。</sub>
+  <sub>仪表盘 —— Provider 状态、微信登录状态，以及按会话隔离的列表。</sub>
 </p>
 
 |                                        聊天记录                                        |                                        系统日志                                        |
@@ -97,14 +97,14 @@ Windows 构建已提交至 [SignPath Foundation](https://signpath.org/) 的免�
 |                                       设置                                       |                                       系统提示词                                       |
 | :-------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------: |
 | ![设置](.github/images/settings-light.png) | ![系统提示词](.github/images/prompt-light.png) |
-| 服务商预设、连接测试和开机自启。 | 定义机器人性格的系统提示词。 |
+| 服务商预设、连接测试和已保存的 API Key。 | 定义机器人性格的系统提示词。 |
 
 ## 🚀 快速开始
 
-> **环境要求** —— Windows 10+ 或 Linux x64，约 25 MB 磁盘空间。除此之外不需要任何东西：二进制为静态链接，使用纯 Go 的 SQLite 驱动（无需 CGO），Web 界面已内嵌其中。
+> **环境要求** —— Windows 10+ 或 Linux x64。便携版 ZIP 约 10 MB；桌面安装包下载约 85 MB，安装后约占用 300 MB。除此之外不需要任何东西：二进制为静态链接，使用纯 Go 的 SQLite 驱动（无需 CGO），Web 界面已内嵌其中。
 
 1. **安装或解压。** 从 [**Releases**](https://github.com/SorarinX/SorarinBot/releases) 运行 `SorarinBot-Setup.exe`（推荐），或获取 `SorarinBot-v*-win64-portable.zip` 解压到任意目录。
-2. **运行。** 双击 `SorarinBot.exe`。托盘出现图标，浏览器自动打开 `http://localhost:8080`，控制台窗口随后自动隐藏。若 8080 被占用，会自动换到下一个空闲端口并打开正确地址。
+2. **启动。** 桌面安装版会直接打开 Electron 窗口。便携版启动 `SorarinBot.exe` 后出现托盘图标，浏览器自动打开 `http://localhost:8080`，控制台窗口随后隐藏。若 8080 被占用，会自动换到下一个空闲端口并打开正确地址。
 3. **接入模型。** 打开 **设置**，填入 API Key、选择模型并保存 —— 下一条消息即生效，无需重启。还没有 Key？在欢迎页点 **先不扫码，去配置**，先逛逛控制台。
 4. **登录微信。** 在欢迎页用微信扫描二维码。无头环境可加 `-console-qr` 在终端打印二维码；加 `-console` 可保留控制台窗口。状态标签变绿即表示登录成功。
 
@@ -123,7 +123,7 @@ v3.0.1 不提供 Linux 发行包。请用下面的源码构建命令，systemd �
 
 v3.0.1 发布 `SorarinBot-Setup.exe`：Tauri bootstrapper 下载带版本的 Electron payload，校验 SHA-256，按当前用户安装并启动应用。
 
-> ⚠️ 安装包目前**未签名**，Windows SmartScreen 可能提示「未知发布者」。代码签名是下一项发布任务。上面的便携版继续可用。
+> ⚠️ 在 SignPath Foundation 审核通过前，安装器与 payload 仍**未签名**，Windows SmartScreen 可能提示「未知发布者」。在此期间可继续使用便携版。
 
 ### 从源码构建
 
@@ -231,7 +231,7 @@ web:
 | --- | --- |
 | 后端 | Go 1.25 · `net/http` · `logrus` · `modernc.org/sqlite`（纯 Go） |
 | 前端 | React 19 · Vite 7 · Tailwind CSS 4 · TypeScript |
-| 桌面端 | Electron 43 · electron-builder · Tauri 2 安装器（v3.0.1 尚未签名） |
+| 桌面端 | Electron 33.4.11 · electron-builder · Tauri 2 安装器（SignPath 审核中，签发前未签名） |
 | 数据库 | SQLite —— `data.db`，保存聊天记录与系统日志 |
 | 微信 | [openwechat](https://github.com/eatmoreapple/openwechat) v1.4.10，vendored 在 `internal/` 下 |
 | 大模型 | 任意 OpenAI 兼容 HTTP 接口，由 `providers/openaicompat` 实现 |
@@ -267,7 +267,7 @@ web:
 <details>
 <summary><b>Windows 提示「已保护你的电脑」</b></summary>
 
-二进制没有代码签名。点 **更多信息 → 仍要运行**。也可以用 Release 里的校验和核对下载文件。
+便携版和当前安装包在 SignPath Foundation 签发证书前都未签名。点 **更多信息 → 仍要运行**，并用 Release 里的校验和核对下载文件。
 </details>
 
 <details>

@@ -27,7 +27,7 @@ Prerequisites: Node 20+, Rust stable (MSVC), WebView2 runtime.
 ```powershell
 cd installer/app
 npm install
-npm run tauri build -- --no-bundle
+npx tauri build --no-bundle
 ```
 
 Output: `installer/app/src-tauri/target/release/sorarinbot-installer.exe`.
@@ -80,12 +80,13 @@ Serve a manifest and the payload over localhost, then launch the bootstrapper wi
 
 ## Signing
 
-The build has signing hooks for `CSC_LINK` / `CSC_KEY_PASSWORD`; Tauri's Windows signing is not wired yet. Until a certificate exists, builds are unsigned and SmartScreen will warn. Do not call the public installer release done until the bootstrapper and payload are signed.
+The payload build still supports `CSC_LINK` / `CSC_KEY_PASSWORD` for a traditional PFX certificate. The project is applying to SignPath Foundation for free OSS signing; the staged SignPath flow is documented in `tools/signing/SIGNPATH.md`. Until that certificate is issued, the bootstrapper and payload are unsigned and SmartScreen will warn.
 
 ## Status
 
-- Bootstrapper UI: Welcome, Options, Progress, Finish; light/dark system theme; 1000×660 fixed window.
+- Bootstrapper UI: Welcome, Options, Progress, Finish; light/dark system theme; 1000×660 fixed window; native DWM frame.
 - Rust commands: manifest fetch, HTTPS download, SHA-256, silent payload, install.ok polling, launch, folder pickers, data import.
 - Payload: silent per-user install, config preserved, install.ok written.
 - Local E2E: passed (download → verify → silent install → finish) with a localhost manifest.
-- Not done: code signing, hosted manifest/release assets, electron-updater integration, WebView2 fallback UI.
+- Not done: code signing (SignPath application pending), electron-updater integration, WebView2 fallback UI.
+- Hosted manifest and release assets: done.
