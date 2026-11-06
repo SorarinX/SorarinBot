@@ -14,7 +14,8 @@ if (!existsSync(source)) {
   process.exit(1);
 }
 
-const next = header + readFileSync(source, "utf8");
+const normalize = (value) => value.replace(/\r\n/g, "\n");
+const next = header + normalize(readFileSync(source, "utf8"));
 const check = process.argv.includes("--check");
 
 if (check) {
@@ -22,7 +23,7 @@ if (check) {
     console.error("missing generated tokens:", dest);
     process.exit(1);
   }
-  const current = readFileSync(dest, "utf8");
+  const current = normalize(readFileSync(dest, "utf8"));
   if (current !== next) {
     console.error("design tokens are out of date; run node installer/app/scripts/sync-tokens.mjs");
     process.exit(1);
