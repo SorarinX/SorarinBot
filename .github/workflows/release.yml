@@ -219,11 +219,24 @@ jobs:
           if-no-files-found: warn
           compression-level: 0
 
+      - name: Package portable ZIP from the same build
+        shell: pwsh
+        run: |
+          & ./tools/portable/package.ps1 -Version '${{ steps.version.outputs.version }}' -ExePath 'electron/SorarinBot.exe' -OutDir 'out/portable'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Upload installer manifest
         uses: actions/upload-artifact@v4
         with:
           name: installer-manifest-${{ steps.version.outputs.version }}
           path: out/installer-manifest.json
+          if-no-files-found: error
+
+      - name: Upload portable ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: sorarinbot-${{ steps.version.outputs.version }}-portable
+          path: out/portable/*.zip
           if-no-files-found: error
 
       - name: Summarize release artifacts
