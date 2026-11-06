@@ -32,7 +32,7 @@
         "to": "SorarinBot.exe"
       }
     ],
-    "electronVersion": "43.0.0",
+    "electronVersion": "33.4.11",
     "electronDist": "dist",
     "win": {
       "target": [
@@ -57,7 +57,7 @@
     }
   },
   "devDependencies": {
-    "electron": "43.0.0",
+    "electron": "33.4.11",
     "electron-builder": "^26.15.3"
   }
 }

@@ -106,6 +106,7 @@ pub fn run() {
                 // Let the CSS border-radius be genuinely transparent instead of
                 // showing the WebView2 default white surface in the corners.
                 let _ = window.set_background_color(Some(tauri::window::Color(0, 0, 0, 0)));
+                let _ = window.set_focus();
             }
             Ok(())
         })
