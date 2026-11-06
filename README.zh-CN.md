@@ -13,7 +13,7 @@
 <p align="center">
   <a href="https://github.com/SorarinX/SorarinBot/releases/latest"><img alt="最新版本" src="https://img.shields.io/github/v/release/SorarinX/SorarinBot?style=flat-square&sort=semver&label=release&color=07C160"></a>
   <a href="https://github.com/SorarinX/SorarinBot/actions/workflows/ci.yml"><img alt="CI 状态" src="https://github.com/SorarinX/SorarinBot/actions/workflows/ci.yml/badge.svg?style=flat-square"></a>
-  <a href="LICENSE"><img alt="许可证" src="https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-07C160?style=flat-square"></a>
+  <a href="LICENSE"><img alt="许可证" src="https://img.shields.io/badge/license-AGPL%20v3-07C160?style=flat-square"></a>
   <a href="https://github.com/SorarinX/SorarinBot/releases"><img alt="下载量" src="https://img.shields.io/github/downloads/SorarinX/SorarinBot/total?style=flat-square&color=6E7E96&label=downloads"></a>
   <a href="https://github.com/SorarinX/SorarinBot/stargazers"><img alt="Star" src="https://img.shields.io/github/stars/SorarinX/SorarinBot?style=flat-square&color=6E7E96&label=stars"></a>
 </p>
@@ -345,6 +345,4 @@ gofmt -l .
 
 ## 📄 许可证
 
-SorarinBot 基于 [PolyForm Noncommercial License 1.0.0](LICENSE) 发布 —— 个人学习、教育、研究、公益机构与政府部门均可免费使用。
-
-**商业用途需另行取得授权。** 请联系 **zyc2597376118@gmail.com**。
+SorarinBot 基于 [GNU Affero General Public License v3.0](LICENSE) 发布。你可以按照 AGPL-3.0 使用、修改和再分发；如果将修改版作为网络服务运行，需要以相同许可证提供对应源代码。

@@ -1,6 +1,6 @@
 # Third-Party Notices
 
-SorarinBot is distributed under the [PolyForm Noncommercial License 1.0.0](LICENSE).
+SorarinBot is distributed under the [GNU Affero General Public License v3.0](LICENSE).
 That license covers the original work in this repository. It does **not** cover the
 third-party component listed below, which remains under its own license and is
 reproduced here with the notice that license requires.

@@ -13,7 +13,7 @@
 <p align="center">
   <a href="https://github.com/SorarinX/SorarinBot/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/SorarinX/SorarinBot?style=flat-square&sort=semver&label=release&color=07C160"></a>
   <a href="https://github.com/SorarinX/SorarinBot/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/SorarinX/SorarinBot/actions/workflows/ci.yml/badge.svg?style=flat-square"></a>
-  <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-07C160?style=flat-square"></a>
+  <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-AGPL%20v3-07C160?style=flat-square"></a>
   <a href="https://github.com/SorarinX/SorarinBot/releases"><img alt="Downloads" src="https://img.shields.io/github/downloads/SorarinX/SorarinBot/total?style=flat-square&color=6E7E96&label=downloads"></a>
   <a href="https://github.com/SorarinX/SorarinBot/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/SorarinX/SorarinBot?style=flat-square&color=6E7E96&label=stars"></a>
 </p>
@@ -345,6 +345,4 @@ If SorarinBot is useful to you, a coffee is appreciated — it goes straight int
 
 ## 📄 License
 
-SorarinBot is released under the [PolyForm Noncommercial License 1.0.0](LICENSE) — free to use for personal, educational, research, charity and government purposes.
-
-**Commercial use requires a separate license.** Write to **zyc2597376118@gmail.com** to arrange one.
+SorarinBot is released under the [GNU Affero General Public License v3.0](LICENSE). You may use, modify, and redistribute it under AGPL-3.0. If you run a modified version as a network service, you must offer the corresponding source under the same license.

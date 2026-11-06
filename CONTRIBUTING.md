@@ -137,6 +137,4 @@ LINUX.md                         → Linux build/run guide
 
 ## License / 许可证
 
-By contributing, you agree that your contributions will be licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE). / 贡献代码即表示你同意在 PolyForm Noncommercial License 1.0.0 下授权。
-
-Commercial use requires a separate license. / 商业使用需取得单独授权。
+By contributing, you agree that your contributions will be licensed under the [GNU Affero General Public License v3.0](LICENSE). / 贡献代码即表示你同意在 GNU Affero General Public License v3.0 下授权。

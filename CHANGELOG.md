@@ -3,6 +3,15 @@
 Notable changes to SorarinBot. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- Relicensed SorarinBot under **AGPL-3.0-only** so it qualifies for free
+  SignPath Foundation code signing; removed the commercial dual-license notice.
+- Added `docs/SIGNPATH.md` and `tools/signing/verify-release.ps1` for the
+  SignPath application, staged signing order, and signature verification.
+
 ## [3.0.1] - 2026-11-04
 
 The first release with a real Windows installer, plus a cleaner repository and
