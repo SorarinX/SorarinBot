@@ -34,8 +34,17 @@
 >
 > 🆕 **v3.0.1** ships the Windows installer: a Tauri bootstrapper with a real rounded window, a four-step progress flow, and a manifest-driven payload. [Release notes →](https://github.com/SorarinX/SorarinBot/releases/tag/v3.0.1)
 
+## Download
+
+- **Windows installer:** [SorarinBot-Setup.exe](https://github.com/SorarinX/SorarinBot/releases/latest/download/SorarinBot-Setup.exe)
+- **Portable ZIP:** [latest release assets](https://github.com/SorarinX/SorarinBot/releases/latest)
+- **All releases:** <https://github.com/SorarinX/SorarinBot/releases>
+
+Windows builds are code-signed through the [SignPath Foundation](https://signpath.org/) free open-source code-signing program. See the [Privacy Policy](PRIVACY.md).
+
 ## 📑 Contents
 
+- [Download](#download)
 - [Features](#-features)
 - [Screenshots](#-screenshots)
 - [Quick Start](#-quick-start)

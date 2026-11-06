@@ -34,8 +34,17 @@
 >
 > 🆕 **v3.0.1** 发布 Windows 安装版：Tauri bootstrapper、真正圆角的窗口、四步进度流程，以及 manifest 驱动的安装 payload。[发布说明 →](https://github.com/SorarinX/SorarinBot/releases/tag/v3.0.1)
 
+## 下载
+
+- **Windows 安装程序：** [SorarinBot-Setup.exe](https://github.com/SorarinX/SorarinBot/releases/latest/download/SorarinBot-Setup.exe)
+- **便携版 ZIP：** [最新 Release 资产](https://github.com/SorarinX/SorarinBot/releases/latest)
+- **所有版本：** <https://github.com/SorarinX/SorarinBot/releases>
+
+Windows 构建通过 [SignPath Foundation](https://signpath.org/) 的免费开源代码签名计划签名。隐私说明见 [PRIVACY.md](PRIVACY.md)。
+
 ## 📑 目录
 
+- [下载](#下载)
 - [功能特性](#-功能特性)
 - [界面预览](#-界面预览)
 - [快速开始](#-快速开始)
