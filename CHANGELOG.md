@@ -9,7 +9,7 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Relicensed SorarinBot under **AGPL-3.0-only** so it qualifies for free
   SignPath Foundation code signing; removed the commercial dual-license notice.
-- Added `docs/SIGNPATH.md` and `tools/signing/verify-release.ps1` for the
+- Added `tools/signing/SIGNPATH.md` and `tools/signing/verify-release.ps1` for the
   SignPath application, staged signing order, and signature verification.
 
 ## [3.0.1] - 2026-11-04

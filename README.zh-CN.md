@@ -346,3 +346,5 @@ gofmt -l .
 ## 📄 许可证
 
 SorarinBot 基于 [GNU Affero General Public License v3.0](LICENSE) 发布。你可以按照 AGPL-3.0 使用、修改和再分发；如果将修改版作为网络服务运行，需要以相同许可证提供对应源代码。
+
+代码签名策略见 [tools/signing/SIGNPATH.md](tools/signing/SIGNPATH.md)。

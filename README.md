@@ -346,3 +346,5 @@ If SorarinBot is useful to you, a coffee is appreciated — it goes straight int
 ## 📄 License
 
 SorarinBot is released under the [GNU Affero General Public License v3.0](LICENSE). You may use, modify, and redistribute it under AGPL-3.0. If you run a modified version as a network service, you must offer the corresponding source under the same license.
+
+Code signing policy: [tools/signing/SIGNPATH.md](tools/signing/SIGNPATH.md).
