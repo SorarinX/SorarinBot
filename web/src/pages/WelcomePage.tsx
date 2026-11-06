@@ -194,13 +194,14 @@ export default function WelcomePage() {
 
   return (
     <div className="welcome-page">
+      <div className="welcome-drag-strip" data-window-drag aria-hidden="true" />
       <div className="welcome-ambient welcome-ambient-mint" aria-hidden="true" />
       <div className="welcome-ambient welcome-ambient-gold" aria-hidden="true" />
       <div className="welcome-glow" aria-hidden="true" />
       <div className="welcome-noise" aria-hidden="true" />
 
       <div className="welcome-inner">
-        <header className="welcome-topbar">
+        <header className="welcome-topbar" data-window-drag>
           <div className="welcome-wordmark">SorarinBot</div>
 
           <div className="welcome-top-actions">

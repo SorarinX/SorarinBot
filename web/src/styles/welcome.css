@@ -274,6 +274,24 @@ html.dark.welcome-active body {
   gap: 18px 24px;
 }
 
+/* Electron titlebar overlay: leave room for the native window controls and
+ * let the empty masthead area drag the window. */
+html.is-electron .welcome-drag-strip {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 5;
+  height: 36px;
+  -webkit-app-region: no-drag;
+}
+html.is-electron .welcome-topbar {
+  -webkit-app-region: no-drag;
+  padding-right: 138px;
+}
+html.is-electron .welcome-topbar a,
+html.is-electron .welcome-topbar button {
+  -webkit-app-region: no-drag;
+}
+
 .welcome-wordmark {
   display: inline-block;
   white-space: nowrap;

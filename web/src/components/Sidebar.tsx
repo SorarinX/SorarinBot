@@ -19,7 +19,7 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="app-sidebar sidebar-glass fixed inset-y-0 left-0 z-30 flex w-[232px] flex-col border-r border-border">
+    <aside className="app-sidebar sidebar-glass fixed inset-y-0 left-0 z-30 flex w-[204px] flex-col border-r border-border">
       <div className="flex h-14 shrink-0 items-center gap-2.5 border-b border-border px-4">
         <img
           src={LOGO_SRC}

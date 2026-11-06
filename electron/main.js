@@ -143,7 +143,7 @@ function createWindow() {
     titleBarOverlay: {
       color: '#0f1211',
       symbolColor: '#9fe9d8',
-      height: 40,
+      height: 56,
     },
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -172,6 +172,28 @@ function createWindow() {
   mainWindow.on('closed', () => { mainWindow = null })
 }
 
+let windowDrag = null
+
+ipcMain.on('window-drag-start', (event, point) => {
+  const win = BrowserWindow.fromWebContents(event.sender)
+  if (!win || !point) return
+  const [x, y] = win.getPosition()
+  windowDrag = { win, originX: x, originY: y, startX: point.x, startY: point.y }
+})
+
+ipcMain.on('window-drag-move', (event, point) => {
+  if (!windowDrag || !point) return
+  if (BrowserWindow.fromWebContents(event.sender) !== windowDrag.win) return
+  windowDrag.win.setPosition(
+    Math.round(windowDrag.originX + point.x - windowDrag.startX),
+    Math.round(windowDrag.originY + point.y - windowDrag.startY),
+  )
+})
+
+ipcMain.on('window-drag-end', () => {
+  windowDrag = null
+})
+
 ipcMain.on('titlebar-theme', (event, theme) => {
   const win = BrowserWindow.fromWebContents(event.sender)
   if (!win) return
@@ -180,7 +202,7 @@ ipcMain.on('titlebar-theme', (event, theme) => {
     win.setTitleBarOverlay({
       color: light ? '#f7f7f5' : '#0f1211',
       symbolColor: light ? '#0a8f7b' : '#9fe9d8',
-      height: 40,
+      height: 56,
     })
   } catch {
     // Older Electron builds may not support the overlay; the standard frame remains.

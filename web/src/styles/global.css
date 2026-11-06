@@ -167,7 +167,7 @@ html.dark {
 /* Desktop shell offset. Below 900px the fixed sidebar steps aside so the
  * chat page (and the rest of the console) can use the full viewport. */
 .app-content {
-  margin-left: 232px;
+  margin-left: 204px;
 }
 
 @media (max-width: 899px) {
@@ -203,7 +203,7 @@ html.dark {
 .app-ambient {
   position: fixed;
   top: 56px;
-  left: 232px;
+  left: 204px;
   z-index: 0;
   width: 760px;
   height: 540px;
@@ -226,10 +226,10 @@ html.dark {
 /* Electron titlebar overlay: the native min/max/close buttons sit at the
  * top-right. Keep that area clear and let the topbar drag the window. */
 html.is-electron .app-topbar {
-  -webkit-app-region: drag;
+  -webkit-app-region: no-drag;
 }
 html.is-electron .app-topbar-inner {
-  padding-right: 150px;
+  padding-right: 138px;
 }
 html.is-electron .app-topbar a,
 html.is-electron .app-topbar button,
