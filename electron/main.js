@@ -1,4 +1,4 @@
-const { app, BrowserWindow, shell, dialog } = require('electron')
+const { app, BrowserWindow, shell, dialog, ipcMain } = require('electron')
 const { spawn } = require('child_process')
 const path = require('path')
 const fs = require('fs')
@@ -139,6 +139,12 @@ function createWindow() {
     title: 'SorarinBot',
     icon: path.join(__dirname, 'logo.png'),
     autoHideMenuBar: true,
+    titleBarStyle: 'hidden',
+    titleBarOverlay: {
+      color: '#0f1211',
+      symbolColor: '#9fe9d8',
+      height: 40,
+    },
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
@@ -165,6 +171,21 @@ function createWindow() {
 
   mainWindow.on('closed', () => { mainWindow = null })
 }
+
+ipcMain.on('titlebar-theme', (event, theme) => {
+  const win = BrowserWindow.fromWebContents(event.sender)
+  if (!win) return
+  const light = theme === 'light'
+  try {
+    win.setTitleBarOverlay({
+      color: light ? '#f7f7f5' : '#0f1211',
+      symbolColor: light ? '#0a8f7b' : '#9fe9d8',
+      height: 40,
+    })
+  } catch {
+    // Older Electron builds may not support the overlay; the standard frame remains.
+  }
+})
 
 app.whenReady().then(async () => {
   console.log('[electron] app ready, starting Go backend...')

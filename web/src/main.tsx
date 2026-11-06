@@ -9,6 +9,10 @@ import "./styles/global.css";
 
 const basename = import.meta.env.BASE_URL.replace(/\/$/, "");
 
+if (window.sorarinbot) {
+  document.documentElement.classList.add("is-electron");
+}
+
 const container = document.getElementById("root");
 
 if (!container) {

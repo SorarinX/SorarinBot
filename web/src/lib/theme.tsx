@@ -40,6 +40,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     } catch {
       /* 不允许写存储时，主题在当前会话内仍然生效 */
     }
+    window.sorarinbot?.setTitleBarTheme?.(theme);
   }, [theme]);
 
   const setTheme = useCallback((next: Theme) => {

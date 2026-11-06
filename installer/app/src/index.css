@@ -518,6 +518,80 @@ h2 {
 .finish-actions { display: flex; gap: 8px; margin-top: 18px; }
 .finish-error { margin-top: 12px; max-width: 620px; width: 100%; text-align: left; }
 
+/* ---------------------------------------------------------------- readability
+ * A single type scale for the installer. Labels are never below 10.5px,
+ * secondary copy sits at 12px, and paths keep the mono stack. */
+:root {
+  --fs-caption: 10.5px;
+  --fs-small: 11.5px;
+  --fs-body: 13px;
+  --fs-body-lg: 14px;
+  --fs-title: 15px;
+  --fs-h1: 46px;
+  --fs-h2: 30px;
+}
+
+body { font-size: var(--fs-body-lg); }
+h1 { font-size: var(--fs-h1); }
+h2 { font-size: var(--fs-h2); }
+.eyebrow { font-size: var(--fs-caption); }
+.lede { font-size: var(--fs-body-lg); line-height: 1.65; }
+.version-pill { font-size: var(--fs-small); }
+.version-pill em { font-size: var(--fs-caption); }
+.wizard-label { font-size: 10.5px; }
+.wizard-node { width: 23px; height: 23px; font-size: 9px; }
+
+.options-grid { grid-template-columns: 1.3fr 0.7fr; }
+.lede { max-width: 620px; }
+.feature-card { min-height: 148px; padding: 18px 16px 16px; }
+.feature-card h3 { margin-top: 14px; font-size: 14px; font-weight: 600; }
+.feature-card p { font-size: 12px; line-height: 1.65; }
+.feature-index { font-size: 9.5px; }
+
+.btn { height: 40px; padding: 0 18px; font-size: 13px; }
+.fine-print { font-size: 11px; }
+.page-foot { font-size: 10px; }
+.panel-head h3 { font-size: 14px; }
+.panel-head p { font-size: 11.5px; }
+.badge { font-size: 9px; }
+.field-label { font-size: 12px; }
+.field-label span { font-size: 10px; }
+.path-row input { height: 36px; font-size: 11.5px; }
+.path-row .btn { height: 36px; font-size: 11.5px; }
+.path-meta { font-size: 10px; }
+.switch-row h4 { font-size: 12px; }
+.switch-row p { font-size: 10.5px; }
+.hint-strip { font-size: 10px; line-height: 1.5; }
+.dropzone strong { font-size: 12px; }
+.dropzone span { font-size: 10.5px; }
+.dropzone em { font-size: 9.5px; }
+.import-note { font-size: 9.5px; }
+.license summary { font-size: 11px; }
+.license p { font-size: 10.5px; }
+.license-more { font-size: 9.5px; }
+
+.detail-top strong { font-size: 15px; }
+.detail-kicker { font-size: 9px; }
+.detail-top em { font-size: 10px; }
+.speed-pill { font-size: 10px; }
+.ring-label em { font-size: 10px; }
+.progress-stats span { font-size: 10px; }
+.progress-stats strong { font-size: 12px; }
+.phase-card span { font-size: 9px; }
+.phase-card strong { font-size: 12px; }
+.phase-card em { font-size: 9.5px; }
+.phase-badge { font-size: 9.5px; }
+
+.finish-title { font-size: 38px; }
+.finish-sub { font-size: 13px; }
+.launch-row h4 { font-size: 12px; }
+.launch-row p { font-size: 10.5px; }
+.finish-meta span { font-size: 9.5px; }
+.finish-meta strong { font-size: 11px; }
+.mono-path { font-size: 9.5px; }
+.verified { font-size: 10.5px; }
+.finish-actions .btn { min-width: 132px; }
+
 /* -------------------------------------------------------------- responsive */
 @media (max-height: 640px) {
   .page { padding-top: 18px; padding-bottom: 12px; }

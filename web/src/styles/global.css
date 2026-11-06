@@ -222,3 +222,18 @@ html.dark {
     left: 0;
   }
 }
+
+/* Electron titlebar overlay: the native min/max/close buttons sit at the
+ * top-right. Keep that area clear and let the topbar drag the window. */
+html.is-electron .app-topbar {
+  -webkit-app-region: drag;
+}
+html.is-electron .app-topbar-inner {
+  padding-right: 150px;
+}
+html.is-electron .app-topbar a,
+html.is-electron .app-topbar button,
+html.is-electron .app-topbar input,
+html.is-electron .app-topbar [role="button"] {
+  -webkit-app-region: no-drag;
+}

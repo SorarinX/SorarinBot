@@ -4,9 +4,9 @@ import { APP_VERSION } from "../lib/version";
 
 export function Topbar() {
   return (
-    <header className="glass-bg sticky top-0 z-20 shrink-0 border-b border-border">
+    <header className="app-topbar glass-bg sticky top-0 z-20 shrink-0 border-b border-border">
       <div className="app-gutter">
-        <div className="mx-auto flex h-14 w-full max-w-[1280px] items-center justify-end gap-2.5">
+        <div className="app-topbar-inner mx-auto flex h-14 w-full max-w-[1280px] items-center justify-end gap-2.5">
           <span className="rounded-full border border-border bg-surface px-2 py-0.5 text-[11px] leading-4 tabular-nums text-muted">
             {APP_VERSION}
           </span>
