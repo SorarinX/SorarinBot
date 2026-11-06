@@ -6,8 +6,6 @@ pub fn apply(window: &tauri::WebviewWindow) {
         DwmSetWindowAttribute, DWMWA_BORDER_COLOR, DWMWA_COLOR_NONE,
         DWMWA_WINDOW_CORNER_PREFERENCE, DWMWCP_ROUND,
     };
-    use windows::Win32::Graphics::Gdi::{CreateRoundRectRgn, SetWindowRgn};
-    use windows::Win32::UI::HiDpi::GetDpiForWindow;
     use windows::Win32::UI::WindowsAndMessaging::{
         GetWindowLongW, SetWindowLongW, SetWindowPos, GWL_STYLE, SWP_FRAMECHANGED,
         SWP_NOMOVE, SWP_NOSIZE, SWP_NOZORDER, WS_BORDER, WS_CAPTION, WS_DLGFRAME,
@@ -69,25 +67,8 @@ pub fn apply(window: &tauri::WebviewWindow) {
             );
         }
 
-        // DWM rounding is a hint; clip the actual window region as well so the
-        // white WebView2 background can never show through the corners.
-        if let Ok(size) = window.outer_size() {
-            let dpi = unsafe { GetDpiForWindow(hwnd) };
-            let radius = ((18.0 * dpi as f32 / 96.0).round() as i32).max(1);
-            let region = unsafe {
-                CreateRoundRectRgn(
-                    0,
-                    0,
-                    size.width as i32 + 1,
-                    size.height as i32 + 1,
-                    radius * 2,
-                    radius * 2,
-                )
-            };
-            if !region.is_invalid() {
-                let _ = unsafe { SetWindowRgn(hwnd, Some(region), true) };
-            }
-        }
+        // Let DWM own the rounded clip. SetWindowRgn hard-clips the WebView2
+        // surface and leaves a white antialiased crescent on some GPUs.
     }
 
     crate::logging::write_log("window effects: mica/acrylic + rounded corners");
