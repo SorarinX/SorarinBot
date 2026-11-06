@@ -62,7 +62,7 @@ button:focus-visible, input:focus-visible, summary:focus-visible, .dropzone:focu
   flex-direction: column;
   padding: 30px 26px 22px;
   color: #e8f4ef;
-  border-radius: 18px 0 0 18px;
+  border-radius: 0;
   background:
     radial-gradient(120% 90% at 0% 0%, #0b4a3d 0%, transparent 58%),
     linear-gradient(160deg, #07352b 0%, #041b16 62%, #03120f 100%);
