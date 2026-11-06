@@ -20,7 +20,7 @@ New-Item -ItemType Directory -Path $stage -Force | Out-Null
 
 try {
     Copy-Item -LiteralPath $ExePath -Destination (Join-Path $stage 'SorarinBot.exe')
-    Copy-Item -LiteralPath (Join-Path $RepoRoot 'winres\icon.ico') -Destination (Join-Path $stage 'icon.ico')
+    Copy-Item -LiteralPath (Join-Path $RepoRoot 'electron\icon.ico') -Destination (Join-Path $stage 'icon.ico')
     New-Item -ItemType File -Path (Join-Path $stage 'config.yaml') -Force | Out-Null
 
     foreach ($name in @('LICENSE', 'NOTICE', 'PRIVACY.md', 'README.md', 'README.zh-CN.md', 'THIRD_PARTY_NOTICES.md')) {
