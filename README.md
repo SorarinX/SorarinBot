@@ -40,7 +40,7 @@
 - **Portable ZIP:** [latest release assets](https://github.com/SorarinX/SorarinBot/releases/latest)
 - **All releases:** <https://github.com/SorarinX/SorarinBot/releases>
 
-Windows builds are code-signed through the [SignPath Foundation](https://signpath.org/) free open-source code-signing program. See the [Privacy Policy](PRIVACY.md).
+Windows builds are submitted to the [SignPath Foundation](https://signpath.org/) for code signing under its free open-source program. See the [Privacy Policy](PRIVACY.md).
 
 ## 📑 Contents
 

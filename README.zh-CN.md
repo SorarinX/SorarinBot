@@ -40,7 +40,7 @@
 - **便携版 ZIP：** [最新 Release 资产](https://github.com/SorarinX/SorarinBot/releases/latest)
 - **所有版本：** <https://github.com/SorarinX/SorarinBot/releases>
 
-Windows 构建通过 [SignPath Foundation](https://signpath.org/) 的免费开源代码签名计划签名。隐私说明见 [PRIVACY.md](PRIVACY.md)。
+Windows 构建已提交至 [SignPath Foundation](https://signpath.org/) 的免费开源代码签名计划。隐私说明见 [PRIVACY.md](PRIVACY.md)。
 
 ## 📑 目录
 
