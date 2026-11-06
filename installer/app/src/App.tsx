@@ -451,11 +451,11 @@ function App() {
       <main className="main">
         <header
           className="titlebar"
-          data-tauri-drag-region
-          onMouseDown={(event) => {
+          onPointerDown={(event) => {
             const target = event.target as HTMLElement;
             if (target.closest("button, input, summary, a")) return;
-            void startDraggingWindow();
+            event.preventDefault();
+            void startDraggingWindow(event.nativeEvent);
           }}
         >
           <nav className="wizard" aria-label="安装进度">

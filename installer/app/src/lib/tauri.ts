@@ -12,9 +12,30 @@ export async function onEvent<T>(event: string, handler: (payload: T) => void): 
   return listen<T>(event, (message) => handler(message.payload));
 }
 
-export async function startDraggingWindow(): Promise<void> {
+export async function startDraggingWindow(event: PointerEvent): Promise<void> {
   if (!isTauri()) return;
-  await invoke("start_window_drag");
+  const { getCurrentWindow, PhysicalPosition } = await import("@tauri-apps/api/window");
+  const appWindow = getCurrentWindow();
+  const origin = await appWindow.outerPosition();
+  const scale = await appWindow.scaleFactor();
+  const startX = event.screenX;
+  const startY = event.screenY;
+  let active = true;
+
+  const onMove = (moveEvent: PointerEvent) => {
+    if (!active) return;
+    const x = origin.x + Math.round((moveEvent.screenX - startX) * scale);
+    const y = origin.y + Math.round((moveEvent.screenY - startY) * scale);
+    void appWindow.setPosition(new PhysicalPosition(x, y));
+  };
+  const onUp = () => {
+    active = false;
+    window.removeEventListener("pointermove", onMove);
+    window.removeEventListener("pointerup", onUp);
+  };
+
+  window.addEventListener("pointermove", onMove);
+  window.addEventListener("pointerup", onUp, { once: true });
 }
 
 export async function minimizeWindow(): Promise<void> {
