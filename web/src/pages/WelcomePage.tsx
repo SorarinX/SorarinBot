@@ -203,20 +203,6 @@ export default function WelcomePage() {
       <div className="welcome-inner">
         <header className="welcome-topbar" data-window-drag>
           <div className="welcome-wordmark">SorarinBot</div>
-
-          <div className="welcome-top-actions">
-            <a
-              className="welcome-github"
-              href={GITHUB_URL}
-              target="_blank"
-              rel="noreferrer noopener"
-              aria-label="在 GitHub 上查看 SorarinBot"
-              title="GitHub"
-            >
-              <GithubIcon />
-              <span className="welcome-github-label">GitHub</span>
-            </a>
-          </div>
         </header>
 
         <main className="welcome-main">
@@ -330,7 +316,20 @@ export default function WelcomePage() {
             本地运行 <span aria-hidden="true">·</span> 数据不出机器{" "}
             <span aria-hidden="true">·</span> 开源可审计
           </p>
-          <span className="welcome-footer-version">{APP_VERSION}</span>
+          <div className="welcome-footer-meta">
+            <a
+              className="welcome-github welcome-github-footer"
+              href={GITHUB_URL}
+              target="_blank"
+              rel="noreferrer noopener"
+              aria-label="在 GitHub 上查看 SorarinBot"
+              title="GitHub"
+            >
+              <GithubIcon />
+              <span>GitHub</span>
+            </a>
+            <span className="welcome-footer-version">{APP_VERSION}</span>
+          </div>
         </footer>
       </div>
     </div>

@@ -285,7 +285,6 @@ html.is-electron .welcome-drag-strip {
 }
 html.is-electron .welcome-topbar {
   -webkit-app-region: no-drag;
-  padding-right: 138px;
 }
 html.is-electron .welcome-topbar a,
 html.is-electron .welcome-topbar button {
@@ -500,6 +499,18 @@ html.is-electron .welcome-topbar button {
 
 .welcome-footer-spec {
   margin: 0;
+}
+
+.welcome-footer-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.welcome-github-footer {
+  height: 28px;
+  padding: 0 10px;
+  font-size: 11px;
 }
 
 .welcome-footer-version {

@@ -141,7 +141,7 @@ function createWindow() {
     autoHideMenuBar: true,
     titleBarStyle: 'hidden',
     titleBarOverlay: {
-      color: '#0f1211',
+      color: '#00000000',
       symbolColor: '#9fe9d8',
       height: 56,
     },
@@ -200,7 +200,7 @@ ipcMain.on('titlebar-theme', (event, theme) => {
   const light = theme === 'light'
   try {
     win.setTitleBarOverlay({
-      color: light ? '#f7f7f5' : '#0f1211',
+      color: '#00000000',
       symbolColor: light ? '#0a8f7b' : '#9fe9d8',
       height: 56,
     })

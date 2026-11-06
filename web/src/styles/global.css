@@ -69,6 +69,8 @@ html.dark {
     color: var(--text);
     font-family: var(--font-ui);
     font-size: 14px;
+    font-weight: 500;
+    font-synthesis: none;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -221,6 +223,49 @@ html.dark {
   .app-ambient {
     left: 0;
   }
+}
+
+.app-topbar-context {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.app-topbar-context strong {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.app-topbar-slash {
+  color: var(--border-strong);
+}
+.app-topbar-settings {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 12px;
+  transition: background var(--dur-hover) var(--ease-out), color var(--dur-hover) var(--ease-out), border-color var(--dur-hover) var(--ease-out);
+}
+.app-topbar-settings:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+}
+.app-topbar-settings .icon,
+.app-topbar-settings svg {
+  width: 15px;
+  height: 15px;
 }
 
 /* Electron titlebar overlay: the native min/max/close buttons sit at the

@@ -11,7 +11,10 @@ body {
   background: transparent;
   color: var(--text);
   font-family: var(--font-ui);
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 500;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
   overflow: hidden;
   user-select: none;
 }

@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   formatInteger,
   formatUptime,
@@ -45,6 +45,7 @@ export default function DashboardPage() {
     retrying,
     retryLogin,
   } = useDashboard();
+  const navigate = useNavigate();
 
   const connecting = mode === "connecting";
   const isDemo = mode === "demo";
@@ -104,7 +105,10 @@ export default function DashboardPage() {
           <button
             type="button"
             className="dash-retry"
-            onClick={() => void retryLogin()}
+            onClick={() => {
+              navigate("/");
+              void retryLogin();
+            }}
             disabled={retrying}
             aria-busy={retrying}
             title="重新发起微信登录"
